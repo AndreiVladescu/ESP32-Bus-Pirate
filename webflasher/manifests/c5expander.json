@@ -5,9 +5,9 @@
     {
       "chipFamily": "ESP32-C5",
       "parts": [
-        { "path": "bus_expander_bootloader.bin", "offset": 0 },
-        { "path": "bus_expander_partitions.bin", "offset": 32768 },
-        { "path": "bus_expander_firmware.bin", "offset": 65536 }
+        { "path": "https://geo-tp.github.io/ESP32-Bus-Pirate/webflasher/firmwares/bus_expander_bootloader.bin", "offset": 0 },
+        { "path": "https://geo-tp.github.io/ESP32-Bus-Pirate/webflasher/firmwares/bus_expander_partitions.bin", "offset": 32768 },
+        { "path": "https://geo-tp.github.io/ESP32-Bus-Pirate/webflasher/firmwares/bus_expander_firmware.bin", "offset": 65536 }
       ]
     }
   ]
