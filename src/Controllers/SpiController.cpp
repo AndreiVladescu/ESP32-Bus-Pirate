@@ -226,19 +226,23 @@ Config
 void SpiController::handleConfig() {
     terminalView.println("SPI Configuration:");
 
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
 
     uint8_t mosi = userInputManager.readValidatedPinNumber("MOSI GPIO", state.getSpiMOSIPin(), forbidden);
     state.setSpiMOSIPin(mosi);
+    forbidden.push_back(mosi);
 
     uint8_t miso = userInputManager.readValidatedPinNumber("MISO GPIO", state.getSpiMISOPin(), forbidden);
     state.setSpiMISOPin(miso);
+    forbidden.push_back(miso);
 
     uint8_t sclk = userInputManager.readValidatedPinNumber("SCLK GPIO", state.getSpiCLKPin(), forbidden);
     state.setSpiCLKPin(sclk);
+    forbidden.push_back(sclk);
 
     uint8_t cs = userInputManager.readValidatedPinNumber("CS GPIO", state.getSpiCSPin(), forbidden);
     state.setSpiCSPin(cs);
+    forbidden.push_back(cs);
 
     uint32_t freqMhz = state.getSpiFrequency() / 1000000;
     uint32_t freq = userInputManager.readValidatedUint8("Frequency (MHz)", freqMhz, 1, 80) * 1000000;

@@ -609,11 +609,13 @@ Config
 void InfraredController::handleConfig() {
     terminalView.println("\nInfrared Configuration:");
 
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
 
     uint8_t txPin = userInputManager.readValidatedPinNumber("Infrared TX GPIO", state.getInfraredTxPin(), forbidden);
+    forbidden.push_back(txPin);
     uint8_t rxPin = userInputManager.readValidatedPinNumber("Infrared RX GPIO", state.getInfraredRxPin(), forbidden);
-
+    forbidden.push_back(rxPin);
+    
     state.setInfraredTxPin(txPin);
     state.setInfraredRxPin(rxPin);
     infraredService.configure(txPin, rxPin);

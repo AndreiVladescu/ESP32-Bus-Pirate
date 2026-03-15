@@ -173,7 +173,7 @@ void CanController::handleConfig() {
     terminalView.println("CAN Configuration:");
     terminalView.println("\nMake sure you are using an MCP2515 CAN module.\n");
     
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
 
     // CS pin is fixed, no need to configure
     uint8_t cs = state.getCanCspin();
@@ -184,14 +184,17 @@ void CanController::handleConfig() {
     // Configure SCK
     uint8_t sck = userInputManager.readValidatedPinNumber("MCP2515 SCK GPIO", state.getCanSckPin(), forbidden);
     state.setCanSckPin(sck);
+    forbidden.push_back(sck);
 
     // Configure SI (MOSI)
     uint8_t si = userInputManager.readValidatedPinNumber("MCP2515 SI (MOSI) GPIO", state.getCanSiPin(), forbidden);
     state.setCanSiPin(si);
+    forbidden.push_back(si);
 
     // Configure SO (MISO)
     uint8_t so = userInputManager.readValidatedPinNumber("MCP2515 SO (MISO) GPIO", state.getCanSoPin(), forbidden);
     state.setCanSoPin(so);
+    forbidden.push_back(so);
 
     // Configure bitrate
     uint32_t kbps = userInputManager.readValidatedUint32("Speed in kbps", state.getCanKbps());

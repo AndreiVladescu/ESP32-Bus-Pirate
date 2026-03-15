@@ -334,16 +334,19 @@ Config
 void I2sController::handleConfig() {
     terminalView.println("I2S Configuration:");
 
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
 
     uint8_t bclk = userInputManager.readValidatedPinNumber("BCLK GPIO", state.getI2sBclkPin(), forbidden);
     state.setI2sBclkPin(bclk);
+    forbidden.push_back(bclk);
 
     uint8_t lrck = userInputManager.readValidatedPinNumber("LRCK/WS GPIO", state.getI2sLrckPin(), forbidden);
     state.setI2sLrckPin(lrck);
+    forbidden.push_back(lrck);
 
     uint8_t data = userInputManager.readValidatedPinNumber("DATA GPIO", state.getI2sDataPin(), forbidden);
     state.setI2sDataPin(data);
+    forbidden.push_back(data);
 
     uint32_t freq = userInputManager.readValidatedUint32("Sample rate (e.g. 44100)", state.getI2sSampleRate());
     state.setI2sSampleRate(freq);

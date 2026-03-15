@@ -318,13 +318,15 @@ Config
 void RfidController::handleConfig() {
     terminalView.println("RFID Configuration:");
 
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
 
     uint8_t sda = userInputManager.readValidatedPinNumber("PN532 SDA GPIO", state.getRfidSdaPin(), forbidden);
     state.setRfidSdaPin(sda);
+    forbidden.push_back(sda);
 
     uint8_t scl = userInputManager.readValidatedPinNumber("PN532 SCL GPIO", state.getRfidSclPin(), forbidden);
     state.setRfidSclPin(scl);
+    forbidden.push_back(scl);
 
     // Configure + begin
     rfidService.configure(sda, scl);

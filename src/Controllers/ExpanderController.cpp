@@ -111,7 +111,7 @@ Config
 void ExpanderController::handleConfig() {
     terminalView.println("Expander UART Configuration:");
 
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
 
     uint8_t rxPin = userInputManager.readValidatedPinNumber(
         "RX GPIO number",
@@ -119,6 +119,7 @@ void ExpanderController::handleConfig() {
         forbidden
     );
     state.setUartRxPin(rxPin);
+    forbidden.push_back(rxPin);
 
     uint8_t txPin = userInputManager.readValidatedPinNumber(
         "TX GPIO number",
@@ -126,6 +127,7 @@ void ExpanderController::handleConfig() {
         forbidden
     );
     state.setUartTxPin(txPin);
+    forbidden.push_back(txPin);
 
     uint32_t config = uartService.buildUartConfig(dataBits, parityChar, stopBits);
     uartService.configure(baud, config, rxPin, txPin, inverted);

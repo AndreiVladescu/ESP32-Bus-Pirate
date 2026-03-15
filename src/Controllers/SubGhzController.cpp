@@ -1036,23 +1036,28 @@ Config CC1101
 void SubGhzController::handleConfig() {
     terminalView.println("\nSubGHz Configuration:");
 
-    const auto& forbidden = state.getProtectedPins();    
+    auto forbidden = state.getProtectedPins();    
 
     // CC1101 pins
     uint8_t sck  = userInputManager.readValidatedPinNumber("CC1101 SCK GPIO",  state.getSubGhzSckPin(),  forbidden);
     state.setSubGhzSckPin(sck);
+    forbidden.push_back(sck);
 
     uint8_t miso = userInputManager.readValidatedPinNumber("CC1101 MISO GPIO", state.getSubGhzMisoPin(), forbidden);
     state.setSubGhzMisoPin(miso);
+    forbidden.push_back(miso);
 
     uint8_t mosi = userInputManager.readValidatedPinNumber("CC1101 MOSI GPIO", state.getSubGhzMosiPin(), forbidden);
     state.setSubGhzMosiPin(mosi);
+    forbidden.push_back(mosi);
 
     uint8_t ss   = userInputManager.readValidatedPinNumber("CC1101 SS/CS GPIO", state.getSubGhzCsPin(), forbidden);
     state.setSubGhzCsPin(ss);
+    forbidden.push_back(ss);
 
     uint8_t gdo0 = userInputManager.readValidatedPinNumber("CC1101 GDO0 GPIO", state.getSubGhzGdoPin(), forbidden);
     state.setSubGhzGdoPin(gdo0);
+    forbidden.push_back(gdo0);
 
     float freq = state.getSubGhzFrequency(); 
     

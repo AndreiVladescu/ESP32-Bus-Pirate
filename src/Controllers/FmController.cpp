@@ -71,11 +71,13 @@ void FmController::handleConfig() {
 
     terminalView.println("FM (SI4713) configuration.\n");
 
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
 
     // I2C
     uint8_t sdaPin = (uint8_t)userInputManager.readValidatedPinNumber("SI4713 SDA GPIO", state.getTwoWireIoPin(), forbidden);
+    forbidden.push_back(sdaPin);
     uint8_t sclPin = (uint8_t)userInputManager.readValidatedPinNumber("SI4713 SCL GPIO", state.getTwoWireClkPin(), forbidden);
+    forbidden.push_back(sclPin);
 
     // RST
     terminalView.println("\n [ℹ️  INFORMATIONS]");

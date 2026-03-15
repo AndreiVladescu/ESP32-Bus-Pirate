@@ -575,21 +575,66 @@ void Rf24Controller::handleSetChannel() {
 NRF24 Configuration
 */
 void Rf24Controller::handleConfig() {
-    uint8_t csn = userInputManager.readValidatedInt("NRF24 CSN GPIO?", state.getRf24CsnPin());
-    uint8_t sck  = userInputManager.readValidatedInt("NRF24 SCK GPIO?", state.getRf24SckPin());
-    uint8_t miso = userInputManager.readValidatedInt("NRF24 MISO GPIO?", state.getRf24MisoPin());
-    uint8_t mosi = userInputManager.readValidatedInt("NRF24 MOSI GPIO?", state.getRf24MosiPin());
-    uint8_t ce  = userInputManager.readValidatedInt("NRF24 CE GPIO?", state.getRf24CePin());
+
+    auto forbidden = state.getProtectedPins();
+
+    uint8_t csn = userInputManager.readValidatedPinNumber(
+        "NRF24 CSN GPIO?",
+        state.getRf24CsnPin(),
+        forbidden
+    );
+    forbidden.push_back(csn);
+
+    uint8_t sck = userInputManager.readValidatedPinNumber(
+        "NRF24 SCK GPIO?",
+        state.getRf24SckPin(),
+        forbidden
+    );
+    forbidden.push_back(sck);
+
+    uint8_t miso = userInputManager.readValidatedPinNumber(
+        "NRF24 MISO GPIO?",
+        state.getRf24MisoPin(),
+        forbidden
+    );
+    forbidden.push_back(miso);
+
+    uint8_t mosi = userInputManager.readValidatedPinNumber(
+        "NRF24 MOSI GPIO?",
+        state.getRf24MosiPin(),
+        forbidden
+    );
+    forbidden.push_back(mosi);
+
+    uint8_t ce = userInputManager.readValidatedPinNumber(
+        "NRF24 CE GPIO?",
+        state.getRf24CePin(),
+        forbidden
+    );
+    forbidden.push_back(ce);
+
     state.setRf24CsnPin(csn);
     state.setRf24SckPin(sck);
     state.setRf24MisoPin(miso);
     state.setRf24MosiPin(mosi);
     state.setRf24CePin(ce);
 
-    bool ok = rf24Service.configure(csn, ce, sck, miso, mosi, deviceView.getSharedSpiInstance());
+    bool ok = rf24Service.configure(
+        csn,
+        ce,
+        sck,
+        miso,
+        mosi,
+        deviceView.getSharedSpiInstance()
+    );
 
-    configured = true; // consider configured even if not detected to avoid re-asking
-    terminalView.println(ok ? "\n ✅ NRF24 detected and configured.\n" : "\n ❌ NRF24 not detected. Check wiring.\n");
+    configured = true;
+
+    terminalView.println(
+        ok
+        ? "\n ✅ NRF24 detected and configured.\n"
+        : "\n ❌ NRF24 not detected. Check wiring.\n"
+    );
 }
 
 /*

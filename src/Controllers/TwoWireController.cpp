@@ -124,16 +124,19 @@ Configuration
 */
 void TwoWireController::handleConfig() {
     terminalView.println("2WIRE Configuration:");
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
 
     uint8_t clk = userInputManager.readValidatedPinNumber("CLK GPIO", state.getTwoWireClkPin(), forbidden);
     state.setTwoWireClkPin(clk);
+    forbidden.push_back(clk);
 
     uint8_t io = userInputManager.readValidatedPinNumber("IO GPIO", state.getTwoWireIoPin(), forbidden);
     state.setTwoWireIoPin(io);
+    forbidden.push_back(io);
 
     uint8_t rst = userInputManager.readValidatedPinNumber("RST GPIO", state.getTwoWireRstPin(), forbidden);
     state.setTwoWireRstPin(rst);
+    forbidden.push_back(rst);
 
     twoWireService.configure(clk, io, rst);
 

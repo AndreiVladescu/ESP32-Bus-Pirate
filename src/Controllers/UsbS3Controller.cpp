@@ -462,19 +462,23 @@ void UsbS3Controller::handleConfig() {
     auto confirm = userInputManager.readYesNo("Configure SD card GPIOs for USB?", false);
 
     if (confirm) {
-        const auto& forbidden = state.getProtectedPins();
+        auto forbidden = state.getProtectedPins();
     
         uint8_t cs = userInputManager.readValidatedPinNumber("SD Card CS GPIO", state.getSdCardCsPin(), forbidden);
         state.setSdCardCsPin(cs);
+        forbidden.push_back(cs);
     
         uint8_t clk = userInputManager.readValidatedPinNumber("SD Card CLK GPIO", state.getSdCardClkPin(), forbidden);
         state.setSdCardClkPin(clk);
+        forbidden.push_back(clk);
     
         uint8_t miso = userInputManager.readValidatedPinNumber("SD Card MISO GPIO", state.getSdCardMisoPin(), forbidden);
         state.setSdCardMisoPin(miso);
+        forbidden.push_back(miso);
     
         uint8_t mosi = userInputManager.readValidatedPinNumber("SD Card MOSI GPIO", state.getSdCardMosiPin(), forbidden);
         state.setSdCardMosiPin(mosi);
+        forbidden.push_back(mosi);
     }
 
     std::string productString = userInputManager.readSanitizedString("USB Product String", state.getUSBProductString(), false);

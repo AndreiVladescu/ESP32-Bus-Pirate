@@ -52,7 +52,7 @@ Config W5500
 void EthernetController::handleConfig() {
     terminalView.println("Ethernet (W5500) Configuration:");
 
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
     uint8_t defCS   = state.getEthernetCsPin();
     uint8_t defRST  = state.getEthernetRstPin();
     uint8_t defSCK  = state.getEthernetSckPin();
@@ -63,10 +63,15 @@ void EthernetController::handleConfig() {
 
     // User input for configuration
     uint8_t cs   = userInputManager.readValidatedPinNumber("W5500 CS GPIO",   defCS,   forbidden);
+    forbidden.push_back(cs);
     uint8_t sck  = userInputManager.readValidatedPinNumber("W5500 SCK GPIO",  defSCK,  forbidden);
+    forbidden.push_back(sck);
     uint8_t miso = userInputManager.readValidatedPinNumber("W5500 MISO GPIO", defMISO, forbidden);
+    forbidden.push_back(miso);
     uint8_t mosi = userInputManager.readValidatedPinNumber("W5500 MOSI GPIO", defMOSI, forbidden);
+    forbidden.push_back(mosi);
     uint8_t irq  = userInputManager.readValidatedPinNumber("W5500 IRQ GPIO",  defIRQ,  forbidden);
+    forbidden.push_back(irq);
 
     // RST optional
     bool useReset = userInputManager.readYesNo(

@@ -770,13 +770,15 @@ Config
 void UartController::handleConfig() {
     terminalView.println("UART Configuration:");
 
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
 
     uint8_t rxPin = userInputManager.readValidatedPinNumber("RX GPIO number", state.getUartRxPin(), forbidden);
     state.setUartRxPin(rxPin);
+    forbidden.push_back(rxPin);
 
     uint8_t txPin = userInputManager.readValidatedPinNumber("TX GPIO number", state.getUartTxPin(), forbidden);
     state.setUartTxPin(txPin);
+    forbidden.push_back(txPin);
 
     uint32_t baud = userInputManager.readValidatedUint32("Baud rate", state.getUartBaudRate());
     state.setUartBaudRate(baud);

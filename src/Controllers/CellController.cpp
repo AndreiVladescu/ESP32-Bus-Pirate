@@ -65,13 +65,15 @@ void CellController::handleConfig()
 {
     terminalView.println("Cell configuration");
 
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
 
     uint8_t rx = userInputManager.readValidatedPinNumber("MODEM RX GPIO", state.getUartRxPin(), forbidden);
     state.setUartRxPin(rx);
+    forbidden.push_back(rx);
 
     uint8_t tx = userInputManager.readValidatedPinNumber("MODEM TX GPIO", state.getUartTxPin(), forbidden);
     state.setUartTxPin(tx);
+    forbidden.push_back(tx);
 
     const uint32_t defaultModemBaud = 115200; // common default baudrate for modems
     uint32_t baud = userInputManager.readValidatedUint32("Baudrate", defaultModemBaud);

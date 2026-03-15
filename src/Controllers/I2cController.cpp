@@ -294,14 +294,16 @@ Config
 void I2cController::handleConfig() {
     terminalView.println("I2C Configuration:");
 
-    const auto& forbidden = state.getProtectedPins();
+    auto forbidden = state.getProtectedPins();
 
     uint8_t sda = userInputManager.readValidatedPinNumber("SDA GPIO", state.getI2cSdaPin(), forbidden);
     state.setI2cSdaPin(sda);
+    forbidden.push_back(sda);
 
     uint8_t scl = userInputManager.readValidatedPinNumber("SCL GPIO", state.getI2cSclPin(), forbidden);
     state.setI2cSclPin(scl);
-
+    forbidden.push_back(scl);
+    
     uint32_t freq = userInputManager.readValidatedUint32("Frequency", state.getI2cFrequency());
     state.setI2cFrequency(freq);
 
