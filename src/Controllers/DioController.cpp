@@ -49,14 +49,14 @@ Read
 */
 void DioController::handleReadPin(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: read <pin>");
+        terminalView.println("Usage: read <GPIO>");
         return;
     }
 
     uint8_t pin = argTransformer.toUint8(cmd.getSubcommand());
     if (!isPinAllowed(pin, "Read")) return;
     int value = pinService.read(pin);
-    terminalView.println("Pin " + std::to_string(pin) + " = " + std::to_string(value) + (value ? " (HIGH)" : " (LOW)"));
+    terminalView.println("GPIO " + std::to_string(pin) + " = " + std::to_string(value) + (value ? " (HIGH)" : " (LOW)"));
 }
 
 /*
@@ -64,7 +64,7 @@ Set
 */
 void DioController::handleSetPin(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: set <pin> <IN/OUT/HI/LOW>");
+        terminalView.println("Usage: set <GPIO> <IN/OUT/HI/LOW>");
         return;
     }
 
@@ -81,11 +81,11 @@ void DioController::handleSetPin(const TerminalCommand& cmd) {
     switch (c) {
         case 'I':
             pinService.setInput(pin);
-            terminalView.println("DIO Set: Pin " + std::to_string(pin) + " set to INPUT");
+            terminalView.println("DIO Set: GPIO " + std::to_string(pin) + " set to INPUT");
             break;
         case 'O':
             pinService.setOutput(pin);
-            terminalView.println("DIO Set: Pin " + std::to_string(pin) + " set to OUTPUT");
+            terminalView.println("DIO Set: GPIO " + std::to_string(pin) + " set to OUTPUT");
             break;
         case 'H':
         case '1':
@@ -125,7 +125,7 @@ void DioController::handleScan(const TerminalCommand& cmd) {
 
     // Limit
     if (pins.size() > 8) {
-        terminalView.println("Too many pins selected, limiting to first 8.");
+        terminalView.println("Too many GPIOs selected, limiting to first 8.");
         pins.resize(8);
     }
 
@@ -139,7 +139,7 @@ void DioController::handleScan(const TerminalCommand& cmd) {
     }
 
     if (validPins.empty()) {
-        terminalView.println("DIO Scan: No valid pins selected.");
+        terminalView.println("DIO Scan: No valid GPIOs selected.");
         return;
     }
 
@@ -205,7 +205,7 @@ void DioController::handleScan(const TerminalCommand& cmd) {
         if (now - lastPrint >= 2000) {
             lastPrint = now;
 
-            terminalView.println("Active pins:");
+            terminalView.println("Active GPIOs:");
 
             // Find max digits for align
             size_t maxEdgeDigits = 1;
@@ -306,7 +306,7 @@ void DioController::handlePins(const TerminalCommand& cmd) {
     }
 
     if (validPins.empty()) {
-        terminalView.println("\nDIO Pins: No usable pins (all protected?).\n");
+        terminalView.println("\nDIO Pins: No usable GPIOs (all protected?).\n");
         return;
     }
 
@@ -344,7 +344,7 @@ Pullup
 */
 void DioController::handlePullup(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: pullup <pin>");
+        terminalView.println("Usage: pullup <GPIO>");
         return;
     }
 
@@ -352,7 +352,7 @@ void DioController::handlePullup(const TerminalCommand& cmd) {
     if (!isPinAllowed(pin, "Pullup")) return;
     pinService.setInputPullup(pin);
 
-    terminalView.println("DIO Pullup: Set on pin " + std::to_string(pin));
+    terminalView.println("DIO Pullup: Set on GPIO " + std::to_string(pin));
 }
 
 /*
@@ -360,7 +360,7 @@ Pulldown
 */
 void DioController::handlePulldown(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: pulldown <pin>");
+        terminalView.println("Usage: pulldown <GPIO>");
         return;
     }
 
@@ -368,7 +368,7 @@ void DioController::handlePulldown(const TerminalCommand& cmd) {
     if (!isPinAllowed(pin, "Pulldown")) return;
     pinService.setInputPullDown(pin);
 
-    terminalView.println("DIO Pulldown: Set on pin " + std::to_string(pin));
+    terminalView.println("DIO Pulldown: Set on GPIO " + std::to_string(pin));
 }
 
 /*
@@ -376,7 +376,7 @@ Sniff
 */
 void DioController::handleSniff(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: sniff <pin>");
+        terminalView.println("Usage: sniff <GPIO>");
         return;
     }
 
@@ -389,7 +389,7 @@ void DioController::handleSniff(const TerminalCommand& cmd) {
     else if (pull == PinService::PULL_DOWN) pinService.setInputPullDown(pin);
     else                                   pinService.setInput(pin);
 
-    terminalView.println("DIO Sniff: Pin " + std::to_string(pin) + "... Press [ENTER] to stop");
+    terminalView.println("DIO Sniff: GPIO " + std::to_string(pin) + "... Press [ENTER] to stop");
     uint8_t last = pinService.read(pin);
     terminalView.println("\nInitial state: " + std::string(last ? "HIGH" : "LOW"));
     terminalView.println("");
@@ -419,7 +419,7 @@ void DioController::handleSniff(const TerminalCommand& cmd) {
                 : "HIGH -> LOW ";
 
             terminalView.println(
-                "Pin " + std::to_string(pin) + ": " + transition +
+                "GPIO " + std::to_string(pin) + ": " + transition +
                 " | delta=" + std::to_string(dtUs) + "us"
             );
 
@@ -435,9 +435,9 @@ void DioController::handlePwm(const TerminalCommand& cmd) {
     auto sub = cmd.getSubcommand();
     auto args = argTransformer.splitArgs(cmd.getArgs());
 
-    // Validate pin
+    // Validate GPIO
     if (sub.empty() || !argTransformer.isValidNumber(sub)) {
-        terminalView.println("Usage: pwm <pin> [frequency] [duty]");
+        terminalView.println("Usage: pwm <GPIO> [frequency] [duty]");
         return;
     }
 
@@ -471,7 +471,7 @@ void DioController::handlePwm(const TerminalCommand& cmd) {
          return;
     }
 
-    terminalView.println("\nDIO PWM: Pin " + std::to_string(pin) +
+    terminalView.println("\nDIO PWM: GPIO " + std::to_string(pin) +
                          " (" + std::to_string(freq) + "Hz, " +
                          std::to_string(duty) + "% duty)... Use 'reset " + 
                          std::to_string(pin) + "' to stop.\n");
@@ -485,12 +485,12 @@ void DioController::handleMeasure(const TerminalCommand& cmd) {
     auto args = argTransformer.splitArgs(cmd.getArgs());
 
     if (cmd.getSubcommand().empty()) {
-        terminalView.println("Usage: measure <pin> [duration_ms]");
+        terminalView.println("Usage: measure <GPIO> [duration_ms]");
         return;
     }
 
     if (!argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("DIO Measure: Invalid pin number.");
+        terminalView.println("DIO Measure: Invalid GPIO number.");
         return;
     }
 
@@ -505,7 +505,7 @@ void DioController::handleMeasure(const TerminalCommand& cmd) {
         }
     }
 
-    terminalView.println("DIO Measure: Sampling pin " + std::to_string(pin) +
+    terminalView.println("DIO Measure: Sampling GPIO " + std::to_string(pin) +
                          " for " + std::to_string(durationMs) + " ms...");
 
     PinService::pullType pull =  pinService.getPullType(pin);
@@ -562,7 +562,7 @@ void DioController::handleTogglePin(const TerminalCommand& cmd) {
     auto args = argTransformer.splitArgs(cmd.getArgs());
     
     if (cmd.getSubcommand().empty() || args.empty()) {
-        terminalView.println("Usage: toggle <pin> <ms>");
+        terminalView.println("Usage: toggle <GPIO> <ms>");
         return;
     }
     
@@ -580,7 +580,7 @@ void DioController::handleTogglePin(const TerminalCommand& cmd) {
     pinService.setOutput(pin);
     bool state = false;
 
-    terminalView.println("\nDIO Toggle: Pin " + std::to_string(pin) + " every " + std::to_string(intervalMs) + "ms...Press [ENTER] to stop.");
+    terminalView.println("\nDIO Toggle: GPIO " + std::to_string(pin) + " every " + std::to_string(intervalMs) + "ms...Press [ENTER] to stop.");
     terminalView.println("");
 
     unsigned long lastToggle = millis();
@@ -599,7 +599,7 @@ void DioController::handleTogglePin(const TerminalCommand& cmd) {
             }
         }
 
-        // toggle pin at defined interval
+        // toggle GPIO at defined interval
         if (now - lastToggle >= intervalMs) {
             lastToggle = now;
             state = !state;
@@ -617,12 +617,12 @@ Reset
 */
 void DioController::handleResetPin(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty()) {
-        terminalView.println("Usage: reset <pin>");
+        terminalView.println("Usage: reset <GPIO>");
         return;
     }
 
     if (!argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("DIO Reset: Invalid pin number.");
+        terminalView.println("DIO Reset: Invalid GPIO number.");
         return;
     }
 
@@ -634,12 +634,12 @@ void DioController::handleResetPin(const TerminalCommand& cmd) {
     // Reset Pullup
     pinService.setInput(pin);
 
-    terminalView.println("DIO Reset: Pin " + std::to_string(pin) + " to INPUT (no pull-up, no PWM).");
+    terminalView.println("DIO Reset: GPIO " + std::to_string(pin) + " to INPUT (no pull-up, no PWM).");
 }
 
 void DioController::handleServo(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || cmd.getArgs().empty()) {
-        terminalView.println("Usage: servo <pin> <angle>");
+        terminalView.println("Usage: servo <GPIO> <angle>");
         return;
     }
 
@@ -654,7 +654,7 @@ void DioController::handleServo(const TerminalCommand& cmd) {
 
     uint8_t angle = argTransformer.parseHexOrDec(cmd.getArgs());
     pinService.setServoAngle(pin, angle);
-    terminalView.println("DIO Servo: Set pin " + std::to_string(pin) + 
+    terminalView.println("DIO Servo: Set GPIO " + std::to_string(pin) + 
                          " to angle " + std::to_string(angle) + 
                          "... Use 'reset " + std::to_string(pin) + "' to stop.");
 }
@@ -664,7 +664,7 @@ Pulse
 */
 void DioController::handlePulse(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || cmd.getArgs().empty()) {
-        terminalView.println("Usage: pulse <pin> <duration_us>");
+        terminalView.println("Usage: pulse <GPIO> <duration_us>");
         return;
     }
 
@@ -696,7 +696,7 @@ void DioController::handlePulse(const TerminalCommand& cmd) {
     else      pinService.setLow(pin);
 
     terminalView.println(
-        "DIO Pulse: Pin " + std::to_string(pin) +
+        "DIO Pulse: GPIO " + std::to_string(pin) +
         " pulsed " + std::string(pulseLevel ? "HIGH" : "LOW") +
         " for " + std::to_string(durationUs) + " us."
     );
@@ -712,7 +712,7 @@ void DioController::handleJamPin(const TerminalCommand& cmd) {
     uint32_t maxUs = 100;
 
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: jam <pin> [min_us] [max_us]");
+        terminalView.println("Usage: jam <GPIO> [min_us] [max_us]");
         return;
     }
 
@@ -732,7 +732,7 @@ void DioController::handleJamPin(const TerminalCommand& cmd) {
 
     pinService.setOutput(pin);
 
-    terminalView.println("DIO Jam: Pin " + std::to_string(pin) +
+    terminalView.println("DIO Jam: GPIO " + std::to_string(pin) +
                          " random toggle [" + std::to_string(minUs) + ".." + std::to_string(maxUs) +
                          "] us... Press [ENTER] to stop.");
     terminalView.println("");
@@ -774,17 +774,17 @@ bool DioController::isPinAllowed(uint8_t pin, const std::string& context) {
     const auto& protectedPins = state.getProtectedPins();
     
     if (std::find(protectedPins.begin(), protectedPins.end(), pin) != protectedPins.end()) {
-        terminalView.println("DIO " + context + ": Pin " + std::to_string(pin) + " is protected and cannot be used.");
+        terminalView.println("DIO " + context + ": GPIO " + std::to_string(pin) + " is protected and cannot be used.");
         return false;
     }
 
     if (pin > 48 /* max pin for S3 */) {
-        terminalView.println("DIO " + context + ": Pin " + std::to_string(pin) + " is out of range (0-48).");
+        terminalView.println("DIO " + context + ": GPIO " + std::to_string(pin) + " is out of range (0-48).");
         return false;
     }
 
     if (pin < 0) {
-        terminalView.println("DIO " + context + ": Pin " + std::to_string(pin) + " is invalid.");
+        terminalView.println("DIO " + context + ": GPIO " + std::to_string(pin) + " is invalid.");
         return false;
     }
 

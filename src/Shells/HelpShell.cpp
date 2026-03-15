@@ -103,13 +103,13 @@ void HelpShell::cmdGeneral() {
         "mode [name]          - Set active mode",
         "man                  - Show firmware guide",
         "system               - Show system infos",
-        "profile              - Save/load pins config",
+        "profile              - Save/load GPIOs config",
         "alias                - Create shortcut",
         "hex [number]         - Convert dec/hex/bin",
-        "logic <pin>          - Logic analyzer",
-        "analogic <pin>       - Analogic plotter",
-        "wizard <pin>         - Pin activity analyzer",
-        "listen <pin>         - Pin activity to audio",
+        "logic <GPIO>         - Logic analyzer",
+        "analogic <GPIO>      - Analogic plotter",
+        "wizard <GPIO>        - GPIO activity analyzer",
+        "listen <GPIO>        - GPIO activity to audio",
         "repeat <count> <cmd> - Repeat command",
         "P                    - Enable pull-up",
         "p                    - Disable pull-up",
@@ -155,7 +155,7 @@ void HelpShell::cmdUart() {
         "xmodem <send> <path> - Send file via XMODEM",
         "xmodem <recv> <path> - Receive file via XMODEM",
         "config               - Configure settings",
-        "swap                 - Swap RX and TX pins",
+        "swap                 - Swap RX and TX GPIOs",
         "['Hello'] [r:64]...  - Instruction syntax"
     };
     printLines(lines, (int)(sizeof(lines) / sizeof(lines[0])));
@@ -191,7 +191,7 @@ void HelpShell::cmdI2c() {
         "eeprom [addr]        - I2C EEPROM operations",
         "recover              - Attempt bus recovery",
         "jam                  - Jam I2C bus with noise",
-        "swap                 - Swap SDA and SCL pins",
+        "swap                 - Swap SDA and SCL GPIOs",
         "config               - Configure settings",
         "[0x13 0x4B 0x1]      - Instruction syntax"
     };
@@ -235,20 +235,20 @@ void HelpShell::cmdThreeWire() {
 void HelpShell::cmdDio() {
     printHeader("DIO");
     static const char* const lines[] = {
-        "scan                 - Detect pins activity",
-        "pins                 - Show pins state",
-        "sniff <pin>          - Track toggle states",
-        "read <pin>           - Get pin state",
-        "set <pin> <H/L/I/O>  - Set pin state",
-        "pullup <pin>         - Set pin pullup",
-        "pulldown <pin>       - Set pin pulldown",
-        "pulse <pin> <us>     - Send pulse on pin",
-        "servo <pin> <angle>  - Set servo angle",
-        "pwm <pin> [frq duty%]- Set PWM on pin",
-        "toggle <pin> <ms>    - Toggle pin periodically",
-        "measure <pin> [ms]   - Calculate frequency",
-        "jam <pin> [min max]  - Random high/low states",
-        "reset <pin>          - Reset to default"
+        "scan                  - Detect pins activity",
+        "pins                  - Show pins state",
+        "sniff <GPIO>          - Track toggle states",
+        "read <GPIO>           - Get pin state",
+        "set <GPIO> <H/L/I/O>  - Set pin state",
+        "pullup <GPIO>         - Set pin pullup",
+        "pulldown <GPIO>       - Set pin pulldown",
+        "pulse <GPIO> <us>     - Send pulse on pin",
+        "servo <GPIO> <angle>  - Set servo angle",
+        "pwm <GPIO> [frq duty%]- Set PWM on pin",
+        "toggle <GPIO> <ms>    - Toggle pin periodically",
+        "measure <GPIO> [ms]   - Calculate frequency",
+        "jam <GPIO> [min max]  - Random high/low states",
+        "reset <GPIO>          - Reset to default"
     };
     printLines(lines, (int)(sizeof(lines) / sizeof(lines[0])));
 }

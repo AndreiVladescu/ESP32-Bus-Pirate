@@ -419,7 +419,7 @@ uint8_t UserInputManager::readValidatedPinNumber(const std::string& label, uint8
     while (true) {
         int val = readValidatedUint8(label, def, min, max);
         if (std::find(forbiddenPins.begin(), forbiddenPins.end(), val) != forbiddenPins.end()) {
-            terminalView.println("This pin is reserved/protected and cannot be used.");
+            terminalView.println("This GPIO is reserved/protected and cannot be used.");
             continue;
         }
         return val;
@@ -463,13 +463,13 @@ std::vector<uint8_t> UserInputManager::readValidatedPinGroup(
         while (ss >> val) {
             // Invalid
             if (val < 0 || val > 48) {
-                terminalView.println("Invalid pin: " + std::to_string(val));
+                terminalView.println("Invalid GPIO: " + std::to_string(val));
                 valid = false;
                 break;
             }
             // Protected
             if (std::find(protectedPins.begin(), protectedPins.end(), val) != protectedPins.end()) {
-                terminalView.println("Pin " + std::to_string(val) + " is protected/reserved.");
+                terminalView.println("GPIO " + std::to_string(val) + " is protected/reserved.");
                 valid = false;
                 break;
             }

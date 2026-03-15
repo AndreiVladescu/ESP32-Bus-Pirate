@@ -58,7 +58,7 @@ bool FmController::ensurePresent_() {
 
     if (!fmService.begin()) {
         terminalView.println("FM: SI4713 not detected (I2C 0x63).");
-        terminalView.println("Tip: check wiring, reset pin required\n");
+        terminalView.println("Tip: check wiring, reset GPIO required\n");
         return false;
     }
     return true;
@@ -74,15 +74,15 @@ void FmController::handleConfig() {
     const auto& forbidden = state.getProtectedPins();
 
     // I2C
-    uint8_t sdaPin = (uint8_t)userInputManager.readValidatedPinNumber("SI4713 SDA pin", state.getTwoWireIoPin(), forbidden);
-    uint8_t sclPin = (uint8_t)userInputManager.readValidatedPinNumber("SI4713 SCL pin", state.getTwoWireClkPin(), forbidden);
+    uint8_t sdaPin = (uint8_t)userInputManager.readValidatedPinNumber("SI4713 SDA GPIO", state.getTwoWireIoPin(), forbidden);
+    uint8_t sclPin = (uint8_t)userInputManager.readValidatedPinNumber("SI4713 SCL GPIO", state.getTwoWireClkPin(), forbidden);
 
     // RST
     terminalView.println("\n [ℹ️  INFORMATIONS]");
-    terminalView.println(" Reset pin is required, or you can");
+    terminalView.println(" Reset GPIO is required, or you can");
     terminalView.println(" briefly connect SI4713 RST to GND");
     terminalView.println(" to activate the device.\n");
-    int8_t resetPin = (int8_t)userInputManager.readValidatedPinNumber("SI4713 RESET pin", state.getTwoWireRstPin(), forbidden); // -1 = none
+    int8_t resetPin = (int8_t)userInputManager.readValidatedPinNumber("SI4713 RESET GPIO", state.getTwoWireRstPin(), forbidden); // -1 = none
 
     // Freq
     uint32_t i2cFreqHz = userInputManager.readValidatedUint32("I2C frequency (Hz)", state.getI2cFrequency());
@@ -439,7 +439,7 @@ void FmController::handleBroadcast() {
 Reset
 */
 void FmController::handleReset() {
-    terminalView.println("FM: Resetting SI4713 via reset pin...");
+    terminalView.println("FM: Resetting SI4713 via reset GPIO...");
     fmService.reset(state.getTwoWireRstPin());
 }
 

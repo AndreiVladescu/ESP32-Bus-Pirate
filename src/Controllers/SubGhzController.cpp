@@ -927,7 +927,7 @@ void SubGhzController::handleEar() {
                          " MHz... Press [ENTER] to stop.\n");
 
     terminalView.println(" [ℹ️  INFORMATION] ");
-    terminalView.println(" Using I2S configured pins for audio output.");
+    terminalView.println(" Using I2S configured GPIOs for audio output.");
     terminalView.println(" You can set volume in the I2S mode settings.\n");
 
     // Mapping params
@@ -1039,19 +1039,19 @@ void SubGhzController::handleConfig() {
     const auto& forbidden = state.getProtectedPins();    
 
     // CC1101 pins
-    uint8_t sck  = userInputManager.readValidatedPinNumber("CC1101 SCK pin",  state.getSubGhzSckPin(),  forbidden);
+    uint8_t sck  = userInputManager.readValidatedPinNumber("CC1101 SCK GPIO",  state.getSubGhzSckPin(),  forbidden);
     state.setSubGhzSckPin(sck);
 
-    uint8_t miso = userInputManager.readValidatedPinNumber("CC1101 MISO pin", state.getSubGhzMisoPin(), forbidden);
+    uint8_t miso = userInputManager.readValidatedPinNumber("CC1101 MISO GPIO", state.getSubGhzMisoPin(), forbidden);
     state.setSubGhzMisoPin(miso);
 
-    uint8_t mosi = userInputManager.readValidatedPinNumber("CC1101 MOSI pin", state.getSubGhzMosiPin(), forbidden);
+    uint8_t mosi = userInputManager.readValidatedPinNumber("CC1101 MOSI GPIO", state.getSubGhzMosiPin(), forbidden);
     state.setSubGhzMosiPin(mosi);
 
-    uint8_t ss   = userInputManager.readValidatedPinNumber("CC1101 SS/CS pin", state.getSubGhzCsPin(), forbidden);
+    uint8_t ss   = userInputManager.readValidatedPinNumber("CC1101 SS/CS GPIO", state.getSubGhzCsPin(), forbidden);
     state.setSubGhzCsPin(ss);
 
-    uint8_t gdo0 = userInputManager.readValidatedPinNumber("CC1101 GDO0 pin", state.getSubGhzGdoPin(), forbidden);
+    uint8_t gdo0 = userInputManager.readValidatedPinNumber("CC1101 GDO0 GPIO", state.getSubGhzGdoPin(), forbidden);
     state.setSubGhzGdoPin(gdo0);
 
     float freq = state.getSubGhzFrequency(); 

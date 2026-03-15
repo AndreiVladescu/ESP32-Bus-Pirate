@@ -348,7 +348,7 @@ void UartController::handleScan() {
 
     // Limit selection to 8 pins max
     if (selectedPins.size() > 8) {
-        terminalView.println("Too many pins selected, limiting to first 8.");
+        terminalView.println("Too many GPIOs selected, limiting to first 8.");
         selectedPins.resize(8);
     }
 
@@ -360,11 +360,11 @@ void UartController::handleScan() {
     PinoutConfig cfg;
     PinoutConfig lastCfg;
 
-    terminalView.println("UART Scan: Measuring edges on pins... Press [ENTER] to stop.\n");
+    terminalView.println("UART Scan: Measuring edges on GPIOs... Press [ENTER] to stop.\n");
     terminalView.println(" [ℹ️  INFORMATION]");
-    terminalView.println(" The UART scan monitors GPIO pins to detect");
+    terminalView.println(" The UART scan monitors GPIO to detect");
     terminalView.println(" UART-like electrical activity (edges and timings).");
-    terminalView.println(" Pins showing activity are potential UART lines.");
+    terminalView.println(" GPIOs showing activity are potential UART lines.");
     terminalView.println("");
     delay(300); // since the loop below is fast, the message above may not be seen without delay
     
@@ -396,7 +396,7 @@ void UartController::handleScan() {
         if (now - lastPrint >= 1000) {
             lastPrint = now;
 
-            terminalView.println("Active pins:");
+            terminalView.println("Active GPIOs:");
 
             if (accum.empty()) {
                 terminalView.println("  (none)");
@@ -674,7 +674,7 @@ void UartController::handleXmodemSend(const std::string& path) {
 
     //Check SD mounted
     if (!sdMounted) {
-        terminalView.println("UART XMODEM: No SD card detected. Check SPI pins");
+        terminalView.println("UART XMODEM: No SD card detected. Check SPI GPIOs");
         return;
     }
 
@@ -720,7 +720,7 @@ void UartController::handleXmodemReceive(const std::string& path) {
 
     //Check SD mounted
     if (!sdMounted) {
-        terminalView.println("UART XMODEM: No SD card detected. Check SPI pins");
+        terminalView.println("UART XMODEM: No SD card detected. Check SPI GPIOs");
         return;
     }
 
@@ -772,10 +772,10 @@ void UartController::handleConfig() {
 
     const auto& forbidden = state.getProtectedPins();
 
-    uint8_t rxPin = userInputManager.readValidatedPinNumber("RX pin number", state.getUartRxPin(), forbidden);
+    uint8_t rxPin = userInputManager.readValidatedPinNumber("RX GPIO number", state.getUartRxPin(), forbidden);
     state.setUartRxPin(rxPin);
 
-    uint8_t txPin = userInputManager.readValidatedPinNumber("TX pin number", state.getUartTxPin(), forbidden);
+    uint8_t txPin = userInputManager.readValidatedPinNumber("TX GPIO number", state.getUartTxPin(), forbidden);
     state.setUartTxPin(txPin);
 
     uint32_t baud = userInputManager.readValidatedUint32("Baud rate", state.getUartBaudRate());

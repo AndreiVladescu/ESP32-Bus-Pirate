@@ -68,7 +68,7 @@ void LedController::handleScan() {
         ? LedService::getSingleWireProtocols()
         : LedService::getSpiChipsets();
 
-    // Get saved pins and leds count
+    // Get saved GPIOs and leds count
     uint8_t dataPin = state.getLedDataPin();
     uint8_t clockPin = state.getLedClockPin();
     uint16_t length = state.getLedLength();
@@ -197,8 +197,8 @@ void LedController::handleConfig() {
 
     // LEDs pins, locked because FastLED needs them at compile time
     terminalView.println("\n [⚠️  WARNING]");
-    terminalView.println(" Data pin cannot be changed. Set to : " + std::to_string(defaultDataPin));
-    terminalView.println(" Clock pin cannot be changed. Set to: " + std::to_string(defaultClockPin));
+    terminalView.println(" Data GPIO cannot be changed. Set to : " + std::to_string(defaultDataPin));
+    terminalView.println(" Clock GPIO cannot be changed. Set to: " + std::to_string(defaultClockPin));
     terminalView.println("");
 
     // LEDs count

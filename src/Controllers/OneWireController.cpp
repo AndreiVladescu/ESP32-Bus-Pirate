@@ -354,7 +354,7 @@ void OneWireController::handleConfig() {
 
     const auto& forbidden = state.getProtectedPins();
 
-    uint8_t pin = userInputManager.readValidatedPinNumber("Data pin", state.getOneWirePin(), forbidden);
+    uint8_t pin = userInputManager.readValidatedPinNumber("Data GPIO", state.getOneWirePin(), forbidden);
     state.setOneWirePin(pin);
     oneWireService.configure(pin);
 

@@ -459,21 +459,21 @@ Config
 void UsbS3Controller::handleConfig() {
     terminalView.println("USB Configuration:");
 
-    auto confirm = userInputManager.readYesNo("Configure SD card pins for USB?", false);
+    auto confirm = userInputManager.readYesNo("Configure SD card GPIOs for USB?", false);
 
     if (confirm) {
         const auto& forbidden = state.getProtectedPins();
     
-        uint8_t cs = userInputManager.readValidatedPinNumber("SD Card CS pin", state.getSdCardCsPin(), forbidden);
+        uint8_t cs = userInputManager.readValidatedPinNumber("SD Card CS GPIO", state.getSdCardCsPin(), forbidden);
         state.setSdCardCsPin(cs);
     
-        uint8_t clk = userInputManager.readValidatedPinNumber("SD Card CLK pin", state.getSdCardClkPin(), forbidden);
+        uint8_t clk = userInputManager.readValidatedPinNumber("SD Card CLK GPIO", state.getSdCardClkPin(), forbidden);
         state.setSdCardClkPin(clk);
     
-        uint8_t miso = userInputManager.readValidatedPinNumber("SD Card MISO pin", state.getSdCardMisoPin(), forbidden);
+        uint8_t miso = userInputManager.readValidatedPinNumber("SD Card MISO GPIO", state.getSdCardMisoPin(), forbidden);
         state.setSdCardMisoPin(miso);
     
-        uint8_t mosi = userInputManager.readValidatedPinNumber("SD Card MOSI pin", state.getSdCardMosiPin(), forbidden);
+        uint8_t mosi = userInputManager.readValidatedPinNumber("SD Card MOSI GPIO", state.getSdCardMosiPin(), forbidden);
         state.setSdCardMosiPin(mosi);
     }
 

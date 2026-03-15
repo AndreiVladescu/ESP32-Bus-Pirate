@@ -611,8 +611,8 @@ void InfraredController::handleConfig() {
 
     const auto& forbidden = state.getProtectedPins();
 
-    uint8_t txPin = userInputManager.readValidatedPinNumber("Infrared TX pin", state.getInfraredTxPin(), forbidden);
-    uint8_t rxPin = userInputManager.readValidatedPinNumber("Infrared RX pin", state.getInfraredRxPin(), forbidden);
+    uint8_t txPin = userInputManager.readValidatedPinNumber("Infrared TX GPIO", state.getInfraredTxPin(), forbidden);
+    uint8_t rxPin = userInputManager.readValidatedPinNumber("Infrared RX GPIO", state.getInfraredRxPin(), forbidden);
 
     state.setInfraredTxPin(txPin);
     state.setInfraredRxPin(rxPin);

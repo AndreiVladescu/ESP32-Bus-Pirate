@@ -106,7 +106,7 @@ void GuideShell::cmdExamples() {
     terminalView.println("  monitor 0x13 500    (watch changes)");
     terminalView.println("");
 
-    terminalView.println("[DIO] Drive / observe pins:");
+    terminalView.println("[DIO] Drive / observe GPIOs:");
     terminalView.println("  mode dio");
     terminalView.println("  read 1");
     terminalView.println("  set 1 L");

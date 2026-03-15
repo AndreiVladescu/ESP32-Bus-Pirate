@@ -6,7 +6,7 @@
  * It is not part of the I2C BUS. It is neither a Master, nor a Slave and puts no data to the lines.
  * It just listens and logs the communication.
  * 
- * Two pins as imput are attached to SDC and SDA lines.
+ * Two pins as input are attached to SDC and SDA lines.
  * Since the I2C communications runs on 400kHz so,
  * the tool that runs this program should be fast.
  * This was tested on an ESP32 bord Heltec WiFi Lora32 v2

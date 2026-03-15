@@ -73,7 +73,7 @@ void HdUartController::handleConfig() {
 
     const auto& forbidden = state.getProtectedPins();
 
-    uint8_t pin = userInputManager.readValidatedPinNumber("Shared TX/RX pin", state.getHdUartPin(), forbidden);
+    uint8_t pin = userInputManager.readValidatedPinNumber("Shared TX/RX GPIO", state.getHdUartPin(), forbidden);
     state.setHdUartPin(pin);
 
     uint32_t baud = userInputManager.readValidatedUint32("Baud rate", state.getHdUartBaudRate());
@@ -119,7 +119,7 @@ void HdUartController::ensureConfigured() {
 
     hdUartService.end();
 
-    // User could have set the same pin to a different usage
+    // User could have set the same GPIO to a different usage
     // eg. select UART, then select I2C, then select UART
     // Always reconfigure pins before use
     auto rx = state.getHdUartPin();

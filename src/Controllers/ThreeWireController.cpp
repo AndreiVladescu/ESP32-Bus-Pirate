@@ -58,13 +58,13 @@ void ThreeWireController::handleConfig() {
     
     // Pins
     const auto& forbidden = state.getProtectedPins();
-    uint8_t cs = userInputManager.readValidatedPinNumber("CS pin", state.getThreeWireCsPin(), forbidden);
+    uint8_t cs = userInputManager.readValidatedPinNumber("CS GPIO", state.getThreeWireCsPin(), forbidden);
     state.setThreeWireCsPin(cs);
-    uint8_t sk = userInputManager.readValidatedPinNumber("SK pin", state.getThreeWireSkPin(), forbidden);
+    uint8_t sk = userInputManager.readValidatedPinNumber("SK GPIO", state.getThreeWireSkPin(), forbidden);
     state.setThreeWireSkPin(sk);
-    uint8_t di = userInputManager.readValidatedPinNumber("DI pin", state.getThreeWireDiPin(), forbidden);
+    uint8_t di = userInputManager.readValidatedPinNumber("DI GPIO", state.getThreeWireDiPin(), forbidden);
     state.setThreeWireDiPin(di);
-    uint8_t doPin = userInputManager.readValidatedPinNumber("DO pin", state.getThreeWireDoPin(), forbidden);
+    uint8_t doPin = userInputManager.readValidatedPinNumber("DO GPIO", state.getThreeWireDoPin(), forbidden);
     state.setThreeWireDoPin(doPin);
 
     // Configure the service, default value for eeprom

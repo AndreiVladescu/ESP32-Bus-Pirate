@@ -166,7 +166,7 @@ void I2sController::handleTestSpeaker() {
 
     auto rate = state.getI2sSampleRate();
 
-    terminalView.println("Using pins:");
+    terminalView.println("Using GPIOs:");
     terminalView.println("  BCLK : " + std::to_string(state.getI2sBclkPin()));
     terminalView.println("  LRCK : " + std::to_string(state.getI2sLrckPin()));
     terminalView.println("  DATA : " + std::to_string(state.getI2sDataPin()));
@@ -278,7 +278,7 @@ void I2sController::handleTestMic() {
     terminalView.println("\nI2S Micro: Analyzing input signal...\n");
 
     // Show pin config
-    terminalView.println("Using pins:");
+    terminalView.println("Using GPIOs:");
     terminalView.println("  BCLK : " + std::to_string(state.getI2sBclkPin()));
     terminalView.println("  LRCK : " + std::to_string(state.getI2sLrckPin()));
     terminalView.println("  DATA : " + std::to_string(state.getI2sDataPin()));
@@ -336,13 +336,13 @@ void I2sController::handleConfig() {
 
     const auto& forbidden = state.getProtectedPins();
 
-    uint8_t bclk = userInputManager.readValidatedPinNumber("BCLK pin", state.getI2sBclkPin(), forbidden);
+    uint8_t bclk = userInputManager.readValidatedPinNumber("BCLK GPIO", state.getI2sBclkPin(), forbidden);
     state.setI2sBclkPin(bclk);
 
-    uint8_t lrck = userInputManager.readValidatedPinNumber("LRCK/WS pin", state.getI2sLrckPin(), forbidden);
+    uint8_t lrck = userInputManager.readValidatedPinNumber("LRCK/WS GPIO", state.getI2sLrckPin(), forbidden);
     state.setI2sLrckPin(lrck);
 
-    uint8_t data = userInputManager.readValidatedPinNumber("DATA pin", state.getI2sDataPin(), forbidden);
+    uint8_t data = userInputManager.readValidatedPinNumber("DATA GPIO", state.getI2sDataPin(), forbidden);
     state.setI2sDataPin(data);
 
     uint32_t freq = userInputManager.readValidatedUint32("Sample rate (e.g. 44100)", state.getI2sSampleRate());

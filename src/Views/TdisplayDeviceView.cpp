@@ -80,7 +80,7 @@ void TdisplayDeviceView::drawLogicTrace(uint8_t pin, const std::vector<uint8_t>&
   tft.setTextFont(1);
   tft.setTextSize(1);
   tft.setCursor(10, 10);
-  tft.print("Pin ");
+  tft.print("GPIO ");
   tft.print(pin);
 
   const int traceY = 50;
@@ -114,7 +114,7 @@ void TdisplayDeviceView::drawAnalogicTrace(uint8_t pin, const std::vector<uint8_
   tft.setTextFont(1);
   tft.setTextSize(1);
   tft.setCursor(10, 10);
-  tft.print("Pin ");
+  tft.print("GPIO ");
   tft.print(pin);
 
   const int topY = 35;

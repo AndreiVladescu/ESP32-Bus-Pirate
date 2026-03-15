@@ -238,7 +238,7 @@ void UtilityController::handleLogicAnalyzer(const TerminalCommand& cmd) {
     uint8_t step = 1; // step of the trace display kind of a zoom
 
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: logic <pin>");
+        terminalView.println("Usage: logic <GPIO>");
         return;
     }
 
@@ -252,10 +252,10 @@ void UtilityController::handleLogicAnalyzer(const TerminalCommand& cmd) {
     }
 */
     if (state.isPinProtected(pin)) {
-        terminalView.println("Logic Analyzer: This pin is protected or reserved.");
+        terminalView.println("Logic Analyzer: This GPIO is protected or reserved.");
         return;
     }
-    terminalView.println("\nLogic Analyzer: Monitoring pin " + std::to_string(pin) + "... Press [ENTER] to stop.");
+    terminalView.println("\nLogic Analyzer: Monitoring GPIO " + std::to_string(pin) + "... Press [ENTER] to stop.");
     terminalView.println("Displaying waveform on the ESP32 screen...\n");
 
 
@@ -337,22 +337,22 @@ void UtilityController::handleAnalogic(const TerminalCommand& cmd) {
     uint8_t step = 1; // step of the trace display kind of a zoom
 
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: analogic <pin>");
+        terminalView.println("Usage: analogic <GPIO>");
         return;
     }
 
     // Verify protected pin
     uint8_t pin = argTransformer.toUint8(cmd.getSubcommand());
     if (state.isPinProtected(pin)) {
-        terminalView.println("Analogic: This pin is protected or reserved.");
+        terminalView.println("Analogic: This GPIO is protected or reserved.");
         return;
     }
     if (!state.isPinAnalog(pin)){
-        terminalView.println("Analogic: This pin is not an analog one");
+        terminalView.println("Analogic: This GPIO is not an analog one");
         return;
     };
 
-    terminalView.println("\nAnalogic: Monitoring pin " + std::to_string(pin) + "... Press [ENTER] to stop.");
+    terminalView.println("\nAnalogic: Monitoring GPIO " + std::to_string(pin) + "... Press [ENTER] to stop.");
     terminalView.println("Displaying waveform on the ESP32 screen...\n");
 
 
@@ -403,7 +403,7 @@ void UtilityController::handleAnalogic(const TerminalCommand& cmd) {
                 float voltage = (raw / 4095.0f) * 3.3f;
 
                 std::ostringstream oss;
-                oss << "   Analog pin " << static_cast<int>(pin)
+                oss << "   Analog GPIO " << static_cast<int>(pin)
                     << ": " << raw
                     << " (" << voltage << " V)";
                 terminalView.println(oss.str());
@@ -443,18 +443,18 @@ Wizard
 void UtilityController::handleWizard(const TerminalCommand& cmd) {
     // Validate pin argument
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: wizard <pin>");
+        terminalView.println("Usage: wizard <GPIO>");
         return;
     }
 
     // Verify protected pin
     uint8_t pin = argTransformer.toUint8(cmd.getSubcommand());
     if (state.isPinProtected(pin)) {
-        terminalView.println("Wizard: This pin is protected or reserved.");
+        terminalView.println("Wizard: This GPIO is protected or reserved.");
         return;
     }
 
-    terminalView.println("\nWizard: Please wait, analyzing pin " + std::to_string(pin) + "... Press [ENTER] to stop.\n");
+    terminalView.println("\nWizard: Please wait, analyzing GPIO " + std::to_string(pin) + "... Press [ENTER] to stop.\n");
     pinAnalyzer.begin(pin);
     const bool doPullTest = false; // TODO: add argument to enable pull test if needed
 
@@ -476,7 +476,7 @@ void UtilityController::handleWizard(const TerminalCommand& cmd) {
             auto report = pinAnalyzer.buildReport(doPullTest);
             terminalView.print(pinAnalyzer.formatWizardReport(pin, report));
             pinAnalyzer.resetWindow();
-            terminalView.println("Wizard: Analyzing pin " + std::to_string(pin) + "... Press [ENTER] to stop.\n");
+            terminalView.println("Wizard: Analyzing GPIO " + std::to_string(pin) + "... Press [ENTER] to stop.\n");
         }
     }
 
@@ -493,19 +493,19 @@ void UtilityController::handleListen(const TerminalCommand& cmd) {
     if (!cmd.getSubcommand().empty() && argTransformer.isValidNumber(cmd.getSubcommand())) {
         pin = argTransformer.toUint8(cmd.getSubcommand());
     } else {
-        terminalView.println("Usage: listen <pin>");
+        terminalView.println("Usage: listen <GPIO>");
         return;
     }
 
     // Protected
     if (state.isPinProtected(pin)) {
-        terminalView.println("Listen: This pin is protected or reserved.");
+        terminalView.println("Listen: This GPIO is protected or reserved.");
         return;
     }
 
     // Used by I2S
     if (state.getI2sBclkPin() == pin || state.getI2sLrckPin() == pin || state.getI2sDataPin() == pin) {
-        terminalView.println("Listen: This pin is used by I2S.");
+        terminalView.println("Listen: This GPIO is used by I2S.");
         return;
     }
 
@@ -526,7 +526,7 @@ void UtilityController::handleListen(const TerminalCommand& cmd) {
                          "... Press [ENTER] to stop.\n");
 
     terminalView.println(" [ℹ️  INFORMATION] ");
-    terminalView.println(" Using I2S configured pins for audio output.");
+    terminalView.println(" Using I2S configured GPIOs for audio output.");
     terminalView.println(" You can set volume in the I2S mode settings.\n");
 
     //  params

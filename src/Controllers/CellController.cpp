@@ -67,10 +67,10 @@ void CellController::handleConfig()
 
     const auto& forbidden = state.getProtectedPins();
 
-    uint8_t rx = userInputManager.readValidatedPinNumber("MODEM RX", state.getUartRxPin(), forbidden);
+    uint8_t rx = userInputManager.readValidatedPinNumber("MODEM RX GPIO", state.getUartRxPin(), forbidden);
     state.setUartRxPin(rx);
 
-    uint8_t tx = userInputManager.readValidatedPinNumber("MODEM TX", state.getUartTxPin(), forbidden);
+    uint8_t tx = userInputManager.readValidatedPinNumber("MODEM TX GPIO", state.getUartTxPin(), forbidden);
     state.setUartTxPin(tx);
 
     const uint32_t defaultModemBaud = 115200; // common default baudrate for modems
@@ -84,7 +84,7 @@ void CellController::handleConfig()
     if (!cellService.detect()) {
         terminalView.println("❌ No modem detected.");
         terminalView.println("It may take up 30 sec to start.");
-        terminalView.println("Try to swap RX and TX pins.\n");
+        terminalView.println("Try to swap RX and TX GPIOs.\n");
         return;
     }
 

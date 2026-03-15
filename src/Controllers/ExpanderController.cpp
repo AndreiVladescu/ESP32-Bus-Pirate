@@ -114,14 +114,14 @@ void ExpanderController::handleConfig() {
     const auto& forbidden = state.getProtectedPins();
 
     uint8_t rxPin = userInputManager.readValidatedPinNumber(
-        "RX pin number",
+        "RX GPIO number",
         state.getUartRxPin(),
         forbidden
     );
     state.setUartRxPin(rxPin);
 
     uint8_t txPin = userInputManager.readValidatedPinNumber(
-        "TX pin number",
+        "TX GPIO number",
         state.getUartTxPin(),
         forbidden
     );
@@ -183,7 +183,7 @@ void ExpanderController::handleConfig() {
 
     if (!handshakeOk) {
         terminalView.println("Expander handshake failed.");
-        terminalView.println("Try to swap RX/TX pins.");
+        terminalView.println("Try to swap RX/TX GPIOs.");
         terminalView.println("Ensure the Expander is powered.\n");
         configured = false;
         state.setCurrentMode(ModeEnum::HIZ);

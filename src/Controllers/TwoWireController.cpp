@@ -45,7 +45,7 @@ void TwoWireController::handleSniff() {
     terminalView.println("2WIRE Sniffer: Running on CLK/IO... Press [ENTER] to stop\r\n");
 
     if (!twoWireService.startSniffer()) {
-        terminalView.println("Failed to start sniffer (check pins/config).");
+        terminalView.println("Failed to start sniffer (check GPIOs/config).");
         return;
     }
 
@@ -126,13 +126,13 @@ void TwoWireController::handleConfig() {
     terminalView.println("2WIRE Configuration:");
     const auto& forbidden = state.getProtectedPins();
 
-    uint8_t clk = userInputManager.readValidatedPinNumber("CLK pin", state.getTwoWireClkPin(), forbidden);
+    uint8_t clk = userInputManager.readValidatedPinNumber("CLK GPIO", state.getTwoWireClkPin(), forbidden);
     state.setTwoWireClkPin(clk);
 
-    uint8_t io = userInputManager.readValidatedPinNumber("IO pin", state.getTwoWireIoPin(), forbidden);
+    uint8_t io = userInputManager.readValidatedPinNumber("IO GPIO", state.getTwoWireIoPin(), forbidden);
     state.setTwoWireIoPin(io);
 
-    uint8_t rst = userInputManager.readValidatedPinNumber("RST pin", state.getTwoWireRstPin(), forbidden);
+    uint8_t rst = userInputManager.readValidatedPinNumber("RST GPIO", state.getTwoWireRstPin(), forbidden);
     state.setTwoWireRstPin(rst);
 
     twoWireService.configure(clk, io, rst);

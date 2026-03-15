@@ -575,11 +575,11 @@ void Rf24Controller::handleSetChannel() {
 NRF24 Configuration
 */
 void Rf24Controller::handleConfig() {
-    uint8_t csn = userInputManager.readValidatedInt("NRF24 CSN pin?", state.getRf24CsnPin());
-    uint8_t sck  = userInputManager.readValidatedInt("NRF24 SCK pin?", state.getRf24SckPin());
-    uint8_t miso = userInputManager.readValidatedInt("NRF24 MISO pin?", state.getRf24MisoPin());
-    uint8_t mosi = userInputManager.readValidatedInt("NRF24 MOSI pin?", state.getRf24MosiPin());
-    uint8_t ce  = userInputManager.readValidatedInt("NRF24 CE pin?", state.getRf24CePin());
+    uint8_t csn = userInputManager.readValidatedInt("NRF24 CSN GPIO?", state.getRf24CsnPin());
+    uint8_t sck  = userInputManager.readValidatedInt("NRF24 SCK GPIO?", state.getRf24SckPin());
+    uint8_t miso = userInputManager.readValidatedInt("NRF24 MISO GPIO?", state.getRf24MisoPin());
+    uint8_t mosi = userInputManager.readValidatedInt("NRF24 MOSI GPIO?", state.getRf24MosiPin());
+    uint8_t ce  = userInputManager.readValidatedInt("NRF24 CE GPIO?", state.getRf24CePin());
     state.setRf24CsnPin(csn);
     state.setRf24SckPin(sck);
     state.setRf24MisoPin(miso);

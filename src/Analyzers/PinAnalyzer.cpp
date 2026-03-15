@@ -553,7 +553,7 @@ PinAnalyzer::Report PinAnalyzer::buildReport(bool doPullTest) {
 std::string PinAnalyzer::formatWizardReport(uint8_t pin, const Report& r) const {
     std::ostringstream oss;
 
-    oss << "[Wizard report on pin " << (int)pin << "]\r\n";
+    oss << "[Wizard report on GPIO " << (int)pin << "]\r\n";
 
     auto line = [&](const std::string& s) {
         oss << "  " << s << "\r\n";

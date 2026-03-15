@@ -320,10 +320,10 @@ void RfidController::handleConfig() {
 
     const auto& forbidden = state.getProtectedPins();
 
-    uint8_t sda = userInputManager.readValidatedPinNumber("PN532 SDA pin", state.getRfidSdaPin(), forbidden);
+    uint8_t sda = userInputManager.readValidatedPinNumber("PN532 SDA GPIO", state.getRfidSdaPin(), forbidden);
     state.setRfidSdaPin(sda);
 
-    uint8_t scl = userInputManager.readValidatedPinNumber("PN532 SCL pin", state.getRfidSclPin(), forbidden);
+    uint8_t scl = userInputManager.readValidatedPinNumber("PN532 SCL GPIO", state.getRfidSclPin(), forbidden);
     state.setRfidSclPin(scl);
 
     // Configure + begin

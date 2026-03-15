@@ -10,7 +10,7 @@
 #include "Inputs/InputKeys.h"
 #include "Views/TembedDeviceView.h"
 
-// ---------------- Pins ----------------
+// ---------------- GPIOs ----------------
 #ifdef DEVICE_TEMBEDS3CC1101
   #define TEMBED_PIN_ENCODE_A   4
   #define TEMBED_PIN_ENCODE_B   5

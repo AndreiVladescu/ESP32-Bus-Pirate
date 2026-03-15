@@ -177,20 +177,20 @@ void CanController::handleConfig() {
 
     // CS pin is fixed, no need to configure
     uint8_t cs = state.getCanCspin();
-    terminalView.print("MCP2515 CS pin is fixed to: " + std::to_string(cs));
+    terminalView.print("MCP2515 CS GPIO is fixed to: " + std::to_string(cs));
     terminalInput.waitPress();
     terminalView.println("");
 
     // Configure SCK
-    uint8_t sck = userInputManager.readValidatedPinNumber("MCP2515 SCK pin", state.getCanSckPin(), forbidden);
+    uint8_t sck = userInputManager.readValidatedPinNumber("MCP2515 SCK GPIO", state.getCanSckPin(), forbidden);
     state.setCanSckPin(sck);
 
     // Configure SI (MOSI)
-    uint8_t si = userInputManager.readValidatedPinNumber("MCP2515 SI (MOSI) pin", state.getCanSiPin(), forbidden);
+    uint8_t si = userInputManager.readValidatedPinNumber("MCP2515 SI (MOSI) GPIO", state.getCanSiPin(), forbidden);
     state.setCanSiPin(si);
 
     // Configure SO (MISO)
-    uint8_t so = userInputManager.readValidatedPinNumber("MCP2515 SO (MISO) pin", state.getCanSoPin(), forbidden);
+    uint8_t so = userInputManager.readValidatedPinNumber("MCP2515 SO (MISO) GPIO", state.getCanSoPin(), forbidden);
     state.setCanSoPin(so);
 
     // Configure bitrate

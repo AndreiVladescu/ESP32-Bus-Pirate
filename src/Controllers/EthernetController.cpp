@@ -62,21 +62,21 @@ void EthernetController::handleConfig() {
     uint32_t defHz  = state.getEthernetFrequency();
 
     // User input for configuration
-    uint8_t cs   = userInputManager.readValidatedPinNumber("W5500 CS pin",   defCS,   forbidden);
-    uint8_t sck  = userInputManager.readValidatedPinNumber("W5500 SCK pin",  defSCK,  forbidden);
-    uint8_t miso = userInputManager.readValidatedPinNumber("W5500 MISO pin", defMISO, forbidden);
-    uint8_t mosi = userInputManager.readValidatedPinNumber("W5500 MOSI pin", defMOSI, forbidden);
-    uint8_t irq  = userInputManager.readValidatedPinNumber("W5500 IRQ pin",  defIRQ,  forbidden);
+    uint8_t cs   = userInputManager.readValidatedPinNumber("W5500 CS GPIO",   defCS,   forbidden);
+    uint8_t sck  = userInputManager.readValidatedPinNumber("W5500 SCK GPIO",  defSCK,  forbidden);
+    uint8_t miso = userInputManager.readValidatedPinNumber("W5500 MISO GPIO", defMISO, forbidden);
+    uint8_t mosi = userInputManager.readValidatedPinNumber("W5500 MOSI GPIO", defMOSI, forbidden);
+    uint8_t irq  = userInputManager.readValidatedPinNumber("W5500 IRQ GPIO",  defIRQ,  forbidden);
 
     // RST optional
     bool useReset = userInputManager.readYesNo(
-        "Use a RESET (RST) pin?",
+        "Use a RESET (RST) GPIO?",
         false
     );
 
     uint8_t rst = 255;
     if (useReset) {
-        rst = userInputManager.readValidatedPinNumber("W5500 RST pin", rst, forbidden);
+        rst = userInputManager.readValidatedPinNumber("W5500 RST GPIO", rst, forbidden);
     }
 
     // Frequency SPI

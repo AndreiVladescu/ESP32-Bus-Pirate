@@ -121,7 +121,7 @@ void JtagController::handleConfig() {
     state.setJtagScanPins(selectedPins);
 
     // Show confirmation
-    terminalView.print("Pins set for the scan (SWD/JTAG): ");
+    terminalView.print("GPIOs set for the scan (SWD/JTAG): ");
     for (uint8_t pin : selectedPins) {
         terminalView.print(std::to_string(pin) + " ");
     }

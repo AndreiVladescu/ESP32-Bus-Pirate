@@ -314,8 +314,8 @@ void M5DeviceView::drawLogicTrace(uint8_t pin, const std::vector<uint8_t>& buffe
         if (x0 > canvasWidth - step) break;
     }
 
-    // Pin num
-    canvas.drawString("Pin " + String(pin), 5, 0);
+    // GPIO num
+    canvas.drawString("GPIO " + String(pin), 5, 0);
 
     // Center
     int x = (M5.Lcd.width() - canvasWidth) / 2;
@@ -346,7 +346,7 @@ void M5DeviceView::drawAnalogicTrace(uint8_t pin, const std::vector<uint8_t>& bu
     }
 
     // Pin num
-    canvas.drawString("Pin " + String(pin), 5, 0);
+    canvas.drawString("GPIO " + String(pin), 5, 0);
 
     canvas.pushSprite(0, 35);
     canvas.deleteSprite();

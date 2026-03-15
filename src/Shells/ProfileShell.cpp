@@ -14,7 +14,7 @@ ProfileShell::ProfileShell(ITerminalView& tv,
 
 void ProfileShell::run() {
     terminalView.println("\n=== Profiles ===");
-    terminalView.println("Load and save your pins config.");
+    terminalView.println("Load and save your GPIOs config.");
 
     while (true) {
         int choice = userInputManager.readValidatedChoiceIndex("Choose an action", actions, actionsCount, actionsCount-1);
