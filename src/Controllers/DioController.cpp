@@ -49,7 +49,7 @@ Read
 */
 void DioController::handleReadPin(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: read <GPIO>");
+        terminalView.println("Usage: read <gpio>");
         return;
     }
 
@@ -64,7 +64,7 @@ Set
 */
 void DioController::handleSetPin(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: set <GPIO> <IN/OUT/HI/LOW>");
+        terminalView.println("Usage: set <gpio> <IN/OUT/HI/LOW>");
         return;
     }
 
@@ -344,7 +344,7 @@ Pullup
 */
 void DioController::handlePullup(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: pullup <GPIO>");
+        terminalView.println("Usage: pullup <gpio>");
         return;
     }
 
@@ -360,7 +360,7 @@ Pulldown
 */
 void DioController::handlePulldown(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: pulldown <GPIO>");
+        terminalView.println("Usage: pulldown <gpio>");
         return;
     }
 
@@ -376,7 +376,7 @@ Sniff
 */
 void DioController::handleSniff(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: sniff <GPIO>");
+        terminalView.println("Usage: sniff <gpio>");
         return;
     }
 
@@ -437,7 +437,7 @@ void DioController::handlePwm(const TerminalCommand& cmd) {
 
     // Validate GPIO
     if (sub.empty() || !argTransformer.isValidNumber(sub)) {
-        terminalView.println("Usage: pwm <GPIO> [frequency] [duty]");
+        terminalView.println("Usage: pwm <gpio> [frequency] [duty]");
         return;
     }
 
@@ -485,7 +485,7 @@ void DioController::handleMeasure(const TerminalCommand& cmd) {
     auto args = argTransformer.splitArgs(cmd.getArgs());
 
     if (cmd.getSubcommand().empty()) {
-        terminalView.println("Usage: measure <GPIO> [duration_ms]");
+        terminalView.println("Usage: measure <gpio> [duration_ms]");
         return;
     }
 
@@ -562,7 +562,7 @@ void DioController::handleTogglePin(const TerminalCommand& cmd) {
     auto args = argTransformer.splitArgs(cmd.getArgs());
     
     if (cmd.getSubcommand().empty() || args.empty()) {
-        terminalView.println("Usage: toggle <GPIO> <ms>");
+        terminalView.println("Usage: toggle <gpio> <ms>");
         return;
     }
     
@@ -617,7 +617,7 @@ Reset
 */
 void DioController::handleResetPin(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty()) {
-        terminalView.println("Usage: reset <GPIO>");
+        terminalView.println("Usage: reset <gpio>");
         return;
     }
 
@@ -639,7 +639,7 @@ void DioController::handleResetPin(const TerminalCommand& cmd) {
 
 void DioController::handleServo(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || cmd.getArgs().empty()) {
-        terminalView.println("Usage: servo <GPIO> <angle>");
+        terminalView.println("Usage: servo <gpio> <angle>");
         return;
     }
 
@@ -664,7 +664,7 @@ Pulse
 */
 void DioController::handlePulse(const TerminalCommand& cmd) {
     if (cmd.getSubcommand().empty() || cmd.getArgs().empty()) {
-        terminalView.println("Usage: pulse <GPIO> <duration_us>");
+        terminalView.println("Usage: pulse <gpio> <duration_us>");
         return;
     }
 
@@ -712,7 +712,7 @@ void DioController::handleJamPin(const TerminalCommand& cmd) {
     uint32_t maxUs = 100;
 
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: jam <GPIO> [min_us] [max_us]");
+        terminalView.println("Usage: jam <gpio> [min_us] [max_us]");
         return;
     }
 

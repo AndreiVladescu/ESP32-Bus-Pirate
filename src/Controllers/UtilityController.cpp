@@ -238,7 +238,7 @@ void UtilityController::handleLogicAnalyzer(const TerminalCommand& cmd) {
     uint8_t step = 1; // step of the trace display kind of a zoom
 
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: logic <GPIO>");
+        terminalView.println("Usage: logic <gpio>");
         return;
     }
 
@@ -337,7 +337,7 @@ void UtilityController::handleAnalogic(const TerminalCommand& cmd) {
     uint8_t step = 1; // step of the trace display kind of a zoom
 
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: analogic <GPIO>");
+        terminalView.println("Usage: analogic <gpio>");
         return;
     }
 
@@ -443,7 +443,7 @@ Wizard
 void UtilityController::handleWizard(const TerminalCommand& cmd) {
     // Validate pin argument
     if (cmd.getSubcommand().empty() || !argTransformer.isValidNumber(cmd.getSubcommand())) {
-        terminalView.println("Usage: wizard <GPIO>");
+        terminalView.println("Usage: wizard <gpio>");
         return;
     }
 
@@ -493,7 +493,7 @@ void UtilityController::handleListen(const TerminalCommand& cmd) {
     if (!cmd.getSubcommand().empty() && argTransformer.isValidNumber(cmd.getSubcommand())) {
         pin = argTransformer.toUint8(cmd.getSubcommand());
     } else {
-        terminalView.println("Usage: listen <GPIO>");
+        terminalView.println("Usage: listen <gpio>");
         return;
     }
 
