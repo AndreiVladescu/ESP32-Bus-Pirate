@@ -83,7 +83,8 @@ uint8_t EEPROM_SPI_WE::powerUpAndReadID(){
     id = _spi->transfer(0x00);
     digitalWrite(csPin, HIGH);
     _spi->endTransaction();
-    while(isBusy()){}
+    // while(isBusy()){}
+    waitUntilReady();
     return id;
 }
 
@@ -103,7 +104,8 @@ void EEPROM_SPI_WE::erasePage(uint32_t addr){
     digitalWrite(csPin, HIGH);
     _spi->endTransaction();
     
-    while(isBusy()){}   
+    // while(isBusy()){}
+    waitUntilReady();   
 }
 
 void EEPROM_SPI_WE::eraseSector(uint32_t addr){
@@ -120,7 +122,8 @@ void EEPROM_SPI_WE::eraseSector(uint32_t addr){
     digitalWrite(csPin, HIGH);
     _spi->endTransaction();
     
-    while(isBusy()){}
+    // while(isBusy()){}
+    waitUntilReady();
 }
 
 void EEPROM_SPI_WE::eraseCompleteEEPROM(){
@@ -136,14 +139,16 @@ void EEPROM_SPI_WE::eraseCompleteEEPROM(){
         _spi->transfer(EEP_CE);
         digitalWrite(csPin, HIGH);
         _spi->endTransaction();
-        while(isBusy()){}  
+        // while(isBusy()){}
+        waitUntilReady();  
     }  
 }
 
 void EEPROM_SPI_WE::write(uint32_t addr, uint8_t val){
     if (read(addr) != val) 
         writeEEPROM(addr, &val, 1);
-    while(isBusy()){}
+    // while(isBusy()){}
+    waitUntilReady();
 }
 
 uint8_t EEPROM_SPI_WE::read(uint32_t addr){
@@ -161,7 +166,8 @@ void EEPROM_SPI_WE::writeProtect(eeprom_writeProtect sectors){
     _spi->transfer((sectors << 2) | 0x80);
     digitalWrite(csPin, HIGH); 
     _spi->endTransaction();
-    while(isBusy()){}
+    // while(isBusy()){}
+    waitUntilReady();
 }
 
 void EEPROM_SPI_WE::protectStatusRegister(bool protect){
@@ -218,6 +224,16 @@ bool EEPROM_SPI_WE::isBusy(){
     return (statusReg & 0x01);
 }
 
+bool EEPROM_SPI_WE::waitUntilReady(){
+    for (uint16_t i = 0; i < 256; i++) {
+        if ((eepromReadStatusReg() & 0x01) == 0) {
+            return true;
+        }
+        delayMicroseconds(50);
+    }
+    return false;
+}
+
 void EEPROM_SPI_WE::setSPIClockSpeed(unsigned long clock){
     mySPISettings = SPISettings(clock, MSBFIRST, SPI_MODE0);
 }
@@ -241,7 +257,8 @@ void EEPROM_SPI_WE::eepromWriteStatusReg(uint8_t cmd){
     digitalWrite(csPin, HIGH);
     _spi->endTransaction();
     
-    while(isBusy()){}
+    // while(isBusy()){}
+    waitUntilReady();
 }
 
 void EEPROM_SPI_WE::writeEEPROM(uint32_t addr, const uint8_t *buf, uint16_t sizeOfBuf){
@@ -294,7 +311,8 @@ void EEPROM_SPI_WE::writeEEPROM(uint32_t addr, const uint8_t *buf, uint16_t size
         addr += chunk;
         arrayIndex += chunk;
         noOfBytesStillToWrite -= chunk;
-        while(isBusy()){}       
+        // while(isBusy()){}
+        waitUntilReady();       
     }
 }
 
@@ -325,7 +343,8 @@ void EEPROM_SPI_WE::continuousPutEnable(uint32_t addr){
 void EEPROM_SPI_WE::continuousPutDisable(){
     digitalWrite(csPin, HIGH);
     _spi->endTransaction();
-    while(isBusy());
+    // while(isBusy());
+    waitUntilReady();
 }
 
 void EEPROM_SPI_WE::continuousWriteEEPROM(const uint8_t *buf, uint16_t sizeOfBuf){
@@ -353,7 +372,8 @@ void EEPROM_SPI_WE::continuousWriteEEPROM(const uint8_t *buf, uint16_t sizeOfBuf
         if(pageEnd){
             digitalWrite(csPin, HIGH);
             _spi->endTransaction();
-            while(isBusy()){}
+            // while(isBusy()){}
+            waitUntilReady();
             continuousPutEnable(contAddr);
             pageEnd = false;
         }

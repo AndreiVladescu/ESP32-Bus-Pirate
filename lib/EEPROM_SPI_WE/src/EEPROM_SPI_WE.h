@@ -110,6 +110,7 @@ class EEPROM_SPI_WE
         }
         
         bool isBusy();
+        bool waitUntilReady();
         uint8_t eepromReadStatusReg(); 
         void setSPIClockSpeed(unsigned long clock);
         void setSmallEEPROM();
