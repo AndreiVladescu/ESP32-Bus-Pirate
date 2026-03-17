@@ -13,6 +13,7 @@ public:
     void setHigh(uint8_t pin);
     void setLow(uint8_t pin);
     bool read(uint8_t pin);
+    bool isInputMode(uint8_t pin);
     void togglePullup(uint8_t pin);
     void togglePullDown(uint8_t pin);
     int readAnalog(uint8_t pin);

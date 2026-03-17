@@ -34,6 +34,15 @@ bool PinService::read(uint8_t pin) {
     return gpio_get_level((gpio_num_t)pin);
 }
 
+bool PinService::isInputMode(uint8_t pin) {
+    gpio_io_config_t config;
+    if (gpio_get_io_config((gpio_num_t)pin, &config) == ESP_OK) {
+        return !config.oe;
+    } else {
+        return false;
+    }
+}
+
 void PinService::togglePullup(uint8_t pin) {
     pullType enabled = pullState[pin];
 
