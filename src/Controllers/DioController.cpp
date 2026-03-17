@@ -311,8 +311,8 @@ void DioController::handlePins(const TerminalCommand& cmd) {
     }
 
     terminalView.println("\nDIO Pins: Reading state of available GPIOs...\n");
-    terminalView.println("GPIO | PULL   | STATE");
-    terminalView.println("-----+--------+------");
+    terminalView.println("GPIO |  PULL  |    STATE");
+    terminalView.println("-----+--------+-------------");
 
     for (uint8_t pin : validPins) {
 
@@ -325,8 +325,13 @@ void DioController::handlePins(const TerminalCommand& cmd) {
         else                                    pullStr = "NOPULL";
 
         // STATE 
-        int v = pinService.read(pin);
-        std::string stateStr = v ? "HIGH" : "LOW ";
+        bool bInput = pinService.isInputMode(pin);
+        int v = 0;
+        if (bInput) { // read return always 0 in output mode
+            // https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/gpio.html#_CPPv414gpio_get_level10gpio_num_t
+            v = pinService.read(pin);
+        }
+        std::string stateStr = bInput ? "INPUT (" + std::string(v == HIGH ? "HIGH" : "LOW") + ")" : "OUTPUT";
 
         // GPIO padded
         std::string gpioStr = std::to_string(pin);
