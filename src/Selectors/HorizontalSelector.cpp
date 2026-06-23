@@ -26,10 +26,13 @@ int HorizontalSelector::select(
             case KEY_ARROW_LEFT:
                 currentIndex = (currentIndex > 0) ? currentIndex - 1 : options.size() - 1;
                 break;
-            case KEY_ARROW_RIGHT:
-                currentIndex = (currentIndex < options.size() - 1) ? currentIndex + 1 : 0;
+             case KEY_ARROW_RIGHT:
+            #if !defined(DEVICE_TDISPLAYS3)                
+               currentIndex = (currentIndex < options.size() - 1) ? currentIndex + 1 : 0;
                 break;
             case KEY_OK:
+            #endif
+
                 return currentIndex;
             default:
                 break;
