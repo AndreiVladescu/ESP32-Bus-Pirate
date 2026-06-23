@@ -1,7 +1,6 @@
 #include "FlashromSerprogAdapter.h"
 #include "Inputs/InputKeys.h"
 #include <USBCDC.h>
-#include <vector>
 
 namespace {
     constexpr uint8_t ACK = 0x06;
@@ -9,8 +8,8 @@ namespace {
     constexpr uint8_t BUS_SPI = 0x08;
     constexpr uint32_t DEFAULT_SPI_FREQUENCY = 8000000;
     constexpr uint32_t MAX_SPI_FREQUENCY = 40000000;
-    constexpr uint32_t MAX_SPI_TRANSFER = 4096;
-    constexpr uint16_t SERIAL_BUFFER_SIZE = MAX_SPI_TRANSFER + 64;
+    constexpr uint32_t SERPROG_MAX_TRANSFER = 0xFFFFFF;
+    constexpr size_t SERIAL_BUFFER_SIZE = 65535;
     constexpr uint32_t READ_TIMEOUT_MS = 1000;
     constexpr uint32_t TX_TIMEOUT_MS = 5000;
     constexpr uint32_t TRANSFER_ABORT_CHECK_INTERVAL = 64;
@@ -191,7 +190,7 @@ void FlashromSerprogAdapter::handleCommand(uint8_t command, IInput& input) {
 
         case CMD_Q_SERBUF:
             writeAck();
-            writeLe16(SERIAL_BUFFER_SIZE);
+            writeLe16(static_cast<uint16_t>(SERIAL_BUFFER_SIZE));
             break;
 
         case CMD_Q_BUSTYPE:
@@ -202,7 +201,7 @@ void FlashromSerprogAdapter::handleCommand(uint8_t command, IInput& input) {
         case CMD_Q_WRNMAXLEN:
         case CMD_Q_RDNMAXLEN:
             writeAck();
-            writeLe24(MAX_SPI_TRANSFER);
+            writeLe24(SERPROG_MAX_TRANSFER);
             break;
 
         case CMD_SYNCNOP:
@@ -327,27 +326,13 @@ void FlashromSerprogAdapter::handleSpiOperation(IInput& input) {
         return;
     }
 
-    if (!pinsEnabled || writeLength > MAX_SPI_TRANSFER || readLength > MAX_SPI_TRANSFER) {
+    if (!pinsEnabled || writeLength > SERPROG_MAX_TRANSFER || readLength > SERPROG_MAX_TRANSFER) {
         purgeInput();
         resetSpiBusState();
         writeNak();
         return;
     }
 
-    std::vector<uint8_t> writeData;
-    writeData.reserve(writeLength);
-    for (uint32_t i = 0; i < writeLength; ++i) {
-        uint8_t value = 0;
-        if (!readByte(input, value)) {
-            purgeInput();
-            resetSpiBusState();
-            writeNak();
-            return;
-        }
-        writeData.push_back(value);
-    }
-
-    writeAck();
     SPISettings settings(config.frequency, MSBFIRST, SPI_MODE0);
     spi.beginTransaction(settings);
     transactionActive = true;
@@ -359,8 +344,18 @@ void FlashromSerprogAdapter::handleSpiOperation(IInput& input) {
             return;
         }
 
-        spi.transfer(writeData[i]);
+        uint8_t value = 0;
+        if (!readByte(input, value)) {
+            purgeInput();
+            resetSpiBusState();
+            writeNak();
+            return;
+        }
+
+        spi.transfer(value);
     }
+
+    writeAck();
 
     for (uint32_t i = 0; i < readLength; ++i) {
         if ((i & (TRANSFER_ABORT_CHECK_INTERVAL - 1)) == 0 && !cdcConnected) {
