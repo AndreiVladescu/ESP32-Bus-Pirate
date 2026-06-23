@@ -33,8 +33,8 @@ private:
     const uint8_t BTN_LONG = 4;
     const uint8_t BTN_SHUT = 8;
     const uint8_t LONG_PRESS_MIN = 5;
-    const uint8_t LONG_PRESS_MAX = 10;
-    const uint8_t LONG_PRESS_MIN_SHTDWN = 30;
+    const uint8_t LONG_PRESS_MAX = 20;
+    const uint8_t LONG_PRESS_MIN_SHTDWN = 50;
 };
 
 #endif
