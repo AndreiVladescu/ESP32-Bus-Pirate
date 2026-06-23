@@ -5,7 +5,7 @@ Contributing to this firmware is **simple**. Below we describe a **straightforwa
 As a contributor, you usually only need to work on the **Controller** and **Service** related to the protocol where you want to add your command.
 
 If you are not familiar with PlatformIO, you can follow the build instructions here:  
-https://github.com/geo-tp/ESP32-Bus-Pirate/wiki/99-Build
+https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/99-Build
 
 
 ## Basic Steps
