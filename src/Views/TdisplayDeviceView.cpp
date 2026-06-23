@@ -278,8 +278,8 @@ void TdisplayDeviceView::horizontalSelection(
 
   // Description 2 
   tft.setTextColor(HELP_COLOR, TFT_BLACK);
-  tft.drawString("Short press any button to change terminal", tft.width() / 2, tft.height() - 30);
-  tft.drawString("Long press top button to accept", tft.width() / 2, tft.height() - 12);
+  tft.drawString("Short press top button to change terminal", tft.width() / 2, tft.height() - 30);
+  tft.drawString("Short press bottom button to accept", tft.width() / 2, tft.height() - 12);
 
   // Box background + border
   tft.fillRoundRect(boxX, boxY, boxW, boxH, corner, DARK_GREY_RECT);

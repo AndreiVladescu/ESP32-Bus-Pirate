@@ -161,8 +161,8 @@ String selectWifiNetwork() {
     tft.setTextFont(2);
     tft.setTextSize(1);
     tft.setTextColor(HELP_COLOR, TFT_BLACK);
-    tft.drawString("Short press any button to change SSID", 10, tft.height() - 35);
-    tft.drawString("Long press top button to accept", 10, tft.height() - 20);
+    tft.drawString("Short press top button to change SSID", 10, tft.height() - 35);
+    tft.drawString("Short press bottom button to accept", 10, tft.height() - 20);
 
     while (true) {
         tft.fillRect(0, 40, tft.width(), tft.height() - 80, TFT_BLACK);
@@ -184,11 +184,9 @@ String selectWifiNetwork() {
         }
 
         char key = handler();
-        if (key == KEY_ARROW_RIGHT) {
-            selected = (selected - 1 + networksCount) % networksCount;
-        } else if (key == KEY_ARROW_LEFT) {
+        if (key == KEY_ARROW_LEFT) {
             selected = (selected + 1) % networksCount;
-        } else if (key == KEY_OK) {
+        } else if (key == KEY_ARROW_RIGHT) {
             return WiFi.SSID(selected);
         }
     }
