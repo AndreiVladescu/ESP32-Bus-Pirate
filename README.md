@@ -120,7 +120,7 @@ The wiki is the best place to learn how everything works.
 
 🛠️ [**Automate interactions with the ESP32 Bit Pirate**](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki/99-Python) using **Python scripts over serial.**
 
-**Examples and ready-to-use scripts** are available in the repository: [ESP32 Bit Pirate Scripts](https://github.com/geo-tp/ESP32-Bit-Pirate-Scripts).
+You can write and test scripts directly in the browser with the [ESP32 Bit Pirate Python Lab](https://geo-tp.github.io/ESP32-Bit-Pirate/web-tools/python-lab/).
 
 **Including:** Logging data in a file, eeprom and flash dump, interracting with GPIOs, LED animation...
 
