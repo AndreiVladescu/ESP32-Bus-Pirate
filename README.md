@@ -1,15 +1,15 @@
 # ESP32 Bit Pirate
 
-![Logo banner of the ESP32 Bit Pirate firmware](images/logo_protocols_banner_small.png)
+[![Logo banner of the ESP32 Bit Pirate firmware](images/logo_protocols_banner_small.png)](https://geo-tp.github.io/ESP32-Bit-Pirate/)
 
 
-**ESP32 Bit Pirate** is an open-source firmware that turns your device into a multi-protocol hacker's tool, inspired by the [legendary Bus Pirate](https://buspirate.com/).
+**ESP32 Bit Pirate** is open-source firmware that turns your device into a multi-protocol development and analysis tool, inspired by the legendary Bus Pirate.
 
 It supports sniffing, sending, scripting, and interacting with various digital protocols (I2C, UART, 1-Wire, SPI, etc.) via a serial terminal or web-based CLI. It also communicates with radio protocols like Bluetooth, Wi-Fi, Sub-GHz and RFID.
 
-Use the [ESP32 Bit Pirate Web Flasher](https://geo-tp.github.io/ESP32-Bit-Pirate/webflasher/) to install the firmware in one click. See the [Wiki](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki) for step-by-step guides on every mode and command. Check [ESP32 Bit Pirate Scripts](https://github.com/geo-tp/ESP32-Bit-Pirate-Scripts) for a collection of scripts.
+The official project website centralizes everything: [ESP32 Bit Pirate Website](https://geo-tp.github.io/ESP32-Bit-Pirate/).
 
-For hardware extensions, see the [ESP32 Bus Expander](https://github.com/geo-tp/ESP32-Bus-Expander) for additional radio interfaces, and the [ESP32 Bit Pirate Dock](https://github.com/AndreiVladescu/ESP32-Bit-Pirate-Dock) to use original [Bus Pirate](https://buspirate.com/) adapters and accessories.
+From there you can [install the firmware](https://geo-tp.github.io/ESP32-Bit-Pirate/webflasher/), open the [web tools](https://geo-tp.github.io/ESP32-Bit-Pirate/web-tools/), follow [hardware guides](https://geo-tp.github.io/ESP32-Bit-Pirate/hardware/), explore [recipes](https://geo-tp.github.io/ESP32-Bit-Pirate/recipes/), and access the [documentation](https://github.com/geo-tp/ESP32-Bit-Pirate/wiki).
 
 ![Demo showing the different mode of the ESP32 Bit Pirate firmware](images/bit_pirate_uart.gif)
 ![Demo showing the LittleFS file system of the ESP32 Bit Pirate firmware](images/pirate_assistant.gif)
