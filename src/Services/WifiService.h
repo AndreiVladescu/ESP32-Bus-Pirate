@@ -69,6 +69,7 @@ public:
     bool isProvisioningEnabled() const;
     void reset();
     void recoverStaForRetry(bool keepApMode);
+    bool prepareRawTx(uint8_t channel = 1);
     
     // Access point
     bool startAccessPoint(const std::string& ssid, const std::string& password = "", int channel = 1, int maxConn = 4);

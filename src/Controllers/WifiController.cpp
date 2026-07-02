@@ -305,6 +305,12 @@ AP Spam
 void WifiController::handleApSpam()
 {
     terminalView.println("WiFi: Starting beacon spam... Press [ENTER] to stop.");
+
+    if (!wifiService.prepareRawTx(1)) {
+        terminalView.println("WiFi: Failed to prepare raw packet injection.\n");
+        return;
+    }
+
     while (true)
     {
         beaconCreate("", 0, 0); // func from Vendors/wifi_atks.h
@@ -664,6 +670,11 @@ void WifiController::handleFlood(const TerminalCommand& cmd)
     }
      
     terminalView.println("\nWiFi Flood: Starting on channel " + std::to_string(channel) + "... Press [ENTER] to stop.");
+
+    if (!wifiService.prepareRawTx(channel)) {
+        terminalView.println("WiFi Flood: Failed to prepare raw packet injection.\n");
+        return;
+    }
 
     while (true) {
         char c = terminalInput.readChar();

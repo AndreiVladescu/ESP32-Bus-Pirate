@@ -125,6 +125,21 @@ void WifiService::recoverStaForRetry(bool keepApMode) {
     connected = false;
 }
 
+bool WifiService::prepareRawTx(uint8_t channel) {
+    esp_wifi_set_promiscuous(false);
+    esp_wifi_set_promiscuous_rx_cb(nullptr);
+
+    WiFi.mode(WIFI_STA);
+
+    esp_err_t err = esp_wifi_start();
+    if (err != ESP_OK && err != ESP_ERR_WIFI_CONN && err != ESP_ERR_WIFI_STATE) {
+        return false;
+    }
+
+    err = esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);
+    return err == ESP_OK;
+}
+
 void WifiService::setModeApSta() {
     WiFi.mode(WIFI_AP_STA);
 }
@@ -296,30 +311,21 @@ void WifiService::startPassiveSniffing() {
     disconnect();
 
     esp_wifi_set_promiscuous(false);
-    esp_wifi_stop();
     esp_wifi_set_promiscuous_rx_cb(nullptr);
 
-    if (isConnected()) {
-        esp_wifi_deinit();
-    }
-    delay(300);
-
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    esp_wifi_init(&cfg);
+    WiFi.mode(WIFI_STA);
     esp_wifi_start();
 
-    esp_wifi_set_promiscuous(true);
     esp_wifi_set_promiscuous_rx_cb(&WifiService::snifferCallback);
+    esp_wifi_set_promiscuous(true);
 }
 
 void WifiService::stopPassiveSniffing() {
     esp_wifi_set_promiscuous(false);
     esp_wifi_set_promiscuous_rx_cb(nullptr);
-    esp_wifi_stop();
-    esp_wifi_deinit();
     sniffLog.clear();
     WiFi.mode(WIFI_STA);
-    WiFi.disconnect(true);
+    esp_wifi_start();
 }
 
 void WifiService::snifferCallback(void* buf, wifi_promiscuous_pkt_type_t) {
