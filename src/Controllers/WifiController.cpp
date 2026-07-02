@@ -206,7 +206,6 @@ void WifiController::handleStatus(const TerminalCommand &cmd)
 
     terminalView.println("Mode         : " + std::string(wifiService.wifiModeToStr(wifiService.getWifiModeRaw())));
     terminalView.println("Status       : " + std::string(wifiService.wlStatusToStr(status)));
-    terminalView.println("Prov enabled : " + std::string(wifiService.isProvisioningEnabled() ? "Yes" : "No"));
     terminalView.println("====================\n");
 }
 
