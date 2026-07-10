@@ -101,7 +101,7 @@ and injecting shared instances of core components
 #include "Shells/FmBroadcastShell.h"
 #include "Shells/UsbAdapterShell.h"
 #include "Shells/MouseShell.h"
-#include "Config/TerminalTypeConfigurator.h"
+#include "Configurators/TerminalTypeConfigurator.h"
 
 class DependencyProvider
 {

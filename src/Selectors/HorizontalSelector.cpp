@@ -41,10 +41,27 @@ int HorizontalSelector::select(
 }
 
 int HorizontalSelector::selectHeadless() {
+    std::vector<std::string> options = {
+        TerminalTypeEnumMapper::toString(TerminalTypeEnum::WiFiClient),
+        TerminalTypeEnumMapper::toString(TerminalTypeEnum::WiFiAp),
+        TerminalTypeEnumMapper::toString(TerminalTypeEnum::SerialPort),
+    };
+
     int selected = 2;  // default: Serial
     const unsigned long longPressMs = 800;
 
-    // 3 sec to press the button
+    display.topBar("ESP32 BIT PIRATE", false, false);
+    display.horizontalSelection(
+        options,
+        selected,
+        "Terminal auto-select",
+        "Short press: CONNECT  Long press: HOTSPOT"
+    );
+
+    // 3 sec window:
+    // - no input: Serial
+    // - short press: WiFi Connect
+    // - long press: WiFi Hotspot
     const unsigned long timeout = millis() + 3000;
     while (millis() < timeout) {
         char c = input.readChar();
@@ -53,12 +70,26 @@ int HorizontalSelector::selectHeadless() {
             while (input.readChar() == KEY_OK) {
                 if (millis() - pressStart >= longPressMs) {
                     selected = 1; // WiFi Hotspot
+                    display.horizontalSelection(
+                        options,
+                        selected,
+                        "Terminal selected",
+                        "Starting hotspot..."
+                    );
+                    delay(250);
                     return selected;
                 }
                 delay(10);
             }
 
             selected = 0; // WiFi Connect
+            display.horizontalSelection(
+                options,
+                selected,
+                "Terminal selected",
+                "Connecting to WiFi..."
+            );
+            delay(250);
             break;
         }
         delay(10);

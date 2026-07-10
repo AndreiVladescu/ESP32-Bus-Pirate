@@ -1,58 +1,57 @@
 #ifndef UNIT_TEST
 
 #include <Views/SerialTerminalView.h>
-#include <Views/M5DeviceView.h>
 #include <Views/WebTerminalView.h>
-#include <Views/NoScreenDeviceView.h>
-#include <Views/TembedDeviceView.h>
-#include <Views/TdisplayDeviceView.h>
-#include <Views/WaveshareS3GeekDeviceView.h>
-#include <Views/CardputerTerminalView.h>
-#include <Views/CardputerDeviceView.h>
+#include <Boards/Common/Views/NoScreenDeviceView.h>
 #include <Inputs/SerialTerminalInput.h>
-#include <Inputs/CardputerInput.h>
-#include <Inputs/StickInput.h>
-#include <Inputs/StampS3Input.h>
-#include <Inputs/TembedInput.h>
-#include <Inputs/TdisplayInput.h>
-#include <Inputs/WaveshareS3GeekInput.h>
-#include <Inputs/S3DevKitInput.h>
+#include <Inputs/WebTerminalInput.h>
+#include <Boards/Cardputer/CardputerBoard.h>
+#include <Boards/Cardputer/CardputerDeviceView.h>
+#include <Boards/Cardputer/CardputerInput.h>
+#include <Boards/Cardputer/CardputerTerminalView.h>
+#include <Boards/StickS3/StickS3Board.h>
+#include <Boards/StampS3/StampS3Board.h>
+#include <Boards/S3DevKit/S3DevKitBoard.h>
+#include <Boards/Common/Inputs/DefaultInput.h>
+#include <Boards/TDisplayS3/TDisplayS3Board.h>
+#include <Boards/WaveshareS3Geek/WaveshareS3GeekBoard.h>
+#include <Boards/TEmbed/TEmbedBoard.h>
+#include <Boards/VisionMasterT190/VisionMasterT190Board.h>
+#include <Boards/Custom/CustomBoard.h>
+#include <Boards/Common/Serial/BoardHostSerial.h>
 #include <Providers/DependencyProvider.h>
 #include <Dispatchers/ActionDispatcher.h>
 #include <Servers/HttpServer.h>
 #include <Servers/WebSocketServer.h>
 #include <Servers/DnsServer.h>
 #include <Services/NvsService.h>
-#include <Inputs/WebTerminalInput.h>
 #include <Selectors/HorizontalSelector.h>
-#include <Config/TerminalTypeConfigurator.h>
-#include <Config/WifiTypeConfigurator.h>
-#include <Config/BootModeConfigurator.h>
+#include <Configurators/TerminalTypeConfigurator.h>
+#include <Configurators/WifiTypeConfigurator.h>
+#include <Configurators/BootModeConfigurator.h>
 #include <Enums/TerminalTypeEnum.h>
-#include <Serial/DefaultHostSerial.h>
-#include <Serial/UartHostSerial.h>
 #include <States/GlobalState.h>
 
 /*
-This file initializes the device (M5Stick / Cardputer / StampS3 / T-Embed / S3 DevKit),
-selects the terminal mode (Serial, Wi-Fi Client/AP, Standalone Cardputer),
-and then launches the main loop through the ActionDispatcher.
+This file initializes the selected board, lets the board expose its device view,
+physical input and host serial link, selects the terminal mode, and then launches
+the main loop through the ActionDispatcher.
 
-- Terminal View: the interface where the user SEES and INTERACTS with the CLI.
-    * SerialTerminalView    -> text terminal via USB serial (COM/tty).
+- Terminal View: the generic CLI interface where the user SEES output.
+    * SerialTerminalView    -> text terminal via the board host serial link.
     * WebTerminalView       -> text terminal in a browser (via WebSocket).
     * CardputerTerminalView -> Cardputer LCD acts as the terminal screen.
 
 - Device View: the interface for device’s screen (if any).
-    * M5DeviceView, TembedDeviceView, CardputerDeviceView, NoScreenDeviceView, etc.
+    * M5DeviceView, St7789SpiDeviceView, St7789ParallelDeviceView, CardputerDeviceView, NoScreenDeviceView, etc.
     * Used for UI elements like mode, pinout mapping, or logic traces.
 
 - Terminal Input: how the user TYPES commands into the system.
-    * SerialTerminalInput  -> keyboard input over USB serial.
+    * SerialTerminalInput  -> keyboard input over the board host serial link.
     * WebTerminalInput     -> keystrokes/events from a browser WebSocket.
 
 - Device Input: physical buttons on the device.
-    * StickInput, TembedInput, StampS3Input, S3DevKitInput -> button/encoders.
+    * StickInput, TEmbedInput, StampS3Input, DefaultInput -> button/encoders.
 
 - ActionDispatcher: the central loop that reads user actions,
   dispatches them to controllers/services, and keeps the system running.
@@ -91,66 +90,68 @@ and then launches the main loop through the ActionDispatcher.
 */
 
 void setup() {
-    #if DEVICE_STICKS3
-        // Setup the Stick
-        #include <M5Unified.h>
-        auto cfg = M5.config();
-        M5.begin(cfg);
-        M5DeviceView deviceView;
-        deviceView.setRotation(3);
-        StickInput deviceInput;
-        M5.Power.setExtOutput(false);
-        deviceView.logo();
-        deviceInput.waitPress(3000);
-    #elif DEVICE_CARDPUTER
-        // Setup the Cardputer
-        #include <M5Unified.h>
-        auto cfg = M5.config();
-        M5Cardputer.begin(cfg, true);
-        M5DeviceView deviceView;
-        deviceView.setRotation(1);
-        CardputerInput deviceInput;
-        deviceView.logo();
-        deviceInput.waitPress(3000);
-    #elif DEVICE_M5STAMPS3
-        // Setup the StampS3/AtomS3
-        #include <M5Unified.h>
-        auto cfg = M5.config();
-        M5.begin(cfg);
-        NoScreenDeviceView deviceView;
-        StampS3Input deviceInput;
+    #if defined(DEVICE_STICKS3)
+        StickS3Board board;
+        board.initialize();
+        IDeviceView& deviceView = board.getDeviceView();
+        IInput& deviceInput = board.getDeviceInput();
+        IHostSerial& hostSerial = board.getHostSerial();
+    #elif defined(DEVICE_CARDPUTER)
+        CardputerBoard board;
+        board.initialize();
+        IDeviceView& deviceView = board.getDeviceView();
+        IInput& deviceInput = board.getDeviceInput();
+        IHostSerial& hostSerial = board.getHostSerial();
+    #elif defined(DEVICE_M5STAMPS3)
+        StampS3Board board;
+        board.initialize();
+        IDeviceView& deviceView = board.getDeviceView();
+        IInput& deviceInput = board.getDeviceInput();
+        IHostSerial& hostSerial = board.getHostSerial();
+    #elif defined(DEVICE_VISION_MASTER_T190)
+        VisionMasterT190Board board;
+        board.initialize();
+        IDeviceView& deviceView = board.getDeviceView();
+        IInput& deviceInput = board.getDeviceInput();
+        IHostSerial& hostSerial = board.getHostSerial();
     #elif defined(DEVICE_TEMBEDS3) || defined(DEVICE_TEMBEDS3CC1101)
-        // Setup the T-embed
-        TembedDeviceView deviceView;
-        TembedInput deviceInput;
-        deviceView.initialize();
-        deviceView.logo();
-        deviceInput.waitPress(3000);
-        deviceView.clear();
+        TEmbedBoard board;
+        board.initialize();
+        IDeviceView& deviceView = board.getDeviceView();
+        IInput& deviceInput = board.getDeviceInput();
+        IHostSerial& hostSerial = board.getHostSerial();
     #elif defined(DEVICE_TDISPLAYS3)
-        TdisplayDeviceView deviceView;
-        TdisplayInput deviceInput;
-        deviceView.initialize();
-        deviceView.logo();
-        deviceInput.waitPress(3000);
-        deviceView.clear();
+        TDisplayS3Board board;
+        board.initialize();
+        IDeviceView& deviceView = board.getDeviceView();
+        IInput& deviceInput = board.getDeviceInput();
+        IHostSerial& hostSerial = board.getHostSerial();
     #elif defined(DEVICE_WAVESHARE_S3_GEEK)
-        WaveshareS3GeekDeviceView deviceView;
-        WaveshareS3GeekInput deviceInput;
-        deviceView.initialize();
-        deviceView.logo();
-        deviceInput.waitPress(3000);
-        deviceView.clear();
+        WaveshareS3GeekBoard board;
+        board.initialize();
+        IDeviceView& deviceView = board.getDeviceView();
+        IInput& deviceInput = board.getDeviceInput();
+        IHostSerial& hostSerial = board.getHostSerial();
+    #elif defined(DEVICE_S3DEVKIT)
+        S3DevKitBoard board;
+        board.initialize();
+        IDeviceView& deviceView = board.getDeviceView();
+        IInput& deviceInput = board.getDeviceInput();
+        IHostSerial& hostSerial = board.getHostSerial();
+    #elif defined(DEVICE_CUSTOM)
+        CustomBoard board;
+        board.initialize();
+        IDeviceView& deviceView = board.getDeviceView();
+        IInput& deviceInput = board.getDeviceInput();
+        IHostSerial& hostSerial = board.getHostSerial();
     #else
-        // Fallback to S3 dev kit
-        NoScreenDeviceView deviceView;
-        S3DevKitInput deviceInput;
-    #endif
-
-    #if defined(DEVICE_HOST_SERIAL_UART)
-        UartHostSerial hostSerial;
-    #else
-        DefaultHostSerial hostSerial;
+        BoardHostSerial fallbackHostSerial;
+        NoScreenDeviceView fallbackDeviceView;
+        DefaultInput fallbackDeviceInput;
+        fallbackDeviceView.initialize();
+        IDeviceView& deviceView = fallbackDeviceView;
+        IInput& deviceInput = fallbackDeviceInput;
+        IHostSerial& hostSerial = fallbackHostSerial;
     #endif
 
     // USB Adapter boot mode if set, otherwise continue to terminal type selection
@@ -255,7 +256,7 @@ void setup() {
             CardputerInput standaloneInput; // cardputer keyboard for command input
             standaloneView.initialize();
             CardputerDeviceView deviceView; // used for logic analyzer only
-            S3DevKitInput deviceInput; // the G0 button of the cardputer
+            DefaultInput deviceInput; // the G0 button of the cardputer
 
             // Build the provider for cardputer standalone and run the dispatcher loop
             DependencyProvider* provider = new DependencyProvider(standaloneView, deviceView, standaloneInput, deviceInput,

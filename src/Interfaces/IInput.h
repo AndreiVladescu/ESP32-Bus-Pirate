@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "Inputs/InputKeys.h"
+#include "Data/InputKeys.h"
 
 // Interface for terminal input
 // This is the interface expected by the ActionDispatcher to handle user input.

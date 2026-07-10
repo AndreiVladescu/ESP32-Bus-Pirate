@@ -4,7 +4,8 @@
 #include <vector>
 #include "Interfaces/IDeviceView.h"
 #include "Interfaces/IInput.h"
-#include "Inputs/CardputerInput.h"
+#include "Data/InputKeys.h"
+#include "Enums/TerminalTypeEnum.h"
 #include <Arduino.h>
 
 class HorizontalSelector {

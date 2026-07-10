@@ -3,7 +3,7 @@
 #include <esp_http_server.h>
 #include <vector>
 #include <string>
-#include <Inputs/InputKeys.h>
+#include <Data/InputKeys.h>
 #include <Arduino.h>
 #include <esp_log.h>
 #include <cstring>
