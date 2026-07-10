@@ -1,6 +1,5 @@
 #include "InfraredToyAdapter.h"
 
-#include "Inputs/InputKeys.h"
 
 void InfraredToyAdapter::run(const InfraredToyConfig& config, IInput& input, IHostSerial& hostSerialRef) {
     InfraredToyAdapter::hostSerial = &hostSerialRef;

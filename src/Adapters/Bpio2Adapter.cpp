@@ -6,7 +6,6 @@
 
 #include "Transformers/Bpio2Transformer.h"
 #include "States/GlobalState.h"
-#include "Inputs/InputKeys.h"
 
 
 void Bpio2Adapter::run(const Bpio2AdapterConfig& adapterConfig,

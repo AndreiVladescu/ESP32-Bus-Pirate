@@ -1,5 +1,4 @@
 #include "SumpLogicAnalyzerAdapter.h"
-#include "Inputs/InputKeys.h"
 #include "driver/gpio.h"
 #include "esp_heap_caps.h"
 #include "esp_timer.h"

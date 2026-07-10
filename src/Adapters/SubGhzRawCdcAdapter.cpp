@@ -4,7 +4,6 @@
 #include <cctype>
 #include <cstring>
 #include <cstdlib>
-#include "Inputs/InputKeys.h"
 
 void SubGhzRawCdcAdapter::run(const SubGhzRawCdcConfig& adapterConfig, IInput& deviceInput, IHostSerial& hostSerialRef) {
     hostSerial = &hostSerialRef;

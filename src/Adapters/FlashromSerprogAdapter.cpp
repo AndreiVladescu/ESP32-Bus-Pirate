@@ -1,5 +1,4 @@
 #include "FlashromSerprogAdapter.h"
-#include "Inputs/InputKeys.h"
 #include <USBCDC.h>
 
 namespace {
