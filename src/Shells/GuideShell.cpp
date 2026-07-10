@@ -25,7 +25,8 @@ void GuideShell::run() {
             case 4: cmdPythonAutomation(); break;
             case 5: cmdLittleFS(); break;
             case 6: cmdPirateAssistant(); break;
-            case 7: cmdSafety(); break;
+            case 7: cmdUsbAdapters(); break;
+            case 8: cmdSafety(); break;
             default:
                 loop = false;
                 break;
@@ -79,8 +80,8 @@ void GuideShell::cmdQuickStart() {
 
     terminalView.println("Tip:");
     terminalView.println("  Use 'help' anywhere for full command lists.");
-    terminalView.println("  See the Wiki for detailed workflows.");
-    terminalView.println("  https://github.com/geo-tp/ESP32-Bit-Pirate/wiki");
+    terminalView.println("  See the Website for detailed workflows.");
+    terminalView.println("  https://geo-tp.github.io/ESP32-Bit-Pirate/");
 }
 
 void GuideShell::cmdExamples() {
@@ -128,8 +129,8 @@ void GuideShell::cmdExamples() {
 
     terminalView.println("Note:");
     terminalView.println("  Examples only.");
-    terminalView.println("  See the Wiki for detailed workflows.");
-    terminalView.println("  https://github.com/geo-tp/ESP32-Bit-Pirate/wiki");
+    terminalView.println("  See the Website for detailed workflows.");
+    terminalView.println("  https://geo-tp.github.io/ESP32-Bit-Pirate/");
 }
 
 void GuideShell::cmdWebTerminal() {
@@ -201,10 +202,13 @@ void GuideShell::cmdInstructionSyntax() {
 void GuideShell::cmdPythonAutomation() {
     terminalView.println("\n=== Python Automation (Serial) ===\n");
     terminalView.println("Repo: ESP32 Bit Pirate Scripts");
-    terminalView.println("https://github.com/geo-tp/ESP32-Bus-Pirate-Scripts");
+    terminalView.println("https://github.com/geo-tp/ESP32-Bit-Pirate-Scripts");
+    terminalView.println("");
+    terminalView.println("Web Python Lab:");
+    terminalView.println("https://geo-tp.github.io/ESP32-Bit-Pirate/web-tools/");
     terminalView.println("");
     terminalView.println("Minimal example:");
-    terminalView.println("  bp = BusPirate.auto_connect()");
+    terminalView.println("  bp = BitPirate.auto_connect()");
     terminalView.println("  bp.start()");
     terminalView.println("  bp.change_mode(\"dio\")");
     terminalView.println("  bp.send(\"set 1 LOW\")");
@@ -237,6 +241,21 @@ void GuideShell::cmdPirateAssistant() {
     terminalView.println("  The assistant may suggest: mode I2C || eeprom");
     terminalView.println("");
     terminalView.println("Check the suggested steps before sending them.");
+}
+
+void GuideShell::cmdUsbAdapters() {
+    terminalView.println("\n=== USB Adapters ===\n");
+    terminalView.println("Dedicated adapters expose the device as a USB tool.");
+    terminalView.println("");
+    terminalView.println("Flow:");
+    terminalView.println("  1. Type 'mode usb || adapters' in the terminal.");
+    terminalView.println("  2. Select an adapter and configure its GPIOs.");
+    terminalView.println("  3. The device reboots into the selected USB mode.");
+    terminalView.println("  4. Open the matching browser tool or desktop client.");
+    terminalView.println("  5. Reset the device to return to normal mode.");
+    terminalView.println("");
+    terminalView.println("Browser tools:");
+    terminalView.println(" https://geo-tp.github.io/ESP32-Bit-Pirate/web-tools/");
 }
 
 void GuideShell::cmdSafety() {

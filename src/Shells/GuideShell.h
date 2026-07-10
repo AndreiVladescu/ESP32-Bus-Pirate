@@ -27,6 +27,7 @@ private:
         " 🐍 Python automation",
         " 📒 File System",
         " ☠️  Pirate Assistant",
+        " 🔌 USB Adapters",
         " ⚠️  Safety (voltage)",
         " 🚪 Exit"
     };
@@ -41,5 +42,6 @@ private:
     void cmdPythonAutomation();
     void cmdLittleFS();
     void cmdPirateAssistant();
+    void cmdUsbAdapters();
     void cmdSafety();
 };
