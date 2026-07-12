@@ -14,6 +14,7 @@ public:
     bool isRepeatCommand(const std::string& raw) const;
     bool isGlobalCommand(const TerminalCommand& cmd) const; 
     bool isScreenCommand(const TerminalCommand& cmd) const;
+    std::string tail(const TerminalCommand& cmd) const;
 private:
     std::string normalizeRaw(const std::string& raw) const;
     void autoCorrectRoot(TerminalCommand& cmd) const;

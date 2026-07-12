@@ -163,6 +163,14 @@ PinoutConfig PinoutTransformer::build(ModeEnum mode) const {
                 "BAUD " + std::to_string(state.getUartBaudRate()),
             });
             break;
+        case ModeEnum::LORA:
+            config.setMappings({
+                "SCK GPIO " + std::to_string(state.getLoRaSckPin()),
+                "MISO GPIO " + std::to_string(state.getLoRaMisoPin()),
+                "MOSI GPIO " + std::to_string(state.getLoRaMosiPin()),
+                "CS GPIO " + std::to_string(state.getLoRaCsPin())
+            });
+            break;
             
         default:
             break;

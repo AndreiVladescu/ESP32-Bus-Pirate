@@ -210,6 +210,15 @@ bool TerminalCommandTransformer::isScreenCommand(const TerminalCommand& cmd) con
        || cmd.getRoot() == "monitor" || cmd.getRoot() == "receive";
 }
 
+std::string TerminalCommandTransformer::tail(const TerminalCommand& cmd) const {
+    std::string result = cmd.getSubcommand();
+    if (!cmd.getArgs().empty()) {
+        if (!result.empty()) result += " ";
+        result += cmd.getArgs();
+    }
+    return result;
+}
+
 std::string TerminalCommandTransformer::normalizeRaw(const std::string& raw) const {
     // trim global
     size_t start = raw.find_first_not_of(" \t\r\n");
