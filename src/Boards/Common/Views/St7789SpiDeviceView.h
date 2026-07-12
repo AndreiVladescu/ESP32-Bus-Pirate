@@ -20,6 +20,7 @@ struct St7789SpiConfig {
   int8_t pinDc = -1;
   int8_t pinReset = -1;
   int8_t pinPower = -1;
+  spi_host_device_t spiHost = SPI2_HOST;
 
   uint16_t panelWidth = 170;
   uint16_t panelHeight = 320;
@@ -51,7 +52,7 @@ public:
     {
     auto cfg = _bus.config();
 
-    cfg.spi_host   = SPI2_HOST;
+    cfg.spi_host   = displayConfig.spiHost;
     cfg.spi_mode   = 0;
 
     cfg.freq_write = displayConfig.writeFrequency;
@@ -131,8 +132,6 @@ private:
   LGFX_ST7789SPI tft;
   //   lgfx::LGFX_Sprite canvas; // Not used currently, memory consumption is too high
   uint8_t brightnessPct = 100;
-  SPIClass screenSpi{HSPI}; // or FSPI
-
   SPIClass sharedSpi{HSPI};
 
   void drawCenterText(const std::string& text, int y, int fontSize);

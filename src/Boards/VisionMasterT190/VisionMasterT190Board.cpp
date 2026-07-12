@@ -12,6 +12,11 @@ St7789SpiConfig VisionMasterT190Board::createDisplayConfig() {
     config.pinDc = 47;
     config.pinReset = 40;
     config.pinPower = 7;
+    // Match Heltec's bus split: the TFT uses HSPI/SPI3 while radios and other
+    // protocols use the global SPI object (FSPI/SPI2 on ESP32-S3). If both use
+    // SPI3, LoRaService::releaseSpiBus() stops the TFT before the exit redraw.
+    config.spiHost = SPI3_HOST;
+    config.useSharedSpi = false;
 
     config.panelWidth = 170;
     config.panelHeight = 320;

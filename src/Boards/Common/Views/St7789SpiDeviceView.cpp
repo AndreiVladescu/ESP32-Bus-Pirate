@@ -32,8 +32,6 @@ void St7789SpiDeviceView::initialize() {
     digitalWrite(config.pinPower, config.powerActiveHigh ? HIGH : LOW);
   }
 
-  screenSpi.begin(config.pinSclk, config.pinMiso, config.pinMosi, config.pinCs);
-
   tft.init();
   tft.setRotation(config.rotation);
   tft.setSwapBytes(true);
