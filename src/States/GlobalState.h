@@ -1,4 +1,5 @@
 #pragma once
+#include "Models/LoRaRadioProfile.h"
 
 #include <cstdint>
 #include <string>
@@ -148,6 +149,20 @@ private:
     uint8_t rf24SckPin = 5;
     uint8_t rf24MisoPin = 7;
     uint8_t rf24MosiPin = 9;
+
+    // LoRa SX1262 Default Configuration
+    uint8_t loRaSckPin = 5, loRaMisoPin = 6, loRaMosiPin = 7, loRaCsPin = 4;
+    uint8_t loRaRstPin = 3, loRaBusyPin = 2, loRaDio1Pin = 1;
+    float loRaFrequency = 868.0f;
+    float loRaTcxoVoltage = 1.8f;
+    uint16_t loRaBandwidth = 125;
+    uint8_t loRaSpreadingFactor = 9;
+    uint8_t loRaCodingRate = 7;
+    int8_t loRaPower = 14;
+    uint16_t loRaPreambleLength = 8;
+    uint16_t loRaSyncWord = 0x1424;
+    bool loRaCrc = true;
+    bool loRaInvertIq = false;
 
     // RFID (I2C PN532)
     uint8_t rfidSdaPin = 1;
@@ -404,6 +419,46 @@ public:
     void setRf24MisoPin(uint8_t pin) { rf24MisoPin = pin; }
     void setRf24MosiPin(uint8_t pin) { rf24MosiPin = pin; }
 
+    uint8_t getLoRaSckPin() const { return loRaSckPin; }
+    uint8_t getLoRaMisoPin() const { return loRaMisoPin; }
+    uint8_t getLoRaMosiPin() const { return loRaMosiPin; }
+    uint8_t getLoRaCsPin() const { return loRaCsPin; }
+    uint8_t getLoRaRstPin() const { return loRaRstPin; }
+    uint8_t getLoRaBusyPin() const { return loRaBusyPin; }
+    uint8_t getLoRaDio1Pin() const { return loRaDio1Pin; }
+    float getLoRaFrequency() const { return loRaFrequency; }
+    float getLoRaTcxoVoltage() const { return loRaTcxoVoltage; }
+    uint16_t getLoRaBandwidth() const { return loRaBandwidth; }
+    uint8_t getLoRaSpreadingFactor() const { return loRaSpreadingFactor; }
+    uint8_t getLoRaCodingRate() const { return loRaCodingRate; }
+    int8_t getLoRaPower() const { return loRaPower; }
+    uint16_t getLoRaPreambleLength() const { return loRaPreambleLength; }
+    uint16_t getLoRaSyncWord() const { return loRaSyncWord; }
+    bool getLoRaCrc() const { return loRaCrc; }
+    bool getLoRaInvertIq() const { return loRaInvertIq; }
+    LoRaRadioProfile getLoRaProfile() const {
+        return {loRaFrequency, loRaBandwidth, loRaSpreadingFactor,
+                loRaCodingRate, loRaPower, loRaTcxoVoltage,
+                loRaPreambleLength, loRaSyncWord, loRaCrc, loRaInvertIq};
+    }
+    void setLoRaSckPin(uint8_t v) { loRaSckPin = v; }
+    void setLoRaMisoPin(uint8_t v) { loRaMisoPin = v; }
+    void setLoRaMosiPin(uint8_t v) { loRaMosiPin = v; }
+    void setLoRaCsPin(uint8_t v) { loRaCsPin = v; }
+    void setLoRaRstPin(uint8_t v) { loRaRstPin = v; }
+    void setLoRaBusyPin(uint8_t v) { loRaBusyPin = v; }
+    void setLoRaDio1Pin(uint8_t v) { loRaDio1Pin = v; }
+    void setLoRaFrequency(float v) { loRaFrequency = v; }
+    void setLoRaTcxoVoltage(float v) { loRaTcxoVoltage = v; }
+    void setLoRaBandwidth(uint16_t v) { loRaBandwidth = v; }
+    void setLoRaSpreadingFactor(uint8_t v) { loRaSpreadingFactor = v; }
+    void setLoRaCodingRate(uint8_t v) { loRaCodingRate = v; }
+    void setLoRaPower(int8_t v) { loRaPower = v; }
+    void setLoRaPreambleLength(uint16_t v) { loRaPreambleLength = v; }
+    void setLoRaSyncWord(uint16_t v) { loRaSyncWord = v; }
+    void setLoRaCrc(bool v) { loRaCrc = v; }
+    void setLoRaInvertIq(bool v) { loRaInvertIq = v; }
+
     // RFID (I2C PN532)
     uint8_t getRfidSdaPin() const { return rfidSdaPin; }
     uint8_t getRfidSclPin() const { return rfidSclPin; }
@@ -610,6 +665,10 @@ public:
         #endif
         #ifdef RF24_MOSI_PIN
             rf24MosiPin = RF24_MOSI_PIN;
+        #endif
+        #ifdef LORA_SCK_PIN
+            loRaSckPin = LORA_SCK_PIN; loRaMisoPin = LORA_MISO_PIN; loRaMosiPin = LORA_MOSI_PIN;
+            loRaCsPin = LORA_CS_PIN; loRaRstPin = LORA_RST_PIN; loRaBusyPin = LORA_BUSY_PIN; loRaDio1Pin = LORA_DIO1_PIN;
         #endif
         #ifdef SDCARD_CS_PIN
             sdCardCsPin = SDCARD_CS_PIN;
