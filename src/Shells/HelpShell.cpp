@@ -69,7 +69,8 @@ void HelpShell::run(ModeEnum currentMode, bool select) {
         case 20: cmdRf24();      break;
         case 21: cmdFm();        break;
         case 22: cmdCell();      break;
-        case 23: cmdExpander(); break;
+        case 23: cmdLoRa();      break;
+        case 24: cmdExpander();  break;
         default:
             break;
     }
@@ -382,7 +383,7 @@ void HelpShell::cmdI2s() {
 }
 
 void HelpShell::cmdCan() {
-    printHeader("CAN");
+    printHeader("CAN (MCP2515)");
     static const char* const lines[] = {
         "sniff                - Print all received frames",
         "send [id]            - Send frame with given ID",
@@ -394,7 +395,7 @@ void HelpShell::cmdCan() {
 }
 
 void HelpShell::cmdEthernet() {
-    printHeader("ETHERNET");
+    printHeader("ETHERNET (W5500)");
     static const char* const lines[] = {
         "connect              - Connect using DHCP",
         "status               - Show ETH status",
@@ -415,7 +416,7 @@ void HelpShell::cmdEthernet() {
 }
 
 void HelpShell::cmdSubGhz() {
-    printHeader("SUBGHZ");
+    printHeader("SUBGHZ (CC1101)");
     static const char* const lines[] = {
         "scan                 - Search best frequency",
         "sweep                - Analyze frequency band",
@@ -436,7 +437,7 @@ void HelpShell::cmdSubGhz() {
 }
 
 void HelpShell::cmdRfid() {
-    printHeader("RFID");
+    printHeader("RFID (PN532)");
     static const char* const lines[] = {
         "read                 - Read RFID tag data",
         "write                - Write UID/Block to tag",
@@ -448,7 +449,7 @@ void HelpShell::cmdRfid() {
 }
 
 void HelpShell::cmdRf24() {
-    printHeader("RF24");
+    printHeader("RF24 (NRF24L01)");
     static const char* const lines[] = {
         "scan                 - Search best active channel",
         "send                 - Send a frame payload",
@@ -463,7 +464,7 @@ void HelpShell::cmdRf24() {
 }
 
 void HelpShell::cmdFm() {
-    printHeader("FM");
+    printHeader("FM (SI4713)");
     static const char* const lines[] = {
         "sweep                - Analyze frequencies",
         "trace [freq]         - Observe frequency signal",
@@ -476,7 +477,7 @@ void HelpShell::cmdFm() {
 }
 
 void HelpShell::cmdCell() {
-    printHeader("CELL");
+    printHeader("CELL (SIMCOM)");
     static const char* const lines[] = {
         "modem                - Show modem info",
         "network              - Show network info",
@@ -505,6 +506,29 @@ void HelpShell::cmdExpander() {
     printLines(lines, (int)(sizeof(lines) / sizeof(lines[0])));
 }
 
+void HelpShell::cmdLoRa() {
+    printHeader("LORA (SX1262)");
+    static const char* const lines[] = {
+        "send [payload]      - Send text or hex{ AA }",
+        "spam [payload] [ms] - Repeat packet every ms",
+        "jam [seconds]       - Lab CW for 1..60 seconds",
+        "receive             - Listen for packets",
+        "record              - Receive and save packet",
+        "load                - Send saved .lora packet",
+        "rssi [ms]           - Monitor RSSI On channel",
+        "ear                 - Map RSSI to audio",
+        "scan                - Scan and find best frequency",
+        "waterfall           - Show frequency activity",
+        "cad [ms]            - Monitor activity on channel",
+        "airtime [bytes]     - Airtime for 1..255 bytes",
+        "setfreq [MHz]       - Set operating frequency",
+        "status              - Show profile and counters",
+        "meshtastic          - Open Meshtastic shell",
+        "config              - Configure LoRa SX1262",
+    };
+    printLines(lines, (int)(sizeof(lines) / sizeof(lines[0])));
+}
+
 void HelpShell::cmdAll() {
     cmdOneWire();
     cmdUart();
@@ -528,5 +552,6 @@ void HelpShell::cmdAll() {
     cmdRf24();
     cmdFm();
     cmdCell();
+    cmdLoRa();
     cmdExpander();
 }
