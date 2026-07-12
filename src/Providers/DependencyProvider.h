@@ -40,6 +40,8 @@ and injecting shared instances of core components
 #include "Services/UsbS3Service.h"
 #include "Services/CellService.h"
 #include "Services/FmService.h"
+#include "Services/LoRaService.h"
+#include "Services/MeshtasticService.h"
 #include "Controllers/UartController.h"
 #include "Controllers/I2cController.h"
 #include "Controllers/OneWireController.h"
@@ -65,6 +67,7 @@ and injecting shared instances of core components
 #include "Controllers/CellController.h"
 #include "Controllers/FmController.h"
 #include "Controllers/ExpanderController.h"
+#include "Controllers/LoRaController.h"
 #include "Transformers/TerminalCommandTransformer.h"
 #include "Transformers/InstructionTransformer.h"
 #include "Transformers/ArgTransformer.h"
@@ -74,6 +77,7 @@ and injecting shared instances of core components
 #include "Transformers/ProfileTransformer.h"
 #include "Transformers/AtTransformer.h"
 #include "Transformers/PinoutTransformer.h"
+#include "Transformers/LoRaTransformer.h"
 #include "Managers/CommandHistoryManager.h"
 #include "Analyzers/BinaryAnalyzer.h"
 #include "Managers/UserInputManager.h"
@@ -101,6 +105,7 @@ and injecting shared instances of core components
 #include "Shells/FmBroadcastShell.h"
 #include "Shells/UsbAdapterShell.h"
 #include "Shells/MouseShell.h"
+#include "Shells/MeshtasticShell.h"
 #include "Configurators/TerminalTypeConfigurator.h"
 
 class DependencyProvider
@@ -152,6 +157,8 @@ public:
     LittleFsService &getLittleFsService();
     CellService &getCellService();
     FmService &getFmService();
+    LoRaService &getLoRaService();
+    MeshtasticService &getMeshtasticService();
 
     // Controllers
     UartController &getUartController();
@@ -177,6 +184,7 @@ public:
     Rf24Controller &getRf24Controller();
     CellController &getCellController();
     FmController &getFmController();
+    LoRaController &getLoRaController();
     ExpanderController &getExpanderController();
 
     // Transformers
@@ -221,6 +229,7 @@ public:
     FmBroadcastShell &getFmBroadcastShell();
     UsbAdapterShell &getUsbAdapterShell();
     MouseShell &getMouseShell();
+    MeshtasticShell &getMeshtasticShell();
 
     // Selectors
     HorizontalSelector &getHorizontalSelector();
@@ -273,6 +282,8 @@ private:
     CellService cellService;
     UsbS3Service usbService;
     FmService fmService;
+    LoRaService loRaService;
+    MeshtasticService meshtasticService;
 
     // Controllers
     UartController uartController;
@@ -298,6 +309,7 @@ private:
     UsbS3Controller usbController;
     CellController cellController;
     FmController fmController;
+    LoRaController loRaController;
     ExpanderController expanderController;
 
     // Transformers
@@ -308,6 +320,7 @@ private:
     JsonTransformer jsonTransformer;
     InfraredRemoteTransformer infraredTransformer;
     SubGhzTransformer subGhzTransformer;
+    LoRaTransformer loRaTransformer;
     ProfileTransformer profileTransformer;
     AtTransformer atTransformer;
     PinoutTransformer pinoutTransformer;
@@ -342,6 +355,7 @@ private:
     FmBroadcastShell fmBroadcastShell;
     UsbAdapterShell usbAdapterShell;
     MouseShell mouseShell;
+    MeshtasticShell meshtasticShell;
 
     // Selectors
     HorizontalSelector horizontalSelector;

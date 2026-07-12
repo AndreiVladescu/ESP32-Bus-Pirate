@@ -39,6 +39,8 @@ DependencyProvider::DependencyProvider(ITerminalView &terminalView, IDeviceView 
       usbService(),
       cellService(),
       fmService(),
+      loRaService(),
+      meshtasticService(),
 
       // Transformers
       commandTransformer(),
@@ -48,6 +50,7 @@ DependencyProvider::DependencyProvider(ITerminalView &terminalView, IDeviceView 
       jsonTransformer(),
       infraredTransformer(),
       subGhzTransformer(),
+      loRaTransformer(),
       profileTransformer(),
       atTransformer(),
 
@@ -81,6 +84,8 @@ DependencyProvider::DependencyProvider(ITerminalView &terminalView, IDeviceView 
       fmBroadcastShell(terminalView, terminalInput, userInputManager, argTransformer, fmService),
       usbAdapterShell(terminalView, terminalInput, userInputManager, nvsService),
       mouseShell(terminalView, terminalInput, userInputManager),
+      meshtasticShell(terminalView, terminalInput, userInputManager,
+                      argTransformer, loRaService, meshtasticService),
 
       // Selectors
       horizontalSelector(deviceView, deviceInput),
@@ -112,6 +117,10 @@ DependencyProvider::DependencyProvider(ITerminalView &terminalView, IDeviceView 
       usbController(terminalView, terminalInput, deviceInput, usbService, argTransformer, userInputManager, helpShell, usbAdapterShell, mouseShell),
       cellController(terminalView, terminalInput, cellService, argTransformer, atTransformer, userInputManager, helpShell, cellCallShell, cellSmsShell),
       fmController(terminalView, terminalInput, deviceView, fmService, argTransformer, userInputManager, helpShell, fmBroadcastShell),
+      loRaController(terminalView, terminalInput, deviceView, loRaService, littleFsService, i2sService,
+                     argTransformer, loRaTransformer,
+                     commandTransformer, userInputManager, helpShell,
+                     meshtasticShell),
       expanderController(terminalView, terminalInput, uartService, argTransformer, userInputManager, helpShell)
 {
 }
@@ -154,6 +163,8 @@ Rf24Service &DependencyProvider::getRf24Service() { return rf24Service; }
 LittleFsService &DependencyProvider::getLittleFsService() { return littleFsService; }
 CellService &DependencyProvider::getCellService() { return cellService; }
 FmService &DependencyProvider::getFmService() { return fmService; }
+LoRaService &DependencyProvider::getLoRaService() { return loRaService; }
+MeshtasticService &DependencyProvider::getMeshtasticService() { return meshtasticService; }
 
 // Controllers
 UartController &DependencyProvider::getUartController() { return uartController; }
@@ -179,6 +190,7 @@ RfidController &DependencyProvider::getRfidController() { return rfidController;
 Rf24Controller &DependencyProvider::getRf24Controller() { return rf24Controller; }
 CellController &DependencyProvider::getCellController() { return cellController; }
 FmController &DependencyProvider::getFmController() { return fmController; }
+LoRaController &DependencyProvider::getLoRaController() { return loRaController; }
 ExpanderController &DependencyProvider::getExpanderController() { return expanderController; }
 
 // Transformers
@@ -220,6 +232,7 @@ CellSmsShell &DependencyProvider::getCellSmsShell() { return cellSmsShell; }
 FmBroadcastShell &DependencyProvider::getFmBroadcastShell() { return fmBroadcastShell; }
 UsbAdapterShell &DependencyProvider::getUsbAdapterShell() { return usbAdapterShell; }
 MouseShell &DependencyProvider::getMouseShell() { return mouseShell; }
+MeshtasticShell &DependencyProvider::getMeshtasticShell() { return meshtasticShell; }
 
 // Selectors
 HorizontalSelector &DependencyProvider::getHorizontalSelector() { return horizontalSelector; }
