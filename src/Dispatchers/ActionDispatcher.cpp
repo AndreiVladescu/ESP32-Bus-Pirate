@@ -176,6 +176,9 @@ void ActionDispatcher::dispatchCommand(const TerminalCommand& cmd) {
         case ModeEnum::CELL:
             provider.getCellController().handleCommand(cmd);
             break;
+        case ModeEnum::LORA:
+            provider.getLoRaController().handleCommand(cmd);
+            break;
         case ModeEnum::EXPANDER:
             provider.getExpanderController().handleCommand(cmd);
             break;
@@ -356,6 +359,9 @@ void ActionDispatcher::setCurrentMode(ModeEnum newMode) {
         case ModeEnum::CELL:
             provider.getCellController().ensureConfigured();
             break;
+        case ModeEnum::LORA:
+            provider.getLoRaController().ensureConfigured();
+            break;
         case ModeEnum::EXPANDER:
              // This will bridge to a UART session with the expander
             provider.getExpanderController().ensureConfigured();
@@ -400,6 +406,9 @@ void ActionDispatcher::releaseMode(ModeEnum currentMode, ModeEnum newMode) {
 
         case ModeEnum::TwoWire:
             provider.getTwoWireController().ensureReleased();
+            break;
+        case ModeEnum::LORA:
+            provider.getLoRaController().ensureReleased();
             break;
 
         // For now, no realy heavy resources in other modes 
