@@ -29,6 +29,7 @@ enum class ModeEnum {
     RF24_,
     FM,
     CELL,
+    LORA,
     EXPANDER,
     COUNT
 };
@@ -65,6 +66,7 @@ public:
         {ModeEnum::RF24_,     "RF24"},
         {ModeEnum::FM,        "FM"},
         {ModeEnum::CELL,      "CELL"},
+        {ModeEnum::LORA,      "LORA"},
         {ModeEnum::EXPANDER,  "EXPANDER"},
     };
 
