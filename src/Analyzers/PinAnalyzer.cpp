@@ -3,8 +3,8 @@
 #include <sstream>
 #include <cmath>
 
-PinAnalyzer::PinAnalyzer(PinService& pinService)
-: pinService(pinService) {}
+PinAnalyzer::PinAnalyzer(PinService& pinService, IUtilityService& utilityService)
+    : pinService(pinService), utilityService(utilityService) {}
 
 void PinAnalyzer::begin(uint8_t pin_) {
     end(); // clean up if rebeginning
@@ -17,8 +17,8 @@ void PinAnalyzer::begin(uint8_t pin_) {
     lastLevel = pinService.read(pin);
     startLevel = lastLevel;
 
-    windowStartMs = millis();
-    lastChangeUs = micros();
+    windowStartMs = utilityService.nowMs();
+    lastChangeUs = utilityService.nowUs();
 
     edges = 0;
     highUs = 0;
@@ -61,7 +61,7 @@ bool PinAnalyzer::shouldReport(unsigned long nowMs) const {
 void PinAnalyzer::sample() {
     bool v = pinService.read(pin);
     if (v == lastLevel) return;
-    onEdge(v, micros());
+    onEdge(v, utilityService.nowUs());
 }
 
 void PinAnalyzer::onEdge(bool newLevel, uint32_t nowUs) {
@@ -132,8 +132,8 @@ void PinAnalyzer::closeTail(uint32_t nowUs) {
 
 void PinAnalyzer::resetWindow() {
     // Start a fresh window from current state
-    windowStartMs = millis();
-    lastChangeUs = micros();
+    windowStartMs = utilityService.nowMs();
+    lastChangeUs = utilityService.nowUs();
     startLevel = lastLevel;
 
     edges = 0;
@@ -548,9 +548,9 @@ std::string PinAnalyzer::runPullTest() {
     auto measureStability = [&](int ms) -> uint32_t {
         uint32_t e = 0;
         bool last = pinService.read(pin);
-        uint32_t t0 = micros();
-        unsigned long t0ms = millis();
-        while ((millis() - t0ms) < (unsigned long)ms) {
+        uint32_t t0 = utilityService.nowUs();
+        uint32_t t0ms = utilityService.nowMs();
+        while ((utilityService.nowMs() - t0ms) < static_cast<uint32_t>(ms)) {
             bool v = pinService.read(pin);
             if (v != last) { e++; last = v; }
         }
@@ -593,9 +593,9 @@ PinAnalyzer::Report PinAnalyzer::buildReport(bool doPullTest) {
     Report r;
 
     // Close tail to include the last stable segment time in high/low
-    closeTail(micros());
+    closeTail(utilityService.nowUs());
 
-    uint32_t elapsedMs = (uint32_t)(millis() - windowStartMs);
+    uint32_t elapsedMs = utilityService.nowMs() - windowStartMs;
     if (elapsedMs == 0) elapsedMs = 1;
     r.edges = edges; // raw count
     r.edgesPerSec = (uint32_t)((uint64_t)edges * 1000ULL / elapsedMs);

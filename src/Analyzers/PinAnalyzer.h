@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Arduino.h>
 #include <stdint.h>
 #include <string>
 #include <vector>
 #include <functional>
+#include "Interfaces/IUtilityService.h"
 #include "Services/PinService.h"
 
 class PinAnalyzer {
@@ -65,7 +65,7 @@ public:
     };
 
 public:
-    explicit PinAnalyzer(PinService& pinService);
+    PinAnalyzer(PinService& pinService, IUtilityService& utilityService);
 
     void begin(uint8_t pin);
     void end();
@@ -77,6 +77,7 @@ public:
 
 private:
     PinService& pinService;
+    IUtilityService& utilityService;
     uint8_t pin = 0;
 
     // Window timing
