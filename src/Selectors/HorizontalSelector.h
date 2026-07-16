@@ -4,13 +4,13 @@
 #include <vector>
 #include "Interfaces/IDeviceView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Data/InputKeys.h"
 #include "Enums/TerminalTypeEnum.h"
-#include <Arduino.h>
 
 class HorizontalSelector {
 public:
-    HorizontalSelector(IDeviceView& display, IInput& input);
+    HorizontalSelector(IDeviceView& display, IInput& input, IUtilityService& utilityService);
 
     int select(
         const std::string& title,
@@ -24,4 +24,5 @@ public:
 private:
     IDeviceView& display;
     IInput& input;
+    IUtilityService& utilityService;
 };

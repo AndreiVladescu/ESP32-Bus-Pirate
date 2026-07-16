@@ -1,7 +1,10 @@
 #include "HorizontalSelector.h"
 
-HorizontalSelector::HorizontalSelector(IDeviceView& display, IInput& input)
-    : display(display), input(input) {}
+HorizontalSelector::HorizontalSelector(
+    IDeviceView& display,
+    IInput& input,
+    IUtilityService& utilityService)
+    : display(display), input(input), utilityService(utilityService) {}
 
 int HorizontalSelector::select(
     const std::string& title, 
@@ -62,13 +65,13 @@ int HorizontalSelector::selectHeadless() {
     // - no input: Serial
     // - short press: WiFi Connect
     // - long press: WiFi Hotspot
-    const unsigned long timeout = millis() + 3000;
-    while (millis() < timeout) {
+    const uint32_t timeout = utilityService.nowMs() + 3000;
+    while (utilityService.nowMs() < timeout) {
         char c = input.readChar();
         if (c == KEY_OK) {
-            const unsigned long pressStart = millis();
+            const uint32_t pressStart = utilityService.nowMs();
             while (input.readChar() == KEY_OK) {
-                if (millis() - pressStart >= longPressMs) {
+                if (utilityService.nowMs() - pressStart >= longPressMs) {
                     selected = 1; // WiFi Hotspot
                     display.horizontalSelection(
                         options,
@@ -76,10 +79,10 @@ int HorizontalSelector::selectHeadless() {
                         "Terminal selected",
                         "Starting hotspot..."
                     );
-                    delay(250);
+                    utilityService.sleepMs(250);
                     return selected;
                 }
-                delay(10);
+                utilityService.sleepMs(10);
             }
 
             selected = 0; // WiFi Connect
@@ -89,10 +92,10 @@ int HorizontalSelector::selectHeadless() {
                 "Terminal selected",
                 "Connecting to WiFi..."
             );
-            delay(250);
+            utilityService.sleepMs(250);
             break;
         }
-        delay(10);
+        utilityService.sleepMs(10);
     }
 
     return selected;
