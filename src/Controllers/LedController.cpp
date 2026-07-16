@@ -6,10 +6,10 @@
 Constructor
 */
 LedController::LedController(ITerminalView& terminalView, IInput& terminalInput,
-                             LedService& ledService, ArgTransformer& argTransformer,
+                             IUtilityService& utilityService, LedService& ledService, ArgTransformer& argTransformer,
                              UserInputManager& userInputManager, HelpShell& helpShell)
     : terminalView(terminalView), terminalInput(terminalInput),
-      ledService(ledService), argTransformer(argTransformer), 
+      utilityService(utilityService), ledService(ledService), argTransformer(argTransformer),
       userInputManager(userInputManager), helpShell(helpShell) {}
 
 /*
@@ -83,8 +83,8 @@ void LedController::handleScan() {
         terminalView.println(">>> PRESS [ENTER] if the LEDs chase in blue (auto-skip in 3s)...");
 
         // Show the animation for 3 sec or until ENTER is press
-        unsigned long start = millis();
-        while (millis() - start < 3000) {
+        uint32_t start = utilityService.nowMs();
+        while (utilityService.nowMs() - start < 3000) {
             char key = terminalInput.readChar();
             // Found, save the protocol
             if (key == '\r' || key == '\n') {

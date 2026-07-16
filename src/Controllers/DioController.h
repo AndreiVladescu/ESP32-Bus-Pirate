@@ -5,6 +5,7 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
+#include "Interfaces/IUtilityService.h"
 #include "Services/PinService.h"
 #include "Models/TerminalCommand.h"
 #include "Models/PinoutConfig.h"
@@ -16,7 +17,7 @@
 class DioController {
 public:
     // Constructor
-    DioController(ITerminalView& terminalView, IInput& terminalInput, IDeviceView& deviceView, PinService& pinService, ArgTransformer& argTransformer, HelpShell& helpShell, UserInputManager& userInputManager);
+    DioController(ITerminalView& terminalView, IInput& terminalInput, IDeviceView& deviceView, IUtilityService& utilityService, PinService& pinService, ArgTransformer& argTransformer, HelpShell& helpShell, UserInputManager& userInputManager);
 
     // Entry point to handle a DIO command
     void handleCommand(const TerminalCommand& cmd);
@@ -28,6 +29,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IDeviceView& deviceView;
+    IUtilityService& utilityService;
     PinService& pinService;
     ArgTransformer& argTransformer;
     HelpShell& helpShell;

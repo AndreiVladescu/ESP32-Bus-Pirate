@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "Interfaces/ITerminalView.h"
+#include "Interfaces/IUtilityService.h"
 #include "Services/SpiService.h" 
 #include "Services/SdService.h"
 #include "Interfaces/IInput.h"
@@ -21,7 +22,7 @@ public:
     // Constructor
     SpiController(
         ITerminalView& terminalView, 
-        IInput& terminalInput, SpiService& 
+        IInput& terminalInput, IUtilityService& utilityService, SpiService&
         spiService, SdService& sdService, 
         ArgTransformer& argTransformer, 
         UserInputManager& userInputManager, 
@@ -44,6 +45,7 @@ public:
 private:
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     SpiService& spiService;
     SdService& sdService;
     ArgTransformer& argTransformer;

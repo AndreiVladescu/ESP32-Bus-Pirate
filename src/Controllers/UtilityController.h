@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <Arduino.h>
+#include <cstdint>
 #include <string>
 #include <sstream>
 #include <algorithm>
@@ -9,6 +9,7 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
+#include "Interfaces/IUtilityService.h"
 #include "States/GlobalState.h"
 #include "Enums/ModeEnum.h"
 #include "Services/PinService.h"
@@ -30,6 +31,7 @@ public:
         ITerminalView& terminalView, 
         IDeviceView& deviceView, 
         IInput& terminalInput, 
+        IUtilityService& utilityService,
         PinService& pinService,
         I2sService& i2sService,
         UserInputManager& userInputManager,
@@ -95,6 +97,7 @@ private:
     ITerminalView& terminalView;
     IDeviceView& deviceView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     PinService& pinService;
     I2sService& i2sService;
     UserInputManager& userInputManager;

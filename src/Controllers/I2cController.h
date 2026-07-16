@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Services/I2cService.h"
 #include "Models/TerminalCommand.h"
 #include "Models/ByteCode.h"
@@ -19,7 +20,7 @@
 class I2cController {
 public:
     // Constructor
-    I2cController(ITerminalView& terminalView, IInput& terminalInput, I2cService& i2cService, ArgTransformer& argTransformer, UserInputManager& userInputManager, I2cEepromShell& eepromShell, HelpShell& helpShell);
+    I2cController(ITerminalView& terminalView, IInput& terminalInput, IUtilityService& utilityService, I2cService& i2cService, ArgTransformer& argTransformer, UserInputManager& userInputManager, I2cEepromShell& eepromShell, HelpShell& helpShell);
 
     // Entry point for I2C command
     void handleCommand(const TerminalCommand& cmd);
@@ -60,6 +61,7 @@ private:
 
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     I2cService& i2cService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;

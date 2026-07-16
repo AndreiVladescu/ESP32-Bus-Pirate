@@ -5,6 +5,7 @@
 #include "Services/OneWireService.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/ITerminalView.h"
+#include "Interfaces/IUtilityService.h"
 #include "Models/TerminalCommand.h"
 #include "States/GlobalState.h"
 #include "Transformers/ArgTransformer.h"
@@ -19,6 +20,7 @@ public:
     OneWireController(
       ITerminalView& terminalView, 
       IInput& terminalInput, 
+      IUtilityService& utilityService,
       OneWireService& service, 
       ArgTransformer& argTransformer,
       UserInputManager& userInputManager, 
@@ -39,6 +41,7 @@ public:
 private:
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     OneWireService& oneWireService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;

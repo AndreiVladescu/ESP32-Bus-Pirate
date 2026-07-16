@@ -11,6 +11,7 @@ InfraredController::InfraredController(
     ITerminalView&           view,
     IInput&                  terminalInput,
     IDeviceView&             deviceView,
+    IUtilityService&         utilityService,
     InfraredService&         service,
     LittleFsService&         littleFsService,
     I2cService&              i2cService,
@@ -23,6 +24,7 @@ InfraredController::InfraredController(
     : terminalView(view),
       terminalInput(terminalInput),
       deviceView(deviceView),
+      utilityService(utilityService),
       infraredService(service),
       i2cService(i2cService),
       littleFsService(littleFsService),
@@ -80,7 +82,7 @@ void InfraredController::handleSend(const TerminalCommand& command) {
 
     for (int i = 0; i < 3; ++i) {
         infraredService.sendInfraredCommand(infraredCommand);
-        delay(100);
+        utilityService.sleepMs(100);
     }
 
     terminalView.println("IR command sent with protocol " + InfraredProtocolMapper::toString(state.getInfraredProtocol()));
@@ -187,7 +189,7 @@ void InfraredController::handleDeviceBgone() {
 
         for (int i = 0; i < 2; ++i) { // send 2x per command
             infraredService.sendInfraredCommand(cmd);
-            delay(100);
+            utilityService.sleepMs(100);
         }
 
         terminalView.println(
@@ -355,7 +357,7 @@ void InfraredController::handleRecord() {
     }
 
     // Ask filename
-    std::string defName = "ir_record_" + std::to_string(millis() % 1000000); // court
+    std::string defName = "ir_record_" + std::to_string(utilityService.nowMs() % 1000000); // court
     std::string fileBase = userInputManager.readSanitizedString("Enter file name", defName, false);
     if (fileBase.empty()) fileBase = defName;
 
@@ -385,7 +387,7 @@ bool InfraredController::recordFrames(std::vector<IRFrame>& tape) {
 
     // Start the capture
     infraredService.startReceiver();
-    uint32_t lastMillis = millis();
+    uint32_t lastMillis = utilityService.nowMs();
     while (true) {
         // Stop if Enter pressed
         char c = terminalInput.readChar();
@@ -401,7 +403,7 @@ bool InfraredController::recordFrames(std::vector<IRFrame>& tape) {
         std::vector<uint16_t> timings;
         uint32_t khz = 0;
         if (infraredService.receiveRaw(timings, khz)) {
-            const uint32_t now = millis();
+            const uint32_t now = utilityService.nowMs();
             const uint32_t gap = tape.empty() ? 0u : (now - lastMillis);
             lastMillis = now;
 
@@ -440,14 +442,14 @@ void InfraredController::playbackFrames(const std::vector<IRFrame>& tape, uint32
             const auto& f = tape[i];
 
             // Check for Enter press and wait for gap
-            uint32_t start = millis();
-            while (millis() - start < f.gapMs) {
+            uint32_t start = utilityService.nowMs();
+            while (utilityService.nowMs() - start < f.gapMs) {
                 char c = terminalInput.readChar();
                 if (c == '\r' || c == '\n') {
                     terminalView.println("\nINFRARED Replay: Stopped by user.");
                     return;
                 }
-                delay(1);
+                utilityService.sleepMs(1);
             }
 
             // Log and send frame

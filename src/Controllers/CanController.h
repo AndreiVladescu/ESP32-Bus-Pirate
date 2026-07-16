@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Arduino.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Models/TerminalCommand.h"
 #include "Services/CanService.h"
 #include "Transformers/ArgTransformer.h"
@@ -13,7 +13,7 @@
 class CanController {
 public:
     CanController(ITerminalView& terminalView, IInput& terminalInput, UserInputManager& userInputManager,
-                  CanService& canService, ArgTransformer& argTransformer, HelpShell& helpShell);
+                  IUtilityService& utilityService, CanService& canService, ArgTransformer& argTransformer, HelpShell& helpShell);
     
     // Entry point to handle CAN commands
     void handleCommand(const TerminalCommand& cmd);
@@ -24,6 +24,7 @@ public:
 private:
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     CanService& canService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;

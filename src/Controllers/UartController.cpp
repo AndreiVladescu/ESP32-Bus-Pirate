@@ -9,6 +9,7 @@ UartController::UartController(
     IInput& terminalInput,
     IDeviceView& deviceView,
     IInput& deviceInput,
+    IUtilityService& utilityService,
     UartService& uartService,
     SdService& sdService,
     HdUartService& hdUartService,
@@ -22,6 +23,7 @@ UartController::UartController(
       terminalInput(terminalInput),
       deviceView(deviceView),
       deviceInput(deviceInput),
+      utilityService(utilityService),
       uartService(uartService),
       sdService(sdService),
       hdUartService(hdUartService),
@@ -147,7 +149,7 @@ void UartController::handleRaw() {
     std::vector<uint8_t> row;
     row.reserve(BYTES_PER_ROW);
 
-    uint32_t lastByteTime = millis();
+    uint32_t lastByteTime = utilityService.nowMs();
 
     while (true) {
         // Stop if ENTER pressed
@@ -173,7 +175,7 @@ void UartController::handleRaw() {
         while (uartService.available() > 0) {
             uint8_t b = (uint8_t)uartService.read();
             row.push_back(b);
-            lastByteTime = millis();
+            lastByteTime = utilityService.nowMs();
 
             // Full row
             if (row.size() == BYTES_PER_ROW) {
@@ -188,7 +190,7 @@ void UartController::handleRaw() {
         }
 
         // Partial flush the line if timeout reached
-        if (!row.empty() && (millis() - lastByteTime) >= FLUSH_INTERVAL_MS) {
+        if (!row.empty() && (utilityService.nowMs() - lastByteTime) >= FLUSH_INTERVAL_MS) {
             std::string dump = argTransformer.formatHexAscii(
                 row.data(), row.size(),
                 true,
@@ -287,13 +289,13 @@ Ping
 */
 void UartController::handlePing() { 
     std::string response;
-    unsigned long start = millis();
+    uint32_t start = utilityService.nowMs();
     size_t probeIndex = 0;
 
     terminalView.println("UART Ping: Probing for 5 seconds...");
     uartService.clearUartBuffer();
 
-    while (millis() - start < 5000) {
+    while (utilityService.nowMs() - start < 5000) {
         // Envoi progressif
         if (probeIndex < kProbesCount) {
             uartService.write(kProbes[probeIndex]);
@@ -307,7 +309,7 @@ void UartController::handlePing() {
             response += c;
         }
 
-        delay(10);
+        utilityService.sleepMs(10);
     }
 
     // Analyse ASCII simple
@@ -369,9 +371,9 @@ void UartController::handleScan() {
     terminalView.println(" UART-like electrical activity (edges and timings).");
     terminalView.println(" GPIOs showing activity are potential UART lines.");
     terminalView.println("");
-    delay(300); // since the loop below is fast, the message above may not be seen without delay
+    utilityService.sleepMs(300); // since the loop below is fast, the message above may not be seen without delay
     
-    unsigned long lastPrint = millis();
+    uint32_t lastPrint = utilityService.nowMs();
     while (true) {
 
         // Stop if ENTER pressed
@@ -395,7 +397,7 @@ void UartController::handleScan() {
         }
 
         // Periodic accumulated report
-        unsigned long now = millis();
+        uint32_t now = utilityService.nowMs();
         if (now - lastPrint >= 1000) {
             lastPrint = now;
 
@@ -454,7 +456,7 @@ void UartController::handleAutoBaud() {
         // hack to warm up the ISR
         // otherwhise it crashes on stick s3
         uartService.scanUartActivity({rxPin}, 20, 4, true); 
-        delay(50);
+        utilityService.sleepMs(50);
     #endif
 
     while (true) {
@@ -616,7 +618,7 @@ void UartController::handleSpam(const TerminalCommand& cmd) {
         }
 
         // Send if delay elapsed
-        unsigned long now = millis();
+        uint32_t now = utilityService.nowMs();
         if (now - lastSend >= delayMs) {
             for (uint8_t b : payload) {
                 uartService.write((char)b);
@@ -624,7 +626,7 @@ void UartController::handleSpam(const TerminalCommand& cmd) {
             lastSend = now;
         }
 
-        delay(1);
+        utilityService.sleepMs(1);
     }
 }
 
@@ -990,7 +992,7 @@ void UartController::handleTrigger(const TerminalCommand& cmd) {
             }
 
             if (matched) {
-                uint32_t now = millis();
+                uint32_t now = utilityService.nowMs();
                 if (now - lastFire >= COOLDOWN_MS) {
                     lastFire = now;
 
@@ -1036,8 +1038,8 @@ void UartController::handleSniffRaw() {
     const uint8_t maxCarPerLine = 16;
     std::array<char, 81> lineBuffer;
     lineBuffer.fill(0x20); lineBuffer[80]=0; lineBuffer[48]='|';
-    unsigned long lastUpdateMixed = millis();
-    const unsigned long TIMEOUT_MIXED = 2000L;  // 2 seconds
+    uint32_t lastUpdateMixed = utilityService.nowMs();
+    constexpr uint32_t TIMEOUT_MIXED = 2000;  // 2 seconds
 
     struct rcvSer{
         source uart;
@@ -1122,7 +1124,7 @@ void UartController::handleSniffRaw() {
                 lineBuffer.fill(0x20); lineBuffer[80]=0; lineBuffer[48]='|';
                 carDisplayed = 0;
                 uartChanged = false;
-                lastUpdateMixed = millis();
+                lastUpdateMixed = utilityService.nowMs();
             }
 
             lineBuffer[3 * carDisplayed] = toHex[snd.key >> 4];
@@ -1135,17 +1137,17 @@ void UartController::handleSniffRaw() {
                 terminalView.print(lineBuffer.data());
                 lineBuffer.fill(0x20); lineBuffer[80]=0; lineBuffer[48]='|';
                 carDisplayed = 0;
-                lastUpdateMixed = millis();
+                lastUpdateMixed = utilityService.nowMs();
             }
 
         }
 
-        if ((carDisplayed > 0) && ((millis() - lastUpdateMixed) > TIMEOUT_MIXED)){ // if mixed mode not updated since a long time
+        if ((carDisplayed > 0) && ((utilityService.nowMs() - lastUpdateMixed) > TIMEOUT_MIXED)){ // if mixed mode not updated since a long time
             terminalView.print(lastUart == UART1 ? "\n\r[RX] " : "\n\r\t[TX] ");
             terminalView.print(lineBuffer.data());
             lineBuffer.fill(0x20); lineBuffer[80]=0; lineBuffer[48]='|';
             carDisplayed = 0;
-            lastUpdateMixed = millis();
+            lastUpdateMixed = utilityService.nowMs();
         }
 
         yield();

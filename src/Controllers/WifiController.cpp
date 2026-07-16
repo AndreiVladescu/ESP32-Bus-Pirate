@@ -157,7 +157,7 @@ void WifiController::handleConnect(const TerminalCommand &cmd)
             terminalView.println("WiFi Hotspot: Still available at http://" + wifiService.getApIp());
         } else {
             wifiService.reset();
-            delay(100);
+            utilityService.sleepMs(100);
         }
     }
 }
@@ -318,7 +318,7 @@ void WifiController::handleApSpam()
         // Enter press to stop
         char key = terminalInput.readChar();
         if (key == '\r' || key == '\n') break;
-        delay(10);
+        utilityService.sleepMs(10);
     }
 
     terminalView.println("WiFi: Beacon spam stopped.\n");
@@ -330,7 +330,7 @@ Scan
 void WifiController::handleScan(const TerminalCommand &)
 {
     terminalView.println("WiFi: Scanning for networks...");
-    delay(300);
+    utilityService.sleepMs(300);
 
     auto networks = wifiService.scanDetailedNetworks();
 
@@ -402,7 +402,7 @@ void WifiController::handleProbe()
             break;
         }
 
-        delay(10);
+        utilityService.sleepMs(10);
     }
 
     // Flush final logs
@@ -434,25 +434,25 @@ void WifiController::handleSniff(const TerminalCommand &cmd)
             break;
 
         // Read sniff data
-        if (millis() - lastPull > 20)
+        if (utilityService.nowMs() - lastPull > 20)
         {
             auto logs = wifiService.getSniffLog();
             for (const auto &line : logs)
             {
                 terminalView.println(line);
             }
-            lastPull = millis();
+            lastPull = utilityService.nowMs();
         }
 
         // Switch channel every 100ms
-        if (millis() - lastHop > 100)
+        if (utilityService.nowMs() - lastHop > 100)
         {
             channel = (channel % 13) + 1; // channel 1 to 13
             wifiService.switchChannel(channel);
-            lastHop = millis();
+            lastHop = utilityService.nowMs();
         }
 
-        delay(5);
+        utilityService.sleepMs(5);
     }
 
     wifiService.stopPassiveSniffing();

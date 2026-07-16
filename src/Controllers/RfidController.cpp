@@ -6,12 +6,14 @@ Constructor
 RfidController::RfidController(
     ITerminalView& view,
     IInput& input,
+    IUtilityService& utilityService,
     RfidService& rfidService,
     UserInputManager& uim,
     ArgTransformer& transformer,
     HelpShell& helpShell
 ) : terminalView(view),
     terminalInput(input),
+    utilityService(utilityService),
     rfidService(rfidService),
     userInputManager(uim),
     argTransformer(transformer),
@@ -47,7 +49,7 @@ void RfidController::handleRead(const TerminalCommand&) {
         int ch = terminalInput.readChar(); 
         if (ch == '\n' || ch == '\r') break;
 
-        uint32_t now = millis();
+        uint32_t now = utilityService.nowMs();
         if ((now - lastPrint) >= PRINT_INTERVAL_MS) {
             lastPrint = now;
 
@@ -60,7 +62,7 @@ void RfidController::handleRead(const TerminalCommand&) {
                 terminalView.println(std::string("       Type  : ") + rfidService.piccType() + "\n");
             }
         }
-        delay(1);
+        utilityService.sleepMs(1);
     }
 
     terminalView.println("\nRFID Read: Done.\n");
@@ -129,7 +131,7 @@ void RfidController::handleWriteUid() {
             terminalView.println("RFID Write UID: Done.\n");
             return;
         } else if (rc == RFIDInterface::TAG_NOT_PRESENT) {
-            delay(5);
+            utilityService.sleepMs(5);
             continue;
         } else {
             terminalView.println(" -> " + rfidService.statusMessage(rc));
@@ -191,7 +193,7 @@ void RfidController::handleWriteBlock() {
             return;
         } else if (rc == RFIDInterface::TAG_NOT_PRESENT) {
             // keep trying until a tag is detected
-            delay(5);
+            utilityService.sleepMs(5);
             continue;
         } else {
             terminalView.println(" -> " + rfidService.statusMessage(rc));
@@ -255,7 +257,7 @@ void RfidController::handleClone(const TerminalCommand&) {
         int ch = terminalInput.readChar();
         if (ch == '\n' || ch == '\r') return;
 
-        uint32_t now = millis();
+        uint32_t now = utilityService.nowMs();
         if ((uint32_t)(now - lastPrint) >= PRINT_INTERVAL_MS) {
             lastPrint = now;
 
@@ -270,7 +272,7 @@ void RfidController::handleClone(const TerminalCommand&) {
                 break;
             }
         }
-        delay(1);
+        utilityService.sleepMs(1);
     }
 
     if (!haveSource) {
@@ -300,7 +302,7 @@ void RfidController::handleClone(const TerminalCommand&) {
             return;
         } else if (rc == RFIDInterface::TAG_NOT_PRESENT) {
             // target not detected
-            delay(5);
+            utilityService.sleepMs(5);
             continue;
         } else {
             // other error: report and stop

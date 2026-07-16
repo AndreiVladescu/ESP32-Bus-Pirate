@@ -4,12 +4,13 @@
 Constructor
 */
 SpiController::SpiController(ITerminalView& terminalView, IInput& terminalInput, 
-                             SpiService& spiService, SdService& sdService, ArgTransformer& argTransformer,
+                             IUtilityService& utilityService, SpiService& spiService, SdService& sdService, ArgTransformer& argTransformer,
                              UserInputManager& userInputManager, BinaryAnalyzer& binaryAnalyzer,
                              SdCardShell& sdCardShell, SpiFlashShell& spiFlashShell, SpiEepromShell& spiEepromShell,
                              HelpShell& helpShell)
     : terminalView(terminalView),
       terminalInput(terminalInput),
+      utilityService(utilityService),
       spiService(spiService),
       sdService(sdService),
       argTransformer(argTransformer),
@@ -186,7 +187,7 @@ void SpiController::handleSdCard() {
     }
 
     terminalView.println("SD Card: Mounting...");
-    delay(500);
+    utilityService.sleepMs(500);
 
     // Configure
     spiService.end();

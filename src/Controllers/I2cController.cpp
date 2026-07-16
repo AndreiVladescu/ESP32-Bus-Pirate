@@ -7,6 +7,7 @@ Constructor
 I2cController::I2cController(
     ITerminalView& terminalView,
     IInput& terminalInput,
+    IUtilityService& utilityService,
     I2cService& i2cService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
@@ -15,6 +16,7 @@ I2cController::I2cController(
 )
     : terminalView(terminalView),
       terminalInput(terminalInput),
+      utilityService(utilityService),
       i2cService(i2cService),
       argTransformer(argTransformer),
       userInputManager(userInputManager),
@@ -118,7 +120,7 @@ void I2cController::handleSniff() {
                 line += c;
             }
         }
-        delayMicroseconds(100);
+        utilityService.sleepUs(100);
     }
 
     i2c_sniffer_reset_buffer();
@@ -496,7 +498,7 @@ void I2cController::performRegisterRead(uint8_t addr, uint16_t start, uint16_t l
         // Flush remaining just in case
         while (i2cService.available()) (void)i2cService.read();
 
-        delay(1);
+        utilityService.sleepMs(1);
     }
 }
 
@@ -555,7 +557,7 @@ void I2cController::performRawRead(uint8_t addr, uint16_t start,
             break;
         }
 
-        delay(1);
+        utilityService.sleepMs(1);
     }
 }
 
@@ -660,39 +662,39 @@ void I2cController::handleGlitch(const TerminalCommand& cmd) {
     }
 
     terminalView.println("I2C Glitch: Attacking device at 0x" + argTransformer.toHex(addr) + "...\n");
-    delay(500);
+    utilityService.sleepMs(500);
 
     terminalView.println(" 1. Flooding with random junk...");
     i2cService.floodRandom(addr, freqHz, scl, sda);
-    delay(50);
+    utilityService.sleepMs(50);
 
     terminalView.println(" 2. Flooding START sequences...");
     i2cService.floodStart(addr, freqHz, scl, sda);
-    delay(50);
+    utilityService.sleepMs(50);
 
     terminalView.println(" 3. Over-read (read more bytes than expected)...");
     i2cService.overReadAttack(addr, freqHz, scl, sda);
-    delay(50);
+    utilityService.sleepMs(50);
 
     terminalView.println(" 4. Reading invalid/unmapped registers...");
     i2cService.invalidRegisterRead(addr, freqHz, scl, sda);
-    delay(50);
+    utilityService.sleepMs(50);
 
     terminalView.println(" 5. Simulating clock stretch confusion...");
     i2cService.simulateClockStretch(addr, freqHz, scl, sda);
-    delay(50);
+    utilityService.sleepMs(50);
 
     terminalView.println(" 6. Rapid START/STOP sequences...");
     i2cService.rapidStartStop(addr, freqHz, scl, sda);
-    delay(50);
+    utilityService.sleepMs(50);
 
     terminalView.println(" 7. Glitching ACK phase...");
     i2cService.glitchAckInjection(addr, freqHz, scl, sda);
-    delay(50);
+    utilityService.sleepMs(50);
 
     terminalView.println(" 8. Injecting random noise on SCL/SDA...");
     i2cService.randomClockPulseNoise(scl, sda, freqHz);
-    delay(50);
+    utilityService.sleepMs(50);
 
     ensureConfigured();
     terminalView.println("\nI2C Glitch: Done. Target may be unresponsive or corrupted.");
@@ -728,7 +730,7 @@ void I2cController::handleFlood(const TerminalCommand& cmd) {
         }
 
         // Random register address
-        uint8_t reg = esp_random() & 0xFF;
+        uint8_t reg = static_cast<uint8_t>(utilityService.randomUint32() & 0xFF);
 
         // Transmit only register
         i2cService.beginTransmission(addr);
@@ -832,7 +834,7 @@ void I2cController::handleMonitor(const TerminalCommand& cmd) {
                 terminalView.println("\nI2C Monitor: Stopped by user.");
                 return;
             }
-            delay(10);
+            utilityService.sleepMs(10);
             elapsed += 10;
         }
     }
@@ -913,7 +915,7 @@ void I2cController::handleTrace(const TerminalCommand& cmd) {
                 terminalView.println("\nI2C Trace: Stopped by user.");
                 return;
             }
-            delay(10);
+            utilityService.sleepMs(10);
             elapsed += 10;
         }
     }
@@ -998,7 +1000,7 @@ void I2cController::handleHealth(const TerminalCommand& cmd) {
     // Warm up
     uint32_t warmDt = 0;
     (void)i2cService.ping(addr, true, &warmDt);
-    delay(1);
+    utilityService.sleepMs(1);
 
     const int PING_TRIES = 50;
     Stats ping;
@@ -1013,7 +1015,7 @@ void I2cController::handleHealth(const TerminalCommand& cmd) {
         bool ok = i2cService.ping(addr, true, &dt);
         ping.add(ok, dt);
 
-        delay(1);
+        utilityService.sleepMs(1);
     }
 
     if (ping.ok == 0) {
@@ -1055,7 +1057,7 @@ void I2cController::handleHealth(const TerminalCommand& cmd) {
             bool ok = i2cService.readReg(addr, 0x00, &val, &dt);
             rd.add(ok, dt);
 
-            delay(1);
+            utilityService.sleepMs(1);
         }
 
         if (rd.ok > 0) {
@@ -1202,7 +1204,7 @@ void I2cController::handleRegs(const TerminalCommand& cmd) {
             }
         }
 
-        delay(5);
+        utilityService.sleepMs(5);
     }
 
     // Flush last partial line
@@ -1223,7 +1225,7 @@ void I2cController::handleRegs(const TerminalCommand& cmd) {
     
     // Ensure bus is not left in a bad state after potential failed writes
     for (int i = 0; i < 32; ++i) {
-        delay(5);
+        utilityService.sleepMs(5);
         i2cService.endTransmission(true);
     }
 }
@@ -1251,7 +1253,7 @@ void I2cController::handleDiscover() {
         if (ok) {
             found.push_back(addr);
         }
-        delay(1);
+        utilityService.sleepMs(1);
     }
 
     if (found.empty()) {
@@ -1287,7 +1289,7 @@ void I2cController::handleDiscover() {
         // Warmup
         uint32_t warmDt = 0;
         (void)i2cService.ping(addr, true, &warmDt);
-        delay(1);
+        utilityService.sleepMs(1);
 
         Stats s;
         for (int i = 0; i < PING_TRIES; ++i) {
@@ -1299,7 +1301,7 @@ void I2cController::handleDiscover() {
             uint32_t dt = 0;
             bool ok = i2cService.ping(addr, true, &dt);
             s.add(ok, dt);
-            delay(1);
+            utilityService.sleepMs(1);
         }
 
         terminalView.println("  Ping timing (" + std::to_string(PING_TRIES) + "x):");

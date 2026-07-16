@@ -258,7 +258,7 @@ void Rf24Controller::handleSend() {
             "[TX #" + std::to_string(count) + " " + (ok ? "SENT ACK OK" : "SENT NO ACK") + " len=" + std::to_string((int)payload.size()) + "]"
         );
 
-        delay(repeatDelayMs);
+        utilityService.sleepMs(repeatDelayMs);
     }
 
     rf24Service.flushTx();
@@ -288,7 +288,7 @@ void Rf24Controller::handleScan() {
         for (uint8_t ch = 0; ch <= 125; ++ch) {
             rf24Service.setChannel(ch);
             rf24Service.startListening();
-            delayMicroseconds(dwell);
+            utilityService.sleepUs(dwell);
             rf24Service.stopListening();
 
             // Measure
@@ -453,7 +453,7 @@ void Rf24Controller::handleSweep() {
             int hits = 0;
             for (int s = 0; s < samples; ++s) {
                 rf24Service.startListening();
-                delayMicroseconds((dwellMs * 1000) / samples);
+                utilityService.sleepUs((dwellMs * 1000) / samples);
                 rf24Service.stopListening();
                 if (rf24Service.testRpd()) {
                     hits += 2;
@@ -513,7 +513,7 @@ void Rf24Controller::handleWaterfall()
         int hits = 0;
         for (int s = 0; s < samples; ++s) {
             rf24Service.startListening();
-            delayMicroseconds((dwellMs * 1000) / samples);
+            utilityService.sleepUs((dwellMs * 1000) / samples);
             rf24Service.stopListening();
 
             if (rf24Service.testRpd())   hits += 2;

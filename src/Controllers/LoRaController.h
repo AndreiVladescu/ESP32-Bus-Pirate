@@ -3,6 +3,7 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
+#include "Interfaces/IUtilityService.h"
 #include "Managers/UserInputManager.h"
 #include "Models/TerminalCommand.h"
 #include "Services/LoRaService.h"
@@ -18,7 +19,7 @@
 class LoRaController {
 public:
     LoRaController(ITerminalView& tv, IInput& input, IDeviceView& device,
-                   LoRaService& service, LittleFsService& littleFs,
+                   IUtilityService& utilityService, LoRaService& service, LittleFsService& littleFs,
                    I2sService& i2s,
                    ArgTransformer& transformer, LoRaTransformer& loRaTransformer,
                    TerminalCommandTransformer& commandTransformer,
@@ -61,6 +62,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IDeviceView& deviceView;
+    IUtilityService& utilityService;
     LoRaService& loRaService;
     LittleFsService& littleFsService;
     I2sService& i2sService;

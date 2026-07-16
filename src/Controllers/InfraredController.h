@@ -4,11 +4,11 @@
 #include <sstream>
 #include <string>
 #include <algorithm>
-#include <Arduino.h>
 
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
+#include "Interfaces/IUtilityService.h"
 #include "Services/InfraredService.h"
 #include "Services/LittleFsService.h"
 #include "Services/I2cService.h"
@@ -25,7 +25,7 @@ class InfraredController {
 public:
     // Constructor
     InfraredController(ITerminalView& view, IInput& terminalInput, IDeviceView& deviceView,
-                       InfraredService& service, LittleFsService& littleFsService, I2cService& i2cService,  
+                       IUtilityService& utilityService, InfraredService& service, LittleFsService& littleFsService, I2cService& i2cService,
                        ArgTransformer& argTransformer, InfraredRemoteTransformer& infraredRemoteTransformer,
                        UserInputManager& userInputManager, UniversalRemoteShell& universalRemoteShell, HelpShell& helpShell);
 
@@ -39,6 +39,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IDeviceView& deviceView;
+    IUtilityService& utilityService;
     InfraredService& infraredService;
     I2cService& i2cService;
     GlobalState& state = GlobalState::getInstance();

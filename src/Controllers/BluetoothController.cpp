@@ -7,6 +7,7 @@ BluetoothController::BluetoothController(
     ITerminalView& terminalView,
     IInput& terminalInput,
     IInput& deviceInput,
+    IUtilityService& utilityService,
     BluetoothService& bluetoothService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
@@ -15,6 +16,7 @@ BluetoothController::BluetoothController(
 ) : terminalView(terminalView),
     terminalInput(terminalInput),
     deviceInput(deviceInput),
+    utilityService(utilityService),
     bluetoothService(bluetoothService),
     argTransformer(argTransformer),
     userInputManager(userInputManager),
@@ -115,7 +117,7 @@ void BluetoothController::handleSniff(const TerminalCommand& cmd) {
     bluetoothService.switchToMode(BluetoothMode::CLIENT);
     BluetoothService::startPassiveBluetoothSniffing();
 
-    unsigned long lastPull = 0;
+    uint32_t lastPull = 0;
 
     while (true) {
         // Enter press
@@ -123,15 +125,15 @@ void BluetoothController::handleSniff(const TerminalCommand& cmd) {
         if (key == '\r' || key == '\n') break;
 
         // Show paquets if any
-        if (millis() - lastPull > 200) { 
+        if (utilityService.nowMs() - lastPull > 200) {
             auto logs = BluetoothService::getBluetoothSniffLog();
             for (const auto& line : logs) {
                 terminalView.println(line);
             }
-            lastPull = millis();
+            lastPull = utilityService.nowMs();
         }
 
-        delay(10);
+        utilityService.sleepMs(10);
     }
 
     BluetoothService::stopPassiveBluetoothSniffing();
@@ -218,7 +220,7 @@ void BluetoothController::handleKeyboardBridge() {
         if (c != KEY_NONE) {
             if (c == '\n' && sameHost) continue;
             bluetoothService.sendKeyboardText(std::string(1, c));
-            delay(20); 
+            utilityService.sleepMs(20);
         }
     }
 }
@@ -265,7 +267,7 @@ void BluetoothController::handleMouse(const TerminalCommand& cmd) {
             [this]() { bluetoothService.clickMouse(); },
             [this]() {
                 bluetoothService.sendMouseReport(0, 0, 0x02);
-                delay(50);
+                utilityService.sleepMs(50);
                 bluetoothService.sendMouseReport(0, 0, 0x00);
             }
         );
@@ -326,22 +328,22 @@ void BluetoothController::handleMouseJiggle(const TerminalCommand& cmd) {
 
     while (true) {
         // Random move
-        int8_t dx = (int8_t)random(-127, 127);
-        int8_t dy = (int8_t)random(-127, 127);
+        int8_t dx = static_cast<int8_t>(utilityService.randomRange(-127, 127));
+        int8_t dy = static_cast<int8_t>(utilityService.randomRange(-127, 127));
         if (dx == 0 && dy == 0) dx = 1;
 
         bluetoothService.mouseMove(dx, dy);
-        delay(30);
+        utilityService.sleepMs(30);
 
         // Wait for interval while listening for ENTER
-        unsigned long t0 = millis();
-        while ((millis() - t0) < (unsigned long)intervalMs) {
+        uint32_t t0 = utilityService.nowMs();
+        while ((utilityService.nowMs() - t0) < static_cast<uint32_t>(intervalMs)) {
             int c = terminalInput.readChar();
             if (c == '\r' || c == '\n') {
                 terminalView.println("Bluetooth Mouse: Jiggle stopped.\n");
                 return;
             }
-            delay(10);
+            utilityService.sleepMs(10);
         }
     }
 }

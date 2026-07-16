@@ -1,10 +1,10 @@
 #pragma once
 
 #include <string>
-#include <Arduino.h>
 
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Services/CellService.h"
 #include "Models/TerminalCommand.h"
 #include "Transformers/ArgTransformer.h"
@@ -19,6 +19,7 @@ class CellController {
 public:
     CellController(ITerminalView& view,
                    IInput& terminalInput,
+                   IUtilityService& utilityService,
                    CellService& service,
                    ArgTransformer& argTransformer,
                    AtTransformer& atTransformer,
@@ -36,6 +37,7 @@ public:
 private:
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     CellService& cellService;
     ArgTransformer& argTransformer;
     AtTransformer& atTransformer;

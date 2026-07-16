@@ -5,6 +5,7 @@
 #include <cstdint>
 #include "Interfaces/IInput.h"
 #include "Interfaces/ITerminalView.h"
+#include "Interfaces/IUtilityService.h"
 #include "Models/TerminalCommand.h"
 #include "Services/RfidService.h"
 #include "Managers/UserInputManager.h"
@@ -17,6 +18,7 @@ public:
     RfidController(
         ITerminalView& view,
         IInput& input,
+        IUtilityService& utilityService,
         RfidService& rfidService,
         UserInputManager& uim,
         ArgTransformer& transformer,
@@ -45,6 +47,7 @@ bool configured = false;
 
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     RfidService& rfidService;
     UserInputManager& userInputManager;
     ArgTransformer& argTransformer;

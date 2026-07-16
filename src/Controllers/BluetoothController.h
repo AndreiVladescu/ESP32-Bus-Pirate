@@ -3,6 +3,7 @@
 #include <string>
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Services/BluetoothService.h"
 #include "Transformers/ArgTransformer.h"
 #include "Models/TerminalCommand.h"
@@ -17,6 +18,7 @@ public:
         ITerminalView& terminalView,
         IInput& terminalInput,
         IInput& deviceInput,
+        IUtilityService& utilityService,
         BluetoothService& bluetoothService,
         ArgTransformer& argTransformer,
         UserInputManager& userInputManager,
@@ -37,6 +39,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IInput& deviceInput;
+    IUtilityService& utilityService;
     BluetoothService& bluetoothService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;

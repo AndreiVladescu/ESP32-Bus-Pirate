@@ -1,9 +1,9 @@
 #pragma once
 
 #include <sstream>
-#include <Arduino.h>
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Models/TerminalCommand.h"
 #include "Models/ByteCode.h"
 #include "States/GlobalState.h"
@@ -21,6 +21,7 @@ public:
         ITerminalView& terminalView, 
         IInput& terminalInput, 
         IInput& deviceInput,
+        IUtilityService& utilityService,
         UsbS3Service& usbService, 
         ArgTransformer& argTransformer, 
         UserInputManager& userInputManager,
@@ -85,6 +86,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IInput& deviceInput;
+    IUtilityService& utilityService;
     UsbS3Service& usbService;
     ArgTransformer& argTransformer;
     GlobalState& state = GlobalState::getInstance();

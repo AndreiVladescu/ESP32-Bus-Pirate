@@ -8,14 +8,14 @@
 Initialize the LoRa controller dependencies
 */
 LoRaController::LoRaController(ITerminalView& tv, IInput& input, IDeviceView& device,
-                               LoRaService& service, LittleFsService& littleFs,
+                               IUtilityService& utilityService, LoRaService& service, LittleFsService& littleFs,
                                I2sService& i2s,
                                ArgTransformer& transformer, LoRaTransformer& transformerLoRa,
                                TerminalCommandTransformer& commandTransformer,
                                UserInputManager& uim,
                                HelpShell& help,
                                MeshtasticShell& meshShell)
-    : terminalView(tv), terminalInput(input), deviceView(device), loRaService(service),
+    : terminalView(tv), terminalInput(input), deviceView(device), utilityService(utilityService), loRaService(service),
       littleFsService(littleFs), i2sService(i2s), argTransformer(transformer),
       loRaTransformer(transformerLoRa),
       terminalCommandTransformer(commandTransformer),
@@ -168,9 +168,9 @@ void LoRaController::handleSend(const TerminalCommand& cmd) {
     terminalView.println(" Airtime : " + std::to_string(loRaService.getTimeOnAir(payload.size())) + " ms");
     terminalView.println(argTransformer.formatHexAscii(payload.data(), payload.size(), true, 8));
 
-    const uint32_t started = millis();
+    const uint32_t started = utilityService.nowMs();
     const bool ok = loRaService.send(payload.data(), payload.size());
-    const uint32_t elapsed = millis() - started;
+    const uint32_t elapsed = utilityService.nowMs() - started;
 
     if (ok) {
         terminalView.println("LoRa TX: sent.");
@@ -268,23 +268,23 @@ void LoRaController::handleSpam(const TerminalCommand& cmd) {
     uint32_t sent = 0;
     uint32_t failed = 0;
     uint32_t lastSendAt = 0;
-    uint32_t lastReportAt = millis();
-    const uint32_t startedAt = millis();
+    uint32_t lastReportAt = utilityService.nowMs();
+    const uint32_t startedAt = utilityService.nowMs();
     bool firstSend = true;
 
     while (true) {
         const char c = terminalInput.readChar();
         if (c == '\r' || c == '\n') break;
 
-        const uint32_t now = millis();
+        const uint32_t now = utilityService.nowMs();
         if (!firstSend && now - lastSendAt < intervalMs) {
             if (now - lastReportAt >= 5000) {
                 terminalView.println("[Spam] sent=" +
                     std::to_string(sent) + " failed=" +
                     std::to_string(failed));
-                lastReportAt = millis();
+                lastReportAt = utilityService.nowMs();
             }
-            delay(1);
+            utilityService.sleepMs(1);
             continue;
         }
 
@@ -305,7 +305,7 @@ void LoRaController::handleSpam(const TerminalCommand& cmd) {
                 std::to_string(sent + failed));
         }
 
-        delay(1);
+        utilityService.sleepMs(1);
     }
 
     terminalView.println("\n[Spam summary]");
@@ -314,7 +314,7 @@ void LoRaController::handleSpam(const TerminalCommand& cmd) {
     terminalView.println("Failed: " +
         std::to_string(failed));
     terminalView.println("Duration: " +
-        std::to_string(millis() - startedAt) + " ms");
+        std::to_string(utilityService.nowMs() - startedAt) + " ms");
     terminalView.println("");
 }
 
@@ -363,17 +363,17 @@ void LoRaController::handleJam(const TerminalCommand& cmd) {
     }
 
     terminalView.println("LoRa jam: active. Press [ENTER] to stop.\n");
-    const uint32_t startedAt = millis();
-    while (millis() - startedAt < static_cast<uint32_t>(durationSeconds) * 1000u) {
+    const uint32_t startedAt = utilityService.nowMs();
+    while (utilityService.nowMs() - startedAt < static_cast<uint32_t>(durationSeconds) * 1000u) {
         const char c = terminalInput.readChar();
         if (c == '\r' || c == '\n') break;
-        delay(1);
+        utilityService.sleepMs(1);
     }
     loRaService.stopContinuousWave();
 
     terminalView.println("\n[Jam summary]");
     terminalView.println("Duration: " +
-        std::to_string(millis() - startedAt) + " ms\n");
+        std::to_string(utilityService.nowMs() - startedAt) + " ms\n");
 }
 
 /*
@@ -411,15 +411,15 @@ void LoRaController::handleReceive() {
         const int16_t result = loRaService.pollReceive(payload);
         if (result == LoRaService::RECEIVE_ERROR) {
             errors++;
-            delay(1);
+            utilityService.sleepMs(1);
             continue;
         }
         if (result != LoRaService::RECEIVE_OK) {
-            delay(1);
+            utilityService.sleepMs(1);
             continue;
         }
 
-        const uint32_t now = millis();
+        const uint32_t now = utilityService.nowMs();
         packetNumber++;
 
         terminalView.println("[RX #" +
@@ -502,7 +502,7 @@ void LoRaController::handleRecord() {
         }
         if (result != LoRaService::RECEIVE_OK) {
             payload.clear();
-            delay(1);
+            utilityService.sleepMs(1);
         }
     }
 
@@ -537,7 +537,7 @@ void LoRaController::handleRecord() {
         true, 8));
 
     std::string defaultName =
-        "lora_" + std::to_string(millis() % 1000000);
+        "lora_" + std::to_string(utilityService.nowMs() % 1000000);
     std::string fileBase =
         userInputManager.readSanitizedString(
             "File name", defaultName, false);
@@ -685,7 +685,7 @@ void LoRaController::handleRssi(const TerminalCommand& cmd) {
         }
 
         const int remaining = intervalMs - static_cast<int>(sampleDuration);
-        if (remaining > 0) delay(remaining);
+        if (remaining > 0) utilityService.sleepMs(remaining);
     }
 
     if (rounds > 0) {
@@ -732,7 +732,7 @@ void LoRaController::handleEar() {
 
         LoRaService::RssiStats stats;
         if (!loRaService.measureRssi(state.getLoRaFrequency(), 20, stats)) {
-            delay(1);
+            utilityService.sleepMs(1);
             continue;
         }
 
@@ -744,7 +744,7 @@ void LoRaController::handleEar() {
             i2sService.playTone(state.getI2sSampleRate(), frequencyHz, 15);
         }
 
-        const uint32_t now = millis();
+        const uint32_t now = utilityService.nowMs();
         if (now - lastReportAt >= 1000) {
             terminalView.println("[Ear] RSSI=" +
                 std::to_string(stats.maximum) + " dBm");
@@ -1132,7 +1132,7 @@ void LoRaController::handleCad(const TerminalCommand& cmd) {
             }
         }
 
-        delay(intervalMs);
+        utilityService.sleepMs(intervalMs);
     }
 
     // Do not discard an incomplete reporting window when the user stops.

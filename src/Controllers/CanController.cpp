@@ -3,12 +3,14 @@
 CanController::CanController(ITerminalView& terminalView,
                              IInput& terminalInput,
                              UserInputManager& userInputManager,
+                             IUtilityService& utilityService,
                              CanService& canService,
                              ArgTransformer& argTransformer,
                              HelpShell& helpShell)
     : terminalView(terminalView),
       terminalInput(terminalInput),
       userInputManager(userInputManager),
+      utilityService(utilityService),
       canService(canService),
       argTransformer(argTransformer),
       helpShell(helpShell) {}
@@ -33,20 +35,20 @@ void CanController::handleSniff() {
     
     terminalView.println("CAN Sniff: Waiting for frame... Press [ENTER] to stop.\n");
     
-    unsigned long lastFrameTime = millis();
+    uint32_t lastFrameTime = utilityService.nowMs();
     while (true) {
         auto frame = canService.readFrameAsString();
 
         // Received frame
         if (!frame.empty()) {
             terminalView.println(" 📥 " + frame);
-            lastFrameTime = millis();  // reset timer
+            lastFrameTime = utilityService.nowMs();  // reset timer
         }
 
         // Reset CAN if no frame for 3 seconds
-        if (millis() - lastFrameTime > 3000) {
+        if (utilityService.nowMs() - lastFrameTime > 3000) {
             canService.reset();
-            lastFrameTime = millis();
+            lastFrameTime = utilityService.nowMs();
         }
 
         // Abort if ENTER is pressed
@@ -129,20 +131,20 @@ void CanController::handleReceive(const TerminalCommand& cmd) {
 
     terminalView.println("Waiting for CAN frame with ID 0x" + argTransformer.toHex(id, 3) + "... Press [ENTER] to stop.\n");
 
-    unsigned long lastFrameTime = millis();
+    uint32_t lastFrameTime = utilityService.nowMs();
     while (true) {
         std::string frameStr = canService.readFrameAsString();
 
         // Received frame
         if (!frameStr.empty()) {
             terminalView.println(" 📥 " + frameStr);
-            lastFrameTime = millis();  // reset timer
+            lastFrameTime = utilityService.nowMs();  // reset timer
         }
 
         // Reset CAN if no frame for 3 seconds
-        if (millis() - lastFrameTime > 3000) {
+        if (utilityService.nowMs() - lastFrameTime > 3000) {
             canService.reset();
-            lastFrameTime = millis();
+            lastFrameTime = utilityService.nowMs();
         }
 
         // Abort if ENTER is pressed
@@ -235,4 +237,3 @@ void CanController::ensureConfigured() {
         state.getCanKbps()
     );
 }
-

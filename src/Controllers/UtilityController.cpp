@@ -7,6 +7,7 @@ UtilityController::UtilityController(
     ITerminalView& terminalView,
     IDeviceView& deviceView,
     IInput& terminalInput,
+    IUtilityService& utilityService,
     PinService& pinService,
     I2sService& i2sService,
     UserInputManager& userInputManager,
@@ -22,6 +23,7 @@ UtilityController::UtilityController(
     : terminalView(terminalView),
       deviceView(deviceView),
       terminalInput(terminalInput),
+      utilityService(utilityService),
       pinService(pinService),
       i2sService(i2sService),
       userInputManager(userInputManager),
@@ -263,14 +265,14 @@ void UtilityController::handleLogicAnalyzer(const TerminalCommand& cmd) {
     std::vector<uint8_t> buffer;
     buffer.reserve(320); // 320 samples
 
-    unsigned long lastCheck = millis();
+    uint32_t lastCheck = utilityService.nowMs();
     deviceView.clear();
     deviceView.topBar("Logic Analyzer", false, false);
 
     while (true) {
         // Enter press
-        if (millis() - lastCheck > 10) {
-            lastCheck = millis();
+        if (utilityService.nowMs() - lastCheck > 10) {
+            lastCheck = utilityService.nowMs();
             char c = terminalInput.readChar();
             if (c == '\r' || c == '\n') {
                 // fdufnews 2025/10/24 added to restore cursor position when leaving
@@ -324,7 +326,7 @@ void UtilityController::handleLogicAnalyzer(const TerminalCommand& cmd) {
         }
 
         buffer.push_back(pinService.read(pin));
-        delayMicroseconds(tDelay);
+        utilityService.sleepUs(tDelay);
     }
 }
 
@@ -360,14 +362,14 @@ void UtilityController::handleAnalogic(const TerminalCommand& cmd) {
     std::vector<uint8_t> buffer;
     buffer.reserve(320); // 320 samples
 
-    unsigned long lastCheck = millis();
+    uint32_t lastCheck = utilityService.nowMs();
     deviceView.clear();
     deviceView.topBar("Analog plotter", false, false);
     int count = 0;
     while (true) {
         // Enter press
-        if (millis() - lastCheck > 10) {
-            lastCheck = millis();
+        if (utilityService.nowMs() - lastCheck > 10) {
+            lastCheck = utilityService.nowMs();
             char c = terminalInput.readChar();
             if (c == '\r' || c == '\n') {
                 terminalView.println("\nAnalogic: Stopped by user.");
@@ -419,7 +421,7 @@ void UtilityController::handleAnalogic(const TerminalCommand& cmd) {
         }
 
         buffer.push_back(pinService.readAnalog(pin) >> 4); // convert the readAnalog() value to a uint8_t (4096 ==> 256)
-        delayMicroseconds(tDelay);
+        utilityService.sleepUs(tDelay);
     }
 }
 
@@ -472,7 +474,7 @@ void UtilityController::handleWizard(const TerminalCommand& cmd) {
         }
 
         // Check if it's time to report and report activity
-        if (pinAnalyzer.shouldReport(millis())) {
+        if (pinAnalyzer.shouldReport(utilityService.nowMs())) {
             auto report = pinAnalyzer.buildReport(doPullTest);
             terminalView.print(pinAnalyzer.formatWizardReport(pin, report));
             pinAnalyzer.resetWindow();
@@ -537,7 +539,7 @@ void UtilityController::handleListen(const TerminalCommand& cmd) {
     const uint16_t fMax = 12000;         // audio high
 
     int last = pinService.read(pin);
-    uint32_t windowStartUs = micros();
+    uint32_t windowStartUs = utilityService.nowUs();
     uint32_t edgesWindow = 0;
 
     while (true) {
@@ -555,7 +557,7 @@ void UtilityController::handleListen(const TerminalCommand& cmd) {
             }
         }
 
-        uint32_t nowUs = micros();
+        uint32_t nowUs = utilityService.nowUs();
         if (nowUs - windowStartUs >= windowUs) {
 
             // approx edges per second
@@ -584,7 +586,7 @@ void UtilityController::handleListen(const TerminalCommand& cmd) {
             windowStartUs = nowUs;
         }
 
-        delayMicroseconds(refreshUs);
+        utilityService.sleepUs(refreshUs);
     }
 
     terminalView.println("Listen: Stopped by user.\n");
@@ -657,7 +659,7 @@ void UtilityController::handleDelay(const TerminalCommand& cmd) {
 
     // Fast path
     if (us < 20000ULL) {
-        delayMicroseconds((uint32_t)us);
+        utilityService.sleepUs(static_cast<uint32_t>(us));
         return;
     }
 
@@ -671,7 +673,7 @@ void UtilityController::handleDelay(const TerminalCommand& cmd) {
         if (c == '\n' || c == '\r') break;
 
         uint32_t chunk = (remaining > 10000ULL) ? 10000U : (uint32_t)remaining;
-        delayMicroseconds(chunk);
+        utilityService.sleepUs(chunk);
         remaining -= chunk;
     }
 }

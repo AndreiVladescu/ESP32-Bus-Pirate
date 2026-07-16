@@ -5,6 +5,7 @@
 #include "Services/UartService.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "Shells/HelpShell.h"
@@ -15,6 +16,7 @@ public:
     // Constructor
     ExpanderController(ITerminalView& terminalView,
                  IInput& terminalInput,
+                 IUtilityService& utilityService,
                  UartService& uartService,
                  ArgTransformer& argTransformer,
                  UserInputManager& userInputManager,
@@ -35,6 +37,7 @@ private:
 
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     UartService& uartService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;

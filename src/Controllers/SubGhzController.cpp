@@ -273,7 +273,7 @@ void SubGhzController::handleReplayDecoded(const TerminalCommand&) {
             } else {
                 terminalView.println(" ✅ Sent frame " + std::to_string(i + 1) + " ... (" + std::to_string(interFrameGapMs) + "ms gap) ");
             }
-            delay(interFrameGapMs);
+            utilityService.sleepMs(interFrameGapMs);
         }
         confirm = userInputManager.readYesNo("\nReplay done. Send all the frames again?", true);
     }
@@ -305,7 +305,7 @@ void SubGhzController::handleJam(const TerminalCommand&) {
     }
 
     terminalView.println("SUBGHZ Jam: In progress @ " + argTransformer.toFixed2(f) + " MHz... Press [ENTER] to stop.");
-    delay(5); // let display the message
+    utilityService.sleepMs(5); // let display the message
     
     auto gdo = state.getSubGhzGdoPin();
     subGhzService.startTxBitBang();
@@ -316,7 +316,7 @@ void SubGhzController::handleJam(const TerminalCommand&) {
 
         // Jam
         pinService.setHigh(gdo);
-        delayMicroseconds(30);
+        utilityService.sleepUs(30);
         pinService.setLow(gdo);
     }
 
@@ -369,8 +369,8 @@ void SubGhzController::handleBandJam() {
                 return;
             }
 
-            unsigned long t0 = millis();
-            while (!stop && (millis() - t0 < static_cast<unsigned long>(dwellMs))) {
+            uint32_t t0 = utilityService.nowMs();
+            while (!stop && (utilityService.nowMs() - t0 < static_cast<uint32_t>(dwellMs))) {
                 char c2 = terminalInput.readChar();
                 if (c2 == '\n' || c2 == '\r') { stop = true; break; }
 
@@ -383,7 +383,7 @@ void SubGhzController::handleBandJam() {
                 // Jam
                 for (int i = 0; i < 64; i++) {
                     pinService.setHigh(gdo);
-                    delayMicroseconds(30);
+                    utilityService.sleepUs(30);
                     pinService.setLow(gdo);
                 }
 
@@ -393,7 +393,7 @@ void SubGhzController::handleBandJam() {
                     char c3 = terminalInput.readChar();
                     if (c3 == '\n' || c3 == '\r') { stop = true; break; }
                     int chunk = std::min(remain, 1000);
-                    delayMicroseconds(chunk);
+                    utilityService.sleepUs(chunk);
                     remain -= chunk;
                 }
             }
@@ -515,13 +515,13 @@ void SubGhzController::handleTrace() {
     std::vector<uint8_t> buffer;
     buffer.reserve(240); // screen width default
 
-    unsigned long lastPoll = millis();
+    uint32_t lastPoll = utilityService.nowMs();
 
     // Samples loop
     while (true) {
         // Cancel
-        if (millis() - lastPoll >= 10) {
-            lastPoll = millis();
+        if (utilityService.nowMs() - lastPoll >= 10) {
+            lastPoll = utilityService.nowMs();
             const char c = terminalInput.readChar();
             if (c == '\n' || c == '\r') {
                 terminalView.println("SUBGHZ Trace: Stopped by user.\n");
@@ -539,7 +539,7 @@ void SubGhzController::handleTrace() {
             buffer.clear();
         }
 
-        delayMicroseconds(sampleUs);
+        utilityService.sleepUs(sampleUs);
     }
 }
 
@@ -869,7 +869,7 @@ void SubGhzController::handleRecord() {
         }
 
         // Ask filename
-        std::string defName = "sub_" + std::to_string(millis() % 1000000);
+        std::string defName = "sub_" + std::to_string(utilityService.nowMs() % 1000000);
         std::string fileBase = userInputManager.readSanitizedString("File name", defName, false);
         if (fileBase.empty()) fileBase = defName;
 
@@ -956,7 +956,7 @@ void SubGhzController::handleEar() {
             i2sService.playTone(state.getI2sSampleRate(), freqHz, toneMs);
         }
 
-        delayMicroseconds(refreshUs);
+        utilityService.sleepUs(refreshUs);
     }
 
     terminalView.println("SUBGHZ Ear: Stopped by user.\n");

@@ -6,6 +6,7 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
+#include "Interfaces/IUtilityService.h"
 #include "Models/TerminalCommand.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
@@ -20,6 +21,7 @@ public:
     Rf24Controller(ITerminalView& terminalView,
                    IInput& terminalInput,
                    IDeviceView& deviceView,
+                   IUtilityService& utilityService,
                    Rf24Service& rf24Service,
                    PinService& pinService,
                    ArgTransformer& argTransformer,
@@ -28,6 +30,7 @@ public:
     : terminalView(terminalView),
       terminalInput(terminalInput),
       deviceView(deviceView),
+      utilityService(utilityService),
       rf24Service(rf24Service),
       pinService(pinService),
       argTransformer(argTransformer),
@@ -56,6 +59,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IDeviceView& deviceView;
+    IUtilityService& utilityService;
     Rf24Service& rf24Service;
     PinService& pinService;
     ArgTransformer& argTransformer;

@@ -5,12 +5,14 @@ Constructor
 */
 ExpanderController::ExpanderController(ITerminalView& terminalView,
                            IInput& terminalInput,
+                           IUtilityService& utilityService,
                            UartService& uartService,
                            ArgTransformer& argTransformer,
                            UserInputManager& userInputManager,
                            HelpShell& helpShell)
     : terminalView(terminalView),
       terminalInput(terminalInput),
+      utilityService(utilityService),
       uartService(uartService),
       argTransformer(argTransformer),
       userInputManager(userInputManager),
@@ -61,14 +63,14 @@ void ExpanderController::handleBridge() {
             if (c == '\x1B') {
                 uartService.write(c);
 
-                unsigned long start = millis();
-                while (millis() - start < 20) {
+                uint32_t start = utilityService.nowMs();
+                while (utilityService.nowMs() - start < 20) {
                     char c2 = terminalInput.readChar();
                     if (c2 != KEY_NONE) {
                         uartService.write(c2);
 
-                        start = millis();
-                        while (millis() - start < 20) {
+                        start = utilityService.nowMs();
+                        while (utilityService.nowMs() - start < 20) {
                             char c3 = terminalInput.readChar();
                             if (c3 != KEY_NONE) {
                                 uartService.write(c3);
@@ -101,7 +103,7 @@ void ExpanderController::handleBridge() {
             }
         }
 
-        delay(1);
+        utilityService.sleepMs(1);
     }
 }
 
@@ -140,13 +142,13 @@ void ExpanderController::handleConfig() {
         uartService.read();
     }
 
-    delay(100);
+    utilityService.sleepMs(100);
 
     // Send a few ENTER to bring the slave back to its main prompt
     for (int i = 0; i < 8; ++i) {
         uartService.write('\r');
         uartService.write('\n');
-        delay(20);
+        utilityService.sleepMs(20);
     }
 
     // flush what came back after the reset
@@ -158,10 +160,10 @@ void ExpanderController::handleConfig() {
     uartService.write("handshake\n");
 
     std::string rxBuffer;
-    unsigned long start = millis();
+    uint32_t start = utilityService.nowMs();
     bool handshakeOk = false;
 
-    while (millis() - start < 2000) {
+    while (utilityService.nowMs() - start < 2000) {
         while (uartService.available()) {
             char c = uartService.read();
             rxBuffer += c;
@@ -180,7 +182,7 @@ void ExpanderController::handleConfig() {
             break;
         }
 
-        delay(5);
+        utilityService.sleepMs(5);
     }
 
     if (!handshakeOk) {

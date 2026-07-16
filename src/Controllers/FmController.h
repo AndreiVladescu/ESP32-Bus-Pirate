@@ -4,6 +4,7 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
+#include "Interfaces/IUtilityService.h"
 #include "Services/FmService.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
@@ -17,6 +18,7 @@ public:
         ITerminalView& terminalView,
         IInput& terminalInput,
         IDeviceView& deviceView,
+        IUtilityService& utilityService,
         FmService& fmService,
         ArgTransformer& argTransformer,
         UserInputManager& userInputManager,
@@ -46,6 +48,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IDeviceView& deviceView;
+    IUtilityService& utilityService;
     FmService& fmService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;

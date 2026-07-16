@@ -8,6 +8,7 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
+#include "Interfaces/IUtilityService.h"
 #include "Models/TerminalCommand.h"
 #include "Models/ByteCode.h"
 #include "Transformers/ArgTransformer.h"
@@ -27,6 +28,7 @@ public:
     SubGhzController(ITerminalView& terminalView,
                      IInput& terminalInput,
                      IDeviceView& deviceView,
+                     IUtilityService& utilityService,
                      SubGhzService& subGhzService,
                      PinService& pinService,
                      I2sService& i2sService,
@@ -39,6 +41,7 @@ public:
     : terminalView(terminalView),
       terminalInput(terminalInput),
       deviceView(deviceView),
+      utilityService(utilityService),
       subGhzService(subGhzService),
       pinService(pinService),
       i2sService(i2sService),
@@ -117,6 +120,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IDeviceView& deviceView;
+    IUtilityService& utilityService;
     SubGhzService& subGhzService;
     PinService& pinService;
     I2sService& i2sService;

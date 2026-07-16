@@ -9,6 +9,7 @@ FmController::FmController(
     ITerminalView& terminalView,
     IInput& terminalInput,
     IDeviceView& deviceView,
+    IUtilityService& utilityService,
     FmService& fmService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
@@ -18,6 +19,7 @@ FmController::FmController(
     : terminalView(terminalView),
       terminalInput(terminalInput),
       deviceView(deviceView),
+      utilityService(utilityService),
       fmService(fmService),
       argTransformer(argTransformer),
       userInputManager(userInputManager),
@@ -256,7 +258,7 @@ void FmController::handleTrace(const TerminalCommand& cmd)
     std::vector<uint8_t> buffer;
     buffer.reserve(240);
 
-    unsigned long lastPoll = millis();
+    uint32_t lastPoll = utilityService.nowMs();
 
     // Baseline EMA 
     int32_t ema = -1;
@@ -267,8 +269,8 @@ void FmController::handleTrace(const TerminalCommand& cmd)
 
     while (true) {
         // Cancel
-        if (millis() - lastPoll >= 10) {
-            lastPoll = millis();
+        if (utilityService.nowMs() - lastPoll >= 10) {
+            lastPoll = utilityService.nowMs();
             const char c = terminalInput.readChar();
             if (c == '\n' || c == '\r') {
                 terminalView.println("FM Trace: Stopped by user.\n");

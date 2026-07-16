@@ -6,6 +6,7 @@ Constructor
 OneWireController::OneWireController(
     ITerminalView& terminalView, 
     IInput& terminalInput, 
+    IUtilityService& utilityService,
     OneWireService& service, 
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager, 
@@ -15,6 +16,7 @@ OneWireController::OneWireController(
 )
     : terminalView(terminalView), 
       terminalInput(terminalInput), 
+      utilityService(utilityService),
       oneWireService(service), 
       argTransformer(argTransformer), 
       userInputManager(userInputManager), 
@@ -116,7 +118,7 @@ void OneWireController::handleRead() {
             terminalView.println("");
             break;
         }
-        delay(100);
+        utilityService.sleepMs(100);
     }
 }
 
@@ -232,7 +234,7 @@ void OneWireController::handleIdWrite(std::vector<uint8_t> idBytes) {
 
     // Wait detection
     while (!oneWireService.reset()) {
-        delay(1);
+        utilityService.sleepMs(1);
         auto key = terminalInput.readChar();
         if (key == '\r' || key == '\n') {
             terminalView.println("");
@@ -248,7 +250,7 @@ void OneWireController::handleIdWrite(std::vector<uint8_t> idBytes) {
 
         // Write
         oneWireService.writeRw1990(state.getOneWirePin(), idBytes.data(), idBytes.size());
-        delay(50);
+        utilityService.sleepMs(50);
 
         // Read ID to verify
         uint8_t buffer[8];
@@ -290,7 +292,7 @@ void OneWireController::handleScratchpadWrite(std::vector<uint8_t> scratchpadByt
             terminalView.println("Aborted by user.");
             return;
         }
-        delay(1);
+        utilityService.sleepMs(1);
     }
 
     // Try up to X times
@@ -302,16 +304,16 @@ void OneWireController::handleScratchpadWrite(std::vector<uint8_t> scratchpadByt
 
         oneWireService.skip();
         oneWireService.write(0x0F); // Scratchpad write command
-        delayMicroseconds(20);
+        utilityService.sleepUs(20);
         oneWireService.writeBytes(scratchpadBytes.data(), 8);
-        delay(50);
+        utilityService.sleepMs(50);
 
         // Verify by reading back
         if (!oneWireService.reset()) continue;
 
         oneWireService.skip();
         oneWireService.write(0xAA); // Read Scratchpad
-        delayMicroseconds(20);
+        utilityService.sleepUs(20);
 
         uint8_t readback[8];
         oneWireService.readBytes(readback, 8);
@@ -376,12 +378,11 @@ void OneWireController::handleSniff() {
     }
 
     // Init the pin to read passively
-    uint8_t pin = state.getOneWirePin();
-    pinMode(pin, INPUT);
+    oneWireService.beginPassiveSniff();
 
     // Read initial state of pin
-    int prev = digitalRead(pin);
-    unsigned long lastFall = micros();
+    int prev = oneWireService.readPinLevel();
+    uint32_t lastFall = utilityService.nowUs();
 
     while (true) {
         // Enter press
@@ -389,8 +390,8 @@ void OneWireController::handleSniff() {
         if (c == '\r' || c == '\n' ) break;
         
         // Read current state of pin
-        int current = digitalRead(pin);
-        unsigned long now = micros();
+        int current = oneWireService.readPinLevel();
+        uint32_t now = utilityService.nowUs();
 
         // Detect a falling edge
         if (prev == HIGH && current == LOW) {
@@ -400,7 +401,7 @@ void OneWireController::handleSniff() {
         // Detect a rising edge (end of a LOW pulse)
         if (prev == LOW && current == HIGH) {
             // Calculate duration of the LOW pulse
-            unsigned long duration = now - lastFall;
+            uint32_t duration = now - lastFall;
             
             // Too long, not mean anything
             if (duration >= 3000) {
@@ -418,13 +419,13 @@ void OneWireController::handleSniff() {
             } else if (duration >= 10 && duration <= 70) {
                 // Want to sample ~15 µs after the falling edge
                 // which is the standard sampling time in the 1-Wire protocol
-                long elapsed = now - lastFall;
+                uint32_t elapsed = now - lastFall;
                 if (elapsed < 15) {
-                    delayMicroseconds(15 - elapsed);
+                    utilityService.sleepUs(15 - elapsed);
                 }
                 
                 // Read the bit
-                int sample = digitalRead(pin);
+                int sample = oneWireService.readPinLevel();
                 terminalView.println("[Bit] LOW " + std::to_string(duration) +
                                      " µs, Sample = " + std::to_string(sample));
 
@@ -481,7 +482,7 @@ void OneWireController::handleTemperature() {
     // Select and write CONVERT T
     oneWireService.select(rom);
     oneWireService.write(0x44);  // CONVERT T
-    delay(750); // wait conversion max 750ms
+    utilityService.sleepMs(750); // wait conversion max 750ms
 
     if (!oneWireService.reset()) {
         terminalView.println("OneWire Temp: Reset failed before scratchpad read.");
@@ -542,4 +543,3 @@ void OneWireController::ensureConfigured() {
     uint8_t pin = state.getOneWirePin();
     oneWireService.configure(pin);
 }
-

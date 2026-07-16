@@ -3,7 +3,6 @@
 #include <vector>
 #include <queue>
 #include <string>
-#include "HardwareSerial.h"
 #include "Models/TerminalCommand.h"
 #include "Models/ByteCode.h"
 #include "Services/UartService.h"
@@ -12,6 +11,7 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
+#include "Interfaces/IUtilityService.h"
 #include "States/GlobalState.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
@@ -26,6 +26,7 @@ public:
                    IInput& terminalInput,
                    IDeviceView& deviceView,
                    IInput& deviceInput,
+                   IUtilityService& utilityService,
                    UartService& uartService, 
                    SdService& sdService,
                    HdUartService& hdUartService, 
@@ -112,6 +113,7 @@ private:
     IDeviceView& deviceView;
     IInput& terminalInput;
     IInput& deviceInput;
+    IUtilityService& utilityService;
     UartService& uartService;
     SdService& sdService;
     HdUartService& hdUartService;

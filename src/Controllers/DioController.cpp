@@ -10,6 +10,7 @@ DioController::DioController(
     ITerminalView& terminalView,
     IInput& terminalInput,
     IDeviceView& deviceView,
+    IUtilityService& utilityService,
     PinService& pinService,
     ArgTransformer& argTransformer,
     HelpShell& helpShell,
@@ -18,6 +19,7 @@ DioController::DioController(
     : terminalView(terminalView),
       terminalInput(terminalInput),
       deviceView(deviceView),
+      utilityService(utilityService),
       pinService(pinService),
       argTransformer(argTransformer),
       helpShell(helpShell),
@@ -175,7 +177,7 @@ void DioController::handleScan(const TerminalCommand& cmd) {
         lowSamples[pin]  = (v ? 0 : 1);
     }
 
-    unsigned long lastPrint = millis();
+    uint32_t lastPrint = utilityService.nowMs();
 
     while (true) {
 
@@ -202,7 +204,7 @@ void DioController::handleScan(const TerminalCommand& cmd) {
         }
 
         // Report each 2 sec
-        unsigned long now = millis();
+        uint32_t now = utilityService.nowMs();
         if (now - lastPrint >= 2000) {
             lastPrint = now;
 
@@ -400,13 +402,13 @@ void DioController::handleSniff(const TerminalCommand& cmd) {
     terminalView.println("\nInitial state: " + std::string(last ? "HIGH" : "LOW"));
     terminalView.println("");
 
-    uint32_t lastEdgeUs = micros();
-    uint32_t lastKeyPollMs = millis();
+    uint32_t lastEdgeUs = utilityService.nowUs();
+    uint32_t lastKeyPollMs = utilityService.nowMs();
 
     while (true) {
         // check ENTER every 10ms
-        if (millis() - lastKeyPollMs > 10) {
-            lastKeyPollMs = millis();
+        if (utilityService.nowMs() - lastKeyPollMs > 10) {
+            lastKeyPollMs = utilityService.nowMs();
             char c = terminalInput.readChar();
             if (c == '\r' || c == '\n') {
                 terminalView.println("\nDIO Sniff: Stopped.");
@@ -416,7 +418,7 @@ void DioController::handleSniff(const TerminalCommand& cmd) {
 
         int current = pinService.read(pin);
         if (current != last) {
-            uint32_t nowUs = micros();
+            uint32_t nowUs = utilityService.nowUs();
             uint32_t dtUs = nowUs - lastEdgeUs;
             lastEdgeUs = nowUs;
 
@@ -535,9 +537,9 @@ void DioController::handleMeasure(const TerminalCommand& cmd) {
     int last = pinService.read(pin);
     uint32_t rising = 0, falling = 0;
 
-    unsigned long startMs = millis();
+    uint32_t startMs = utilityService.nowMs();
 
-    while (millis() - startMs < durationMs) {
+    while (utilityService.nowMs() - startMs < durationMs) {
         int current = pinService.read(pin);
         if (current != last) {
             if (last == 0 && current == 1) ++rising;
@@ -589,11 +591,11 @@ void DioController::handleTogglePin(const TerminalCommand& cmd) {
     terminalView.println("\nDIO Toggle: GPIO " + std::to_string(pin) + " every " + std::to_string(intervalMs) + "ms...Press [ENTER] to stop.");
     terminalView.println("");
 
-    unsigned long lastToggle = millis();
-    unsigned long lastCheck = millis();
+    uint32_t lastToggle = utilityService.nowMs();
+    uint32_t lastCheck = utilityService.nowMs();
 
     while (true) {
-        unsigned long now = millis();
+        uint32_t now = utilityService.nowMs();
 
         // check ENTER press every 10ms
         if (now - lastCheck > 10) {
@@ -696,7 +698,7 @@ void DioController::handlePulse(const TerminalCommand& cmd) {
     if (pulseLevel) pinService.setHigh(pin);
     else            pinService.setLow(pin);
 
-    delayMicroseconds(durationUs);
+    utilityService.sleepUs(durationUs);
 
     if (base) pinService.setHigh(pin);
     else      pinService.setLow(pin);
@@ -744,12 +746,12 @@ void DioController::handleJamPin(const TerminalCommand& cmd) {
     terminalView.println("");
 
     bool state = false;
-    unsigned long lastCheck = millis();
+    uint32_t lastCheck = utilityService.nowMs();
 
     while (true) {
         // check ENTER press every 10ms
-        if (millis() - lastCheck > 10) {
-            lastCheck = millis();
+        if (utilityService.nowMs() - lastCheck > 10) {
+            lastCheck = utilityService.nowMs();
             char c = terminalInput.readChar();
             if (c == '\r' || c == '\n') {
                 terminalView.println("DIO Jam: Stopped by user.");
@@ -763,8 +765,8 @@ void DioController::handleJamPin(const TerminalCommand& cmd) {
 
         // random delay between minUs and maxUs
         uint32_t span = (maxUs - minUs);
-        uint32_t waitUs = minUs + (span ? (esp_random() % (span + 1)) : 0);
-        delayMicroseconds(waitUs);
+        uint32_t waitUs = minUs + (span ? (utilityService.randomUint32() % (span + 1)) : 0);
+        utilityService.sleepUs(waitUs);
     }
 }
 

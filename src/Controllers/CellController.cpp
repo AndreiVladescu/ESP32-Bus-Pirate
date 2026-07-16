@@ -5,6 +5,7 @@ Constructor
 */
 CellController::CellController(ITerminalView& view,
                                IInput& terminalInput,
+                               IUtilityService& utilityService,
                                CellService& service,
                                ArgTransformer& argTransformer,
                                AtTransformer& atTransformer,
@@ -14,6 +15,7 @@ CellController::CellController(ITerminalView& view,
                                CellSmsShell& cellSmsShell)
     : terminalView(view),
       terminalInput(terminalInput),
+      utilityService(utilityService),
       cellService(service),
       argTransformer(argTransformer),
       atTransformer(atTransformer),
@@ -215,7 +217,7 @@ void CellController::handleUnlock(const TerminalCommand& command)
 
         bool ok = cellService.enterPuk(puk, newPin);
         terminalView.println(ok ? "PUK accepted (OK)." : "PUK failed (ERROR).");
-        delay(100);
+        utilityService.sleepMs(100);
         terminalView.println(atTransformer.formatSimState(cellService.getSimState()) + "\n");
         return;
     }
@@ -252,7 +254,7 @@ void CellController::handleUnlock(const TerminalCommand& command)
 
     bool ok = cellService.enterPin(pin);
     terminalView.println(ok ? "PIN accepted (OK)." : "PIN failed (ERROR).");
-    delay(200);
+    utilityService.sleepMs(200);
     terminalView.println(atTransformer.formatSimState(cellService.getSimState()) + "\n");
 }
 

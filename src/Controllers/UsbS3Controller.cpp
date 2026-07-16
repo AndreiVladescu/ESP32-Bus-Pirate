@@ -7,6 +7,7 @@ UsbS3Controller::UsbS3Controller(
     ITerminalView& terminalView,
     IInput& terminalInput,
     IInput& deviceInput,
+    IUtilityService& utilityService,
     UsbS3Service& usbService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
@@ -17,6 +18,7 @@ UsbS3Controller::UsbS3Controller(
     : terminalView(terminalView),
       terminalInput(terminalInput),
       deviceInput(deviceInput),
+      utilityService(utilityService),
       usbService(usbService),
       argTransformer(argTransformer),
       userInputManager(userInputManager),
@@ -106,7 +108,7 @@ void UsbS3Controller::handleKeyboardBridge() {
         if (c != KEY_NONE) { 
             if (c == '\n' && sameHost) continue;
             usbService.keyboardSendString(std::string(1, c));
-            delay(20); // slow down looping
+            utilityService.sleepMs(20); // slow down looping
         }
     }
 }
@@ -149,7 +151,7 @@ Mouse Click
 void UsbS3Controller::handleMouseClick() {
     // Left click
     usbService.mouseClick(1);
-    delay(100);
+    utilityService.sleepMs(100);
     usbService.mouseRelease(1);
     terminalView.println("USB Mouse: Click sent.");
 }
@@ -209,21 +211,21 @@ void UsbS3Controller::handleMouseJiggle(const TerminalCommand& cmd) {
 
     while (true) {
         // Random moves
-        int dx = (int)random(-127, 127);
-        int dy = (int)random(-127, 127);
+        int dx = utilityService.randomRange(-127, 127);
+        int dy = utilityService.randomRange(-127, 127);
         if (dx == 0 && dy == 0) dx = 1;
 
         usbService.mouseMove(dx, dy);
 
         // wait interval while listening for ENTER
-        unsigned long t0 = millis();
-        while ((millis() - t0) < intervalMs) {
+        uint32_t t0 = utilityService.nowMs();
+        while ((utilityService.nowMs() - t0) < static_cast<uint32_t>(intervalMs)) {
             auto c = terminalInput.readChar();
             if (c == '\r' || c == '\n') {
                 terminalView.println("USB Mouse: Jiggle stopped.\n");
                 return;
             }
-            delay(10);
+            utilityService.sleepMs(10);
         }
     }
 }

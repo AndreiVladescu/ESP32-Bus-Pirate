@@ -4,10 +4,10 @@
 Constructor
 */
 I2sController::I2sController(ITerminalView& terminalView, IInput& terminalInput,
-                             I2sService& i2sService, ArgTransformer& argTransformer,
+                             IUtilityService& utilityService, I2sService& i2sService, ArgTransformer& argTransformer,
                              UserInputManager& userInputManager, HelpShell& helpShell)
     : terminalView(terminalView), terminalInput(terminalInput),
-      i2sService(i2sService), argTransformer(argTransformer),
+      utilityService(utilityService), i2sService(i2sService), argTransformer(argTransformer),
       userInputManager(userInputManager), helpShell(helpShell) {}
 
 
@@ -160,7 +160,7 @@ void I2sController::handleTestSpeaker() {
                 stop = true;
                 return;
             }
-            delay(1);
+            utilityService.sleepMs(1);
         }
     };
 
