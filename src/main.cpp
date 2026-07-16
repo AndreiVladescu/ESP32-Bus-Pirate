@@ -25,6 +25,7 @@
 #include <Servers/WebSocketServer.h>
 #include <Servers/DnsServer.h>
 #include <Services/NvsService.h>
+#include <Services/UtilityService.h>
 #include <Selectors/HorizontalSelector.h>
 #include <Configurators/TerminalTypeConfigurator.h>
 #include <Configurators/WifiTypeConfigurator.h>
@@ -162,17 +163,18 @@ void setup() {
     }
 
     LittleFsService littleFsService;
+    UtilityService utilityService;
     GlobalState& state = GlobalState::getInstance();
 
     // Select the terminal type
-    HorizontalSelector selector(deviceView, deviceInput);
+    HorizontalSelector selector(deviceView, deviceInput, utilityService);
     TerminalTypeConfigurator configurator(selector);
     TerminalTypeEnum terminalType = configurator.configure();
     std::string webIp = "0.0.0.0";
 
     // Configure Wi-Fi if needed
     if (terminalType == TerminalTypeEnum::WiFiClient || terminalType == TerminalTypeEnum::WiFiAp) {
-        WifiTypeConfigurator wifiTypeConfigurator(deviceView, deviceInput);
+        WifiTypeConfigurator wifiTypeConfigurator(deviceView, deviceInput, utilityService);
         webIp = wifiTypeConfigurator.configure(terminalType);
 
         if (webIp == "0.0.0.0") {
