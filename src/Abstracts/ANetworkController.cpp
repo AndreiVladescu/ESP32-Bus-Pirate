@@ -8,6 +8,7 @@ ANetworkController::ANetworkController(
     IDeviceView& deviceView,
     IInput& terminalInput, 
     IInput& deviceInput,
+    IUtilityService& utilityService,
     WifiService& wifiService, 
     WifiOpenScannerService& wifiOpenScannerService,
     EthernetService& ethernetService,
@@ -28,6 +29,7 @@ ANetworkController::ANetworkController(
   deviceView(deviceView),
   terminalInput(terminalInput),
   deviceInput(deviceInput),
+  utilityService(utilityService),
   wifiService(wifiService),
   wifiOpenScannerService(wifiOpenScannerService),
   ethernetService(ethernetService),
@@ -176,7 +178,7 @@ void ANetworkController::handleDiscovery(const TerminalCommand &cmd)
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 
-    delay(500);
+    utilityService.sleepMs(500);
 
     // Flush final logs
     for (auto& line : icmpService.fetchICMPLog()) {
@@ -222,9 +224,9 @@ void ANetworkController::handleNetcat(const TerminalCommand& cmd)
     netcatService.startTask(host, 0, port, true);
 
     // Wait for connection
-    unsigned long start = millis();
-    while (!netcatService.isConnected() && millis() - start < 5000) {
-        delay(50);
+    uint32_t start = utilityService.nowMs();
+    while (!netcatService.isConnected() && utilityService.nowMs() - start < 5000) {
+        utilityService.sleepMs(50);
     }
 
     if (!netcatService.isConnected()) {
@@ -244,7 +246,7 @@ void ANetworkController::handleNetcat(const TerminalCommand& cmd)
         if (terminalKey == KEY_NONE) {
             std::string out = netcatService.readOutputNonBlocking();
             if (!out.empty()) terminalView.print(out);
-            delay(10);
+            utilityService.sleepMs(10);
             continue;
         }
 
@@ -254,7 +256,7 @@ void ANetworkController::handleNetcat(const TerminalCommand& cmd)
 
         std::string output = netcatService.readOutputNonBlocking();
         if (!output.empty()) terminalView.print(output);
-        delay(10);
+        utilityService.sleepMs(10);
     }
 
     netcatService.close();
@@ -331,7 +333,7 @@ void ANetworkController::handleNmap(const TerminalCommand &cmd)
     nmapService.startTask(options.verbosity);
     
     while(!nmapService.isReady()){
-        delay(100);
+        utilityService.sleepMs(100);
     }
 
     terminalView.println(nmapService.getReport());
@@ -431,10 +433,10 @@ void ANetworkController::handleSsh(const TerminalCommand &cmd)
     sshService.startTask(host, user, pass, false, port);
 
     // Wait 5 sec for connection success
-    unsigned long start = millis();
-    while (!sshService.isConnected() && millis() - start < 5000)
+    uint32_t start = utilityService.nowMs();
+    while (!sshService.isConnected() && utilityService.nowMs() - start < 5000)
     {
-        delay(500);
+        utilityService.sleepMs(500);
     }
 
     // Can't connect
@@ -461,7 +463,7 @@ void ANetworkController::handleSsh(const TerminalCommand &cmd)
         if (!output.empty())
             terminalView.print(output);
 
-        delay(10);
+        utilityService.sleepMs(10);
     }
 
     // Close SSH
@@ -523,9 +525,9 @@ void ANetworkController::handleHttpGet(const TerminalCommand &cmd)
     httpService.startGetTask(url, 10000, 8192, true, 30000);
 
     // Wait until timeout or response is ready
-    const unsigned long deadline = millis() + 10000;
-    while (!httpService.isResponseReady() && millis() < deadline) {
-        delay(50);
+    const uint32_t deadline = utilityService.nowMs() + 10000;
+    while (!httpService.isResponseReady() && utilityService.nowMs() < deadline) {
+        utilityService.sleepMs(50);
     }
 
     if (httpService.isResponseReady()) {
@@ -724,7 +726,7 @@ void ANetworkController::handleTelnet(const TerminalCommand &cmd)
         std::string out = telnetService.readOutputNonBlocking();
         if (!out.empty()) terminalView.print(out);
 
-        delay(5);
+        utilityService.sleepMs(5);
     }
 
     telnetService.close();

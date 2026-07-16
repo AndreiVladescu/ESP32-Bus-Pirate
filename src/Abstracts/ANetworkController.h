@@ -1,10 +1,11 @@
 #pragma once
 
-#include <Arduino.h>
+#include <cstdint>
 #include <string>
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
+#include "Interfaces/IUtilityService.h"
 #include "Services/WifiService.h"
 #include "Services/WifiOpenScannerService.h"
 #include "Services/EthernetService.h"
@@ -32,6 +33,7 @@ public:
         IDeviceView& deviceView,
         IInput& terminalInput, 
         IInput& deviceInput,
+        IUtilityService& utilityService,
         WifiService& wifiService, 
         WifiOpenScannerService& wifiOpenNetworkService,
         EthernetService& ethernetService,
@@ -74,6 +76,7 @@ protected:
     IDeviceView&       deviceView;
     IInput&            terminalInput;
     IInput&            deviceInput;
+    IUtilityService&   utilityService;
 
     WifiService&       wifiService;
     EthernetService&   ethernetService;
