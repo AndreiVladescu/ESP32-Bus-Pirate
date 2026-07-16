@@ -34,7 +34,7 @@ std::string WifiTypeConfigurator::configure(TerminalTypeEnum& terminalType) {
 
         WiFi.persistent(false);
         WiFi.disconnect(true);
-        delay(100);
+        utilityService.sleepMs(100);
         WiFi.mode(WIFI_AP);
         WiFi.setSleep(false);
 

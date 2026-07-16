@@ -10,17 +10,19 @@
 #include <Boards/VisionMasterT190/VisionMasterT190WifiSetup.h>
 #include <Interfaces/IDeviceView.h>
 #include <Interfaces/IInput.h>
+#include <Interfaces/IUtilityService.h>
 #include <string>
 #include <WiFi.h>
 
 class WifiTypeConfigurator {
 public:
-    WifiTypeConfigurator(IDeviceView& view, IInput& input)
-        : view(view), input(input) {}
+    WifiTypeConfigurator(IDeviceView& view, IInput& input, IUtilityService& utilityService)
+        : view(view), input(input), utilityService(utilityService) {}
 
     std::string configure(TerminalTypeEnum& terminalType);
 
 private:
     IDeviceView& view;
     IInput& input;
+    IUtilityService& utilityService;
 };
