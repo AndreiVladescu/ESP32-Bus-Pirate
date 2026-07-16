@@ -15,6 +15,8 @@ public:
 
     void configure(uint8_t pin);
     void close();
+    void beginPassiveSniff();
+    int readPinLevel() const;
     bool reset();
     void write(uint8_t data);
     void writeBytes(const uint8_t* data, uint8_t len);

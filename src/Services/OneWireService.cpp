@@ -18,6 +18,14 @@ void OneWireService::close() {
     }
 }
 
+void OneWireService::beginPassiveSniff() {
+    pinMode(oneWirePin, INPUT);
+}
+
+int OneWireService::readPinLevel() const {
+    return digitalRead(oneWirePin);
+}
+
 bool OneWireService::reset() {
     if (oneWire) return oneWire->reset();
     return false;
