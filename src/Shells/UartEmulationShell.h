@@ -6,6 +6,7 @@
 
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "Services/UartService.h"
@@ -15,6 +16,7 @@ public:
     UartEmulationShell(
         ITerminalView& view,
         IInput& input,
+        IUtilityService& utilityService,
         UartService& uartService,
         ArgTransformer& argTransformer,
         UserInputManager& userInputManager
@@ -25,6 +27,7 @@ public:
 private:
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     UartService& uartService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;

@@ -6,6 +6,7 @@
 #include "Services/ModbusService.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "States/GlobalState.h"
@@ -15,6 +16,7 @@ public:
     ModbusShell(
         ITerminalView& view,
         IInput& input,
+        IUtilityService& utilityService,
         ArgTransformer& argTransformer,
         UserInputManager& userInputManager,
         ModbusService& modbusService
@@ -45,6 +47,7 @@ private:
     ModbusService&     modbusService;
     ITerminalView&     terminalView;
     IInput&            terminalInput;
+    IUtilityService&   utilityService;
     ArgTransformer&    argTransformer;
     UserInputManager&  userInputManager;
     GlobalState&       state = GlobalState::getInstance();

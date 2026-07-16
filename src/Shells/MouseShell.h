@@ -6,6 +6,7 @@
 
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Managers/UserInputManager.h"
 
 class MouseShell {
@@ -15,7 +16,8 @@ public:
 
     MouseShell(ITerminalView& terminalView,
                IInput& terminalInput,
-               UserInputManager& userInputManager);
+               UserInputManager& userInputManager,
+               IUtilityService& utilityService);
 
     void run(const std::string& title,
              const MoveFn& move,
@@ -41,4 +43,5 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     UserInputManager& userInputManager;
+    IUtilityService& utilityService;
 };

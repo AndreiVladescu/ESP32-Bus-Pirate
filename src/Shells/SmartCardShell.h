@@ -7,6 +7,7 @@
 #include "Managers/UserInputManager.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/ITerminalView.h"
+#include "Interfaces/IUtilityService.h"
 
 class SmartCardShell {
 public:
@@ -14,6 +15,7 @@ public:
         TwoWireService& twoWireService, 
         ITerminalView& terminalView, 
         IInput& terminalInput, 
+        IUtilityService& utilityService,
         ArgTransformer& argTransformer,
         UserInputManager& userInputManager
     );
@@ -23,6 +25,7 @@ private:
     TwoWireService& twoWireService;
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     UserInputManager& userInputManager;
     ArgTransformer& argTransformer;
 

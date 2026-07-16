@@ -5,11 +5,13 @@
 
 IbuttonShell::IbuttonShell(ITerminalView& terminalView,
                            IInput& terminalInput,
+                           IUtilityService& utilityService,
                            UserInputManager& userInputManager,
                            ArgTransformer& argTransformer,
                            OneWireService& oneWireService)
     : terminalView(terminalView),
       terminalInput(terminalInput),
+      utilityService(utilityService),
       userInputManager(userInputManager),
       argTransformer(argTransformer),
       oneWireService(oneWireService) {}
@@ -51,7 +53,7 @@ void IbuttonShell::cmdReadId() {
             terminalView.println("\niButton Read: Stopped by user.");
             break;
         }
-        delay(100);
+        utilityService.sleepMs(100);
 
         uint8_t buffer[8];
         if (!oneWireService.reset()) continue;
@@ -96,7 +98,7 @@ void IbuttonShell::cmdWriteId() {
     terminalView.println("iButton ID Write: Waiting for device... Press [ENTER] to stop");
 
     while (!oneWireService.reset()) {
-        delay(1);
+        utilityService.sleepMs(1);
         auto key = terminalInput.readChar();
         if (key == '\r' || key == '\n') {
             terminalView.println("\niButton Write: Stopped by user.");
@@ -109,7 +111,7 @@ void IbuttonShell::cmdWriteId() {
         terminalView.println("Attempt " + std::to_string(attempt) + "...");
 
         oneWireService.writeRw1990(state.getOneWirePin(), idBytes.data(), idBytes.size());
-        delay(50);
+        utilityService.sleepMs(50);
 
         uint8_t buffer[8];
         if (!oneWireService.reset()) continue;
@@ -138,7 +140,7 @@ void IbuttonShell::cmdCopyId() {
             terminalView.println("\niButton Copy: Stopped by user.");
             return;
         }
-        delay(100);
+        utilityService.sleepMs(100);
     }
 
     // Read source ID
@@ -177,7 +179,7 @@ void IbuttonShell::cmdCopyId() {
             terminalView.println("\niButton Copy: Stopped by user.");
             return;
         }
-        delay(1);
+        utilityService.sleepMs(1);
     }
 
     // Attempt writing and verification
@@ -187,7 +189,7 @@ void IbuttonShell::cmdCopyId() {
 
         // Write ID to target
         oneWireService.writeRw1990(state.getOneWirePin(), idVec.data(), idVec.size());
-        delay(50);
+        utilityService.sleepMs(50);
 
         // Verify
         uint8_t buffer[8];

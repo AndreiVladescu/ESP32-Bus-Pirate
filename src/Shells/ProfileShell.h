@@ -4,6 +4,7 @@
 
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Managers/UserInputManager.h"
 #include "Services/LittleFsService.h"
 #include "Transformers/ProfileTransformer.h"
@@ -12,6 +13,7 @@ class ProfileShell {
 public:
     ProfileShell(ITerminalView& tv,
                  IInput& in,
+                 IUtilityService& utilityService,
                  UserInputManager& uim,
                  LittleFsService& lfs,
                  ProfileTransformer& profileTransformer);
@@ -21,6 +23,7 @@ public:
 private:
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     UserInputManager& userInputManager;
     LittleFsService& littleFsService;
     ProfileTransformer& profileTransformer;

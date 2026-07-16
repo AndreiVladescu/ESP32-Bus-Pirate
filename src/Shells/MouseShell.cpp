@@ -1,13 +1,13 @@
-#include <Arduino.h>
-
 #include "MouseShell.h"
 
 MouseShell::MouseShell(ITerminalView& terminalView,
                        IInput& terminalInput,
-                       UserInputManager& userInputManager)
+                       UserInputManager& userInputManager,
+                       IUtilityService& utilityService)
     : terminalView(terminalView),
       terminalInput(terminalInput),
-      userInputManager(userInputManager) {}
+      userInputManager(userInputManager),
+      utilityService(utilityService) {}
 
 void MouseShell::run(const std::string& title,
                      const MoveFn& move,
@@ -55,22 +55,22 @@ void MouseShell::runJiggle(const std::string& title, const MoveFn& move) {
     terminalView.println(title + ": Jiggle started (" + std::to_string(intervalMs) + " ms)... Press [ENTER] to stop.");
 
     while (true) {
-        int dx = (int)random(-127, 127);
-        int dy = (int)random(-127, 127);
+        int dx = utilityService.randomRange(-127, 127);
+        int dy = utilityService.randomRange(-127, 127);
         if (dx == 0 && dy == 0) {
             dx = 1;
         }
 
         move(dx, dy);
 
-        unsigned long t0 = millis();
-        while ((millis() - t0) < static_cast<unsigned long>(intervalMs)) {
+        uint32_t t0 = utilityService.nowMs();
+        while ((utilityService.nowMs() - t0) < static_cast<uint32_t>(intervalMs)) {
             auto c = terminalInput.readChar();
             if (c == '\r' || c == '\n') {
                 terminalView.println(title + ": Jiggle stopped.\n");
                 return;
             }
-            delay(10);
+            utilityService.sleepMs(10);
         }
     }
 }

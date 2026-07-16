@@ -1,17 +1,18 @@
 #include "UartEmulationShell.h"
-#include <Arduino.h>
 #include <cstdio>
 #include <cctype>
 
 UartEmulationShell::UartEmulationShell(
     ITerminalView& view,
     IInput& input,
+    IUtilityService& utilityService,
     UartService& uartService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager
 )
 : terminalView(view),
   terminalInput(input),
+  utilityService(utilityService),
   uartService(uartService),
   argTransformer(argTransformer),
   userInputManager(userInputManager) {}
@@ -81,9 +82,9 @@ void UartEmulationShell::emulateGps() {
     while (true) {
         if (shouldStopByEnter()) break;
 
-        uint32_t now = millis();
+        uint32_t now = utilityService.nowMs();
         if (now - lastMs < 1000) {
-            delay(5);
+            utilityService.sleepMs(5);
             continue;
         }
         lastMs = now;
@@ -256,9 +257,9 @@ void UartEmulationShell::emulateBoot() {
 
         // delay while checking for ENTER or ESC
         uint32_t waitMs = (i >= 11 && i <= 14) ? 1000 : 100;
-        uint32_t t0 = millis();
+        uint32_t t0 = utilityService.nowMs();
 
-        while ((millis() - t0) < waitMs) {
+        while ((utilityService.nowMs() - t0) < waitMs) {
 
             if (shouldStopByEnter()) {
                 terminalView.println("Boot sequence stopped.\n");
@@ -274,7 +275,7 @@ void UartEmulationShell::emulateBoot() {
                 break;
             }
 
-            delay(5);
+            utilityService.sleepMs(5);
         }
 
         if (escPressed) break;
@@ -295,7 +296,7 @@ void UartEmulationShell::emulateBoot() {
             }
 
             if (!uartService.available()) {
-                delay(5);
+                utilityService.sleepMs(5);
                 continue;
             }
 
@@ -316,7 +317,7 @@ void UartEmulationShell::emulateBoot() {
             }
 
             if (!uartService.available()) {
-                delay(5);
+                utilityService.sleepMs(5);
                 continue;
             }
 
@@ -353,7 +354,7 @@ void UartEmulationShell::emulateShell(bool protectedShell) {
                 return;
             }
             if (!uartService.available()) {
-                delay(5);
+                utilityService.sleepMs(5);
                 continue;
             }
 
@@ -378,7 +379,7 @@ void UartEmulationShell::emulateShell(bool protectedShell) {
                 return;
             }
             if (!uartService.available()) {
-                delay(5);
+                utilityService.sleepMs(5);
                 continue;
             }
 
@@ -399,7 +400,7 @@ void UartEmulationShell::emulateShell(bool protectedShell) {
                     return;
                 }
                 if (!uartService.available()) {
-                    delay(5);
+                    utilityService.sleepMs(5);
                     continue;
                 }
 
@@ -424,7 +425,7 @@ void UartEmulationShell::emulateShell(bool protectedShell) {
         if (shouldStopByEnter()) break;
 
         if (!uartService.available()) {
-            delay(5);
+            utilityService.sleepMs(5);
             continue;
         }
 
@@ -477,7 +478,7 @@ void UartEmulationShell::emulateAt() {
         if (shouldStopByEnter()) break;
 
         if (!uartService.available()) {
-            delay(5);
+            utilityService.sleepMs(5);
             continue;
         }
 
@@ -511,7 +512,7 @@ void UartEmulationShell::emulateAt() {
         else if (u == "AT+RST") {
             uartService.println("OK");
             uartService.println("REBOOTING...");
-            delay(200);
+            utilityService.sleepMs(200);
             uartService.println("READY");
         }
         else if (u == "ATH") {
@@ -546,7 +547,7 @@ void UartEmulationShell::emulateAt() {
                     (void)uartService.readLine();
                     break;
                 }
-                delay(5);
+                utilityService.sleepMs(5);
             }
             uartService.println("+CMGS: 1");
             uartService.println("OK");

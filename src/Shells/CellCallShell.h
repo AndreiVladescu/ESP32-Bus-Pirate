@@ -4,6 +4,7 @@
 
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
 #include "Transformers/AtTransformer.h"
@@ -20,6 +21,7 @@ class CellCallShell {
 public:
     CellCallShell(ITerminalView& terminalView,
                  IInput& terminalInput,
+                 IUtilityService& utilityService,
                  UserInputManager& userInputManager,
                  ArgTransformer& argTransformer,
                  AtTransformer& atTransformer,
@@ -35,6 +37,7 @@ private:
 
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     UserInputManager& userInputManager;
     ArgTransformer& argTransformer;
     AtTransformer& atTransformer;

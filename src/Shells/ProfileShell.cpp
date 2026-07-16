@@ -3,11 +3,13 @@
 
 ProfileShell::ProfileShell(ITerminalView& tv,
                            IInput& in,
+                           IUtilityService& utilityService,
                            UserInputManager& uim,
                            LittleFsService& lfs,
                            ProfileTransformer& pt)
     : terminalView(tv),
       terminalInput(in),
+      utilityService(utilityService),
       userInputManager(uim),
       littleFsService(lfs),
       profileTransformer(pt) {}
@@ -37,7 +39,7 @@ void ProfileShell::cmdSave() {
         return;
     }
 
-    std::string defName = "profile_" + std::to_string(millis() % 1000000);
+    std::string defName = "profile_" + std::to_string(utilityService.nowMs() % 1000000);
     std::string base = userInputManager.readSanitizedString("Profile name", defName, false);
     if (base.empty()) base = defName;
 

@@ -3,12 +3,14 @@
 ModbusShell::ModbusShell(
     ITerminalView& view,
     IInput& input,
+    IUtilityService& utilityService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
     ModbusService& modbusService
 )
 : terminalView(view)
 , terminalInput(input)
+, utilityService(utilityService)
 , argTransformer(argTransformer)
 , userInputManager(userInputManager)
 , modbusService(modbusService) 
@@ -165,8 +167,8 @@ void ModbusShell::cmdMonitorHolding() {
         modbusService.readHolding(unitId, addr, qty);
 
         // Wait for response while handling user input
-        const uint32_t t0 = millis();
-        while ((millis() - t0) < reqTimeoutMs) {
+        const uint32_t t0 = utilityService.nowMs();
+        while ((utilityService.nowMs() - t0) < reqTimeoutMs) {
             if (_reply.ready) break;
 
             // enter press to stop
@@ -175,7 +177,7 @@ void ModbusShell::cmdMonitorHolding() {
                 stop = true; 
                 break; 
             }
-            delay(5);
+            utilityService.sleepMs(5);
         }
 
         if (_reply.ok && _reply.regs != last) {
@@ -308,10 +310,10 @@ void ModbusShell::installModbusCallbacks() {
 }
 
 bool ModbusShell::waitReply(uint32_t timeoutMs) {
-    const uint32_t deadline = millis() + timeoutMs;
-    while (millis() < deadline) {
+    const uint32_t deadline = utilityService.nowMs() + timeoutMs;
+    while (utilityService.nowMs() < deadline) {
         if (_reply.ready) return true;
-        delay(10);
+        utilityService.sleepMs(10);
     }
     return _reply.ready;
 }

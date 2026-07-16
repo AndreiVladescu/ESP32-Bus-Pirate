@@ -3,12 +3,14 @@
 UniversalRemoteShell::UniversalRemoteShell(
     ITerminalView& view,
     IInput& input,
+    IUtilityService& utilityService,
     InfraredService& irService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager
 ) : infraredService(irService),
     terminalView(view),
     terminalInput(input),
+    utilityService(utilityService),
     argTransformer(argTransformer),
     userInputManager(userInputManager) {}
 
@@ -64,7 +66,7 @@ void UniversalRemoteShell::sendCommandGroup(const InfraredCommandStruct* group, 
 
         InfraredCommand cmd(group[i].proto, group[i].device, group[i].subdevice, group[i].function);
         infraredService.sendInfraredCommand(cmd);
-        delay(100);
+        utilityService.sleepMs(100);
 
         // Enter press to stop
         char c = terminalInput.readChar();
@@ -83,4 +85,3 @@ void UniversalRemoteShell::sendCommandGroup(const InfraredCommandStruct* group, 
     }
     terminalView.println("");
 }
-

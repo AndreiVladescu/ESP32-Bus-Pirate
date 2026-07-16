@@ -1,16 +1,19 @@
 #include "UsbAdapterShell.h"
-#include <Arduino.h>
 #include <algorithm>
 #include <vector>
 
 UsbAdapterShell::UsbAdapterShell(ITerminalView& tv,
                                  IInput& in,
+                                 IUtilityService& utilityService,
                                  UserInputManager& uim,
-                                 NvsService& nvs)
+                                 NvsService& nvs,
+                                 SystemService& systemService)
     : terminalView(tv),
       terminalInput(in),
+      utilityService(utilityService),
       userInputManager(uim),
-      nvsService(nvs) {}
+      nvsService(nvs),
+      systemService(systemService) {}
 
 void UsbAdapterShell::run() {
     terminalView.println("\n=== USB Adapters ===");
@@ -64,8 +67,8 @@ void UsbAdapterShell::rebootIntoAdapter(const char* title,
     terminalView.println(example);
     terminalView.println(returnInstruction);
     terminalView.println("The terminal will now close...");
-    delay(1000);
-    ESP.restart();
+    utilityService.sleepMs(1000);
+    systemService.reboot();
 }
 
 void UsbAdapterShell::rebootUsbUartBridge() {

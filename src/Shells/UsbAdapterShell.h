@@ -2,16 +2,20 @@
 
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Managers/UserInputManager.h"
 #include "Services/NvsService.h"
+#include "Services/SystemService.h"
 #include "States/GlobalState.h"
 
 class UsbAdapterShell {
 public:
     UsbAdapterShell(ITerminalView& tv,
                     IInput& in,
+                    IUtilityService& utilityService,
                     UserInputManager& uim,
-                    NvsService& nvs);
+                    NvsService& nvs,
+                    SystemService& systemService);
 
     void run();
     void rebootUsbUartBridge();
@@ -31,8 +35,10 @@ private:
 
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     UserInputManager& userInputManager;
     NvsService& nvsService;
+    SystemService& systemService;
     GlobalState& state = GlobalState::getInstance();
 
     inline static constexpr const char* actions[] = {

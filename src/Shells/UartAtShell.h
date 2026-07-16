@@ -3,6 +3,7 @@
 #include <string>
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IUtilityService.h"
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
 #include "Services/UartService.h"
@@ -12,6 +13,7 @@ class UartAtShell {
 public:
     UartAtShell(ITerminalView& terminalView,
                 IInput& terminalInput,
+                IUtilityService& utilityService,
                 UserInputManager& userInputManager,
                 ArgTransformer& argTransformer,
                 UartService& uartService);
@@ -39,6 +41,7 @@ private:
 private:
     ITerminalView&     terminalView;
     IInput&            terminalInput;
+    IUtilityService&   utilityService;
     UserInputManager&  userInputManager;
     ArgTransformer&    argTransformer;
     UartService&       uartService;

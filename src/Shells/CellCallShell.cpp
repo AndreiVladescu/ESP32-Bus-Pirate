@@ -1,14 +1,15 @@
 #include "CellCallShell.h"
-#include <Arduino.h>
 
 CellCallShell::CellCallShell(ITerminalView& terminalView,
                              IInput& terminalInput,
+                             IUtilityService& utilityService,
                              UserInputManager& userInputManager,
                              ArgTransformer& argTransformer,
                              AtTransformer& atTransformer,
                              CellService& cellService)
     : terminalView(terminalView),
       terminalInput(terminalInput),
+      utilityService(utilityService),
       userInputManager(userInputManager),
       argTransformer(argTransformer),
       atTransformer(atTransformer),
@@ -62,7 +63,7 @@ void CellCallShell::cmdDial()
             break;
         }
         
-        delay(20);
+        utilityService.sleepMs(20);
     }
 }
 

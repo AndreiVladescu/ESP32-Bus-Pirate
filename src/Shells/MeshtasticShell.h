@@ -5,6 +5,7 @@
 
 #include "Interfaces/IInput.h"
 #include "Interfaces/ITerminalView.h"
+#include "Interfaces/IUtilityService.h"
 #include "Managers/UserInputManager.h"
 #include "Models/MeshtasticPacket.h"
 #include "Models/LoRaRadioProfile.h"
@@ -16,6 +17,7 @@ class MeshtasticShell {
 public:
     MeshtasticShell(ITerminalView& terminalView,
                     IInput& terminalInput,
+                    IUtilityService& utilityService,
                     UserInputManager& userInputManager,
                     ArgTransformer& argTransformer,
                     LoRaService& loRaService,
@@ -59,6 +61,7 @@ private:
 
     ITerminalView& terminalView;
     IInput& terminalInput;
+    IUtilityService& utilityService;
     UserInputManager& userInputManager;
     ArgTransformer& argTransformer;
     LoRaService& loRaService;

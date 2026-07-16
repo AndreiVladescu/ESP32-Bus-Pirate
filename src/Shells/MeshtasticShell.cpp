@@ -1,16 +1,17 @@
 #include "Shells/MeshtasticShell.h"
 
 #include <algorithm>
-#include <esp_system.h>
 
 MeshtasticShell::MeshtasticShell(ITerminalView& terminalView,
                                  IInput& terminalInput,
+                                 IUtilityService& utilityService,
                                  UserInputManager& userInputManager,
                                  ArgTransformer& argTransformer,
                                  LoRaService& loRaService,
                                  MeshtasticService& meshtasticService)
     : terminalView(terminalView),
       terminalInput(terminalInput),
+      utilityService(utilityService),
       userInputManager(userInputManager),
       argTransformer(argTransformer),
       loRaService(loRaService),
@@ -28,13 +29,13 @@ void MeshtasticShell::run() {
     const uint64_t mac = ESP.getEfuseMac();
     nodeNumber_ = static_cast<uint32_t>(mac);
     if (nodeNumber_ == 0 || nodeNumber_ == 0xFFFFFFFFu) {
-        nodeNumber_ = esp_random();
+        nodeNumber_ = utilityService.randomUint32();
         if (nodeNumber_ == 0 || nodeNumber_ == 0xFFFFFFFFu) {
             nodeNumber_ = 1;
         }
     }
     if (nextPacketId_ == 0) {
-        nextPacketId_ = esp_random();
+        nextPacketId_ = utilityService.randomUint32();
         if (nextPacketId_ == 0) nextPacketId_ = 1;
     }
 
@@ -288,11 +289,11 @@ void MeshtasticShell::cmdReceive() {
         const int16_t result = loRaService.pollReceive(frame);
         if (result == LoRaService::RECEIVE_ERROR) {
             errors++;
-            delay(1);
+            utilityService.sleepMs(1);
             continue;
         }
         if (result != LoRaService::RECEIVE_OK) {
-            delay(1);
+            utilityService.sleepMs(1);
             continue;
         }
 

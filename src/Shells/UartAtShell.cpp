@@ -5,11 +5,13 @@
 
 UartAtShell::UartAtShell(ITerminalView& terminalView,
                          IInput& terminalInput,
+                         IUtilityService& utilityService,
                          UserInputManager& userInputManager,
                          ArgTransformer& argTransformer,
                          UartService& uartService)
 : terminalView(terminalView),
   terminalInput(terminalInput),
+  utilityService(utilityService),
   userInputManager(userInputManager),
   argTransformer(argTransformer),
   uartService(uartService) {}
@@ -337,17 +339,17 @@ std::string UartAtShell::sendAt(const std::string& cmd, uint32_t timeoutMs /*=50
     uartService.write(cmd);
     uartService.write("\r\n");
     
-    const uint32_t start = millis();
+    const uint32_t start = utilityService.nowMs();
     std::string resp = "";
     uint32_t lastByteTs = start;
     
     // Read everything for timeoutMs
-    while (millis() - start < timeoutMs) {
+    while (utilityService.nowMs() - start < timeoutMs) {
         while (uartService.available() > 0) {
             char c = uartService.read();
             resp.push_back(c);
         }
-        delay(1);
+        utilityService.sleepMs(1);
     }
 
     return resp;

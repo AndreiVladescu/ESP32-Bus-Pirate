@@ -5,12 +5,14 @@ SmartCardShell::SmartCardShell(
     TwoWireService& twoWireService,
     ITerminalView& terminalView,
     IInput& terminalInput,
+    IUtilityService& utilityService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager
 )
     : twoWireService(twoWireService),
       terminalView(terminalView),
       terminalInput(terminalInput),
+      utilityService(utilityService),
       argTransformer(argTransformer),
       userInputManager(userInputManager)
 {}
@@ -121,7 +123,7 @@ Smartcard Dump
 */
 void SmartCardShell::cmdDump() {
     twoWireService.resetSmartCard();
-    delay(10);
+    utilityService.sleepMs(10);
     terminalView.println("\n2WIRE Dump: Reading full memory (MAIN + SEC + PROTECT)...");
 
     // Dump 256 bytes + sec mem + protection mem
