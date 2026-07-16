@@ -29,6 +29,7 @@ DependencyProvider::DependencyProvider(ITerminalView &terminalView, IDeviceView 
       jtagService(),
       canService(),
       systemService(),
+      utilityService(),
       ethernetService(),
       httpService(),
       telnetService(),
@@ -50,7 +51,7 @@ DependencyProvider::DependencyProvider(ITerminalView &terminalView, IDeviceView 
       jsonTransformer(),
       infraredTransformer(),
       subGhzTransformer(),
-      loRaTransformer(),
+      loRaTransformer(utilityService),
       profileTransformer(),
       atTransformer(),
 
@@ -59,69 +60,69 @@ DependencyProvider::DependencyProvider(ITerminalView &terminalView, IDeviceView 
       binaryAnalyzer(terminalView, terminalInput),
       userInputManager(terminalView, terminalInput, argTransformer),
       subGhzAnalyzer(),
-      pinAnalyzer(pinService),
+      pinAnalyzer(pinService, utilityService),
       aliasManager(),
 
       // Shells
       sdCardShell(sdService, terminalView, terminalInput, argTransformer, userInputManager),
       spiFlashShell(spiService, terminalView, terminalInput, argTransformer, userInputManager, binaryAnalyzer),
       spiEepromShell(spiService, terminalView, terminalInput, argTransformer, userInputManager, binaryAnalyzer),
-      smartCardShell(twoWireService, terminalView, terminalInput, argTransformer, userInputManager),
-      universalRemoteShell(terminalView, terminalInput, infraredService, argTransformer, userInputManager),
-      ibuttonShell(terminalView, terminalInput, userInputManager, argTransformer, oneWireService),
+      smartCardShell(twoWireService, terminalView, terminalInput, utilityService, argTransformer, userInputManager),
+      universalRemoteShell(terminalView, terminalInput, utilityService, infraredService, argTransformer, userInputManager),
+      ibuttonShell(terminalView, terminalInput, utilityService, userInputManager, argTransformer, oneWireService),
       i2cEepromShell(terminalView, terminalInput, i2cService, argTransformer, userInputManager, binaryAnalyzer),
-      uartAtShell(terminalView, terminalInput, userInputManager, argTransformer, uartService),
+      uartAtShell(terminalView, terminalInput, utilityService, userInputManager, argTransformer, uartService),
       threeWireEepromShell(terminalView, terminalInput, userInputManager, threeWireService, argTransformer),
       sysInfoShell(terminalView, terminalInput, deviceView, userInputManager, argTransformer, systemService, littleFsService, wifiService),
-      modbusShell(terminalView, terminalInput, argTransformer, userInputManager, modbusService),
+      modbusShell(terminalView, terminalInput, utilityService, argTransformer, userInputManager, modbusService),
       oneWireEepromShell(terminalView, terminalInput, oneWireService, argTransformer, userInputManager, binaryAnalyzer),
       guideShell(terminalView, terminalInput, userInputManager),
       helpShell(terminalView, terminalInput, userInputManager),
-      uartEmulationShell(terminalView, terminalInput, uartService, argTransformer, userInputManager),
-      profileShell(terminalView, terminalInput, userInputManager, littleFsService, profileTransformer),
-      cellCallShell(terminalView, terminalInput, userInputManager, argTransformer, atTransformer, cellService),
+      uartEmulationShell(terminalView, terminalInput, utilityService, uartService, argTransformer, userInputManager),
+      profileShell(terminalView, terminalInput, utilityService, userInputManager, littleFsService, profileTransformer),
+      cellCallShell(terminalView, terminalInput, utilityService, userInputManager, argTransformer, atTransformer, cellService),
       cellSmsShell(terminalView, terminalInput, userInputManager, argTransformer, atTransformer, cellService),
       fmBroadcastShell(terminalView, terminalInput, userInputManager, argTransformer, fmService),
-      usbAdapterShell(terminalView, terminalInput, userInputManager, nvsService),
-      mouseShell(terminalView, terminalInput, userInputManager),
-      meshtasticShell(terminalView, terminalInput, userInputManager,
+      usbAdapterShell(terminalView, terminalInput, utilityService, userInputManager, nvsService, systemService),
+      mouseShell(terminalView, terminalInput, userInputManager, utilityService),
+      meshtasticShell(terminalView, terminalInput, utilityService, userInputManager,
                       argTransformer, loRaService, meshtasticService),
 
       // Selectors
-      horizontalSelector(deviceView, deviceInput),
+      horizontalSelector(deviceView, deviceInput, utilityService),
 
       // Configurators
       terminalTypeConfigurator(horizontalSelector),
 
       // Controllers
-      uartController(terminalView, terminalInput, deviceView, deviceInput, uartService, sdService, hdUartService, argTransformer, userInputManager, uartAtShell, helpShell, uartEmulationShell),
-      i2cController(terminalView, terminalInput, i2cService, argTransformer, userInputManager, i2cEepromShell, helpShell),
-      oneWireController(terminalView, terminalInput, oneWireService, argTransformer, userInputManager, ibuttonShell, oneWireEepromShell, helpShell),
-      infraredController(terminalView, terminalInput, deviceView, infraredService, littleFsService, i2cService, argTransformer, infraredTransformer, userInputManager, universalRemoteShell, helpShell),
-      utilityController(terminalView, deviceView, terminalInput, pinService, i2sService, userInputManager, pinAnalyzer, aliasManager, argTransformer, commandTransformer, sysInfoShell, guideShell, helpShell, profileShell),
+      uartController(terminalView, terminalInput, deviceView, deviceInput, utilityService, uartService, sdService, hdUartService, argTransformer, userInputManager, uartAtShell, helpShell, uartEmulationShell),
+      i2cController(terminalView, terminalInput, utilityService, i2cService, argTransformer, userInputManager, i2cEepromShell, helpShell),
+      oneWireController(terminalView, terminalInput, utilityService, oneWireService, argTransformer, userInputManager, ibuttonShell, oneWireEepromShell, helpShell),
+      infraredController(terminalView, terminalInput, deviceView, utilityService, infraredService, littleFsService, i2cService, argTransformer, infraredTransformer, userInputManager, universalRemoteShell, helpShell),
+      utilityController(terminalView, deviceView, terminalInput, utilityService, pinService, i2sService, userInputManager, pinAnalyzer, aliasManager, argTransformer, commandTransformer, sysInfoShell, guideShell, helpShell, profileShell),
       hdUartController(terminalView, terminalInput, deviceInput, hdUartService, uartService, argTransformer, userInputManager, helpShell),
-      spiController(terminalView, terminalInput, spiService, sdService, argTransformer, userInputManager, binaryAnalyzer, sdCardShell, spiFlashShell, spiEepromShell, helpShell),
+      spiController(terminalView, terminalInput, utilityService, spiService, sdService, argTransformer, userInputManager, binaryAnalyzer, sdCardShell, spiFlashShell, spiEepromShell, helpShell),
       jtagController(terminalView, terminalInput, jtagService, userInputManager, helpShell, usbAdapterShell),
       twoWireController(terminalView, terminalInput, userInputManager, twoWireService, smartCardShell, helpShell),
       threeWireController(terminalView, terminalInput, userInputManager, threeWireService, argTransformer, threeWireEepromShell, helpShell),
-      dioController(terminalView, terminalInput, deviceView, pinService, argTransformer, helpShell, userInputManager),
-      ledController(terminalView, terminalInput, ledService, argTransformer, userInputManager, helpShell),
-      bluetoothController(terminalView, terminalInput, deviceInput, bluetoothService, argTransformer, userInputManager, helpShell, mouseShell),
-      i2sController(terminalView, terminalInput, i2sService, argTransformer, userInputManager, helpShell),
-      wifiController(terminalView, deviceView, terminalInput, deviceInput, wifiService, wifiScannerService, ethernetService, sshService, netcatService, nmapService, icmpService, nvsService, httpService, telnetService, argTransformer, jsonTransformer, userInputManager, modbusShell, helpShell),
-      canController(terminalView, terminalInput, userInputManager, canService, argTransformer, helpShell),
-      subGhzController(terminalView, terminalInput, deviceView, subGhzService, pinService, i2sService, littleFsService, argTransformer, subGhzTransformer, userInputManager, subGhzAnalyzer, helpShell),
-      rfidController(terminalView, terminalInput, rfidService, userInputManager, argTransformer, helpShell),
-      rf24Controller(terminalView, terminalInput, deviceView, rf24Service, pinService, argTransformer, userInputManager, helpShell),
-      ethernetController(terminalView, deviceView, terminalInput, deviceInput, wifiService, wifiScannerService, ethernetService, sshService, netcatService, nmapService, icmpService, nvsService, httpService, telnetService, argTransformer, jsonTransformer, userInputManager, modbusShell, helpShell),
-      usbController(terminalView, terminalInput, deviceInput, usbService, argTransformer, userInputManager, helpShell, usbAdapterShell, mouseShell),
-      cellController(terminalView, terminalInput, cellService, argTransformer, atTransformer, userInputManager, helpShell, cellCallShell, cellSmsShell),
-      fmController(terminalView, terminalInput, deviceView, fmService, argTransformer, userInputManager, helpShell, fmBroadcastShell),
-      loRaController(terminalView, terminalInput, deviceView, loRaService, littleFsService, i2sService,
+      dioController(terminalView, terminalInput, deviceView, utilityService, pinService, argTransformer, helpShell, userInputManager),
+      ledController(terminalView, terminalInput, utilityService, ledService, argTransformer, userInputManager, helpShell),
+      bluetoothController(terminalView, terminalInput, deviceInput, utilityService, bluetoothService, argTransformer, userInputManager, helpShell, mouseShell),
+      i2sController(terminalView, terminalInput, utilityService, i2sService, argTransformer, userInputManager, helpShell),
+      wifiController(terminalView, deviceView, terminalInput, deviceInput, utilityService, wifiService, wifiScannerService, ethernetService, sshService, netcatService, nmapService, icmpService, nvsService, httpService, telnetService, argTransformer, jsonTransformer, userInputManager, modbusShell, helpShell),
+      canController(terminalView, terminalInput, userInputManager, utilityService, canService, argTransformer, helpShell),
+      subGhzController(terminalView, terminalInput, deviceView, utilityService, subGhzService, pinService, i2sService, littleFsService, argTransformer, subGhzTransformer, userInputManager, subGhzAnalyzer, helpShell),
+      rfidController(terminalView, terminalInput, utilityService, rfidService, userInputManager, argTransformer, helpShell),
+      rf24Controller(terminalView, terminalInput, deviceView, utilityService, rf24Service, pinService, argTransformer, userInputManager, helpShell),
+      ethernetController(terminalView, deviceView, terminalInput, deviceInput, utilityService, wifiService, wifiScannerService, ethernetService, sshService, netcatService, nmapService, icmpService, nvsService, httpService, telnetService, argTransformer, jsonTransformer, userInputManager, modbusShell, helpShell),
+      usbController(terminalView, terminalInput, deviceInput, utilityService, usbService, argTransformer, userInputManager, helpShell, usbAdapterShell, mouseShell),
+      cellController(terminalView, terminalInput, utilityService, cellService, argTransformer, atTransformer, userInputManager, helpShell, cellCallShell, cellSmsShell),
+      fmController(terminalView, terminalInput, deviceView, utilityService, fmService, argTransformer, userInputManager, helpShell, fmBroadcastShell),
+      loRaController(terminalView, terminalInput, deviceView, utilityService, loRaService, littleFsService, i2sService,
                      argTransformer, loRaTransformer,
                      commandTransformer, userInputManager, helpShell,
                      meshtasticShell),
-      expanderController(terminalView, terminalInput, uartService, argTransformer, userInputManager, helpShell)
+      expanderController(terminalView, terminalInput, utilityService, uartService, argTransformer, userInputManager, helpShell)
 {
 }
 
@@ -156,6 +157,7 @@ JtagService &DependencyProvider::getJtagService() { return jtagService; }
 CanService &DependencyProvider::getCanService() { return canService; }
 ModbusService &DependencyProvider::getModbusService() { return modbusService; }
 SystemService &DependencyProvider::getSystemService() { return systemService; }
+UtilityService &DependencyProvider::getUtilityService() { return utilityService; }
 EthernetService &DependencyProvider::getEthernetService() { return ethernetService; }
 SubGhzService &DependencyProvider::getSubGhzService() { return subGhzService; }
 RfidService &DependencyProvider::getRfidService() { return rfidService; }

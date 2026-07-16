@@ -28,6 +28,7 @@ and injecting shared instances of core components
 #include "Services/JtagService.h"
 #include "Services/CanService.h"
 #include "Services/SystemService.h"
+#include "Services/UtilityService.h"
 #include "Services/ThreeWireService.h"
 #include "Services/EthernetService.h"
 #include "Services/HttpService.h"
@@ -147,6 +148,7 @@ public:
     JtagService &getJtagService();
     CanService &getCanService();
     SystemService &getSystemService();
+    UtilityService &getUtilityService();
     EthernetService &getEthernetService();
     HttpService &getHttpService();
     TelnetService &getTelnetService();
@@ -272,6 +274,7 @@ private:
     JtagService jtagService;
     CanService canService;
     SystemService systemService;
+    UtilityService utilityService;
     EthernetService ethernetService;
     HttpService httpService;
     TelnetService telnetService;
