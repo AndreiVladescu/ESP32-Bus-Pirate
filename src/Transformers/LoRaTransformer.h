@@ -3,14 +3,20 @@
 #include <string>
 #include <vector>
 
+#include "Interfaces/IUtilityService.h"
 #include "Models/LoRaFrame.h"
 
 class LoRaTransformer {
 public:
+    explicit LoRaTransformer(IUtilityService& utilityService);
+
     bool transform(const std::string& raw, std::vector<uint8_t>& payload) const;
     std::string transformToFileFormat(const LoRaFrame& frame) const;
     bool transformFromFileFormat(const std::string& text, LoRaFrame& frame) const;
     LoRaFrame fromCapture(const std::vector<uint8_t>& payload,
                           const LoRaRadioProfile& profile,
                           float rssi, float snr) const;
+
+private:
+    IUtilityService& utilityService;
 };

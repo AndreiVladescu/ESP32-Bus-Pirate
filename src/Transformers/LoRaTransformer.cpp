@@ -1,7 +1,5 @@
 #include "Transformers/LoRaTransformer.h"
 
-#include <Arduino.h>
-
 #include <cerrno>
 #include <cctype>
 #include <cmath>
@@ -74,6 +72,9 @@ std::string decodeEscapes(const std::string& input) {
 }
 }
 
+LoRaTransformer::LoRaTransformer(IUtilityService& utilityService)
+    : utilityService(utilityService) {}
+
 bool LoRaTransformer::transform(const std::string& raw,
                                 std::vector<uint8_t>& payload) const {
     payload.clear();
@@ -89,7 +90,7 @@ bool LoRaTransformer::transform(const std::string& raw,
     std::string token;
     while (tokens >> token) {
         if (token == "??") {
-            payload.push_back(static_cast<uint8_t>(random(0, 256)));
+            payload.push_back(static_cast<uint8_t>(utilityService.randomRange(0, 256)));
             continue;
         }
         if (token.size() == 4 && token[0] == '0' && (token[1] == 'x' || token[1] == 'X')) {
