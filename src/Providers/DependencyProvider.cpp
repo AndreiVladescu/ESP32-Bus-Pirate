@@ -14,6 +14,9 @@ DependencyProvider::DependencyProvider(ITerminalView &terminalView, IDeviceView 
       nvsService(),
       ledService(),
       uartService(),
+      uartSnifferFirstPort(),
+      uartSnifferSecondPort(),
+      uartSnifferService(uartSnifferFirstPort, &Serial1, uartSnifferSecondPort, &Serial2),
       i2cService(),
       oneWireService(),
       twoWireService(),
@@ -95,7 +98,7 @@ DependencyProvider::DependencyProvider(ITerminalView &terminalView, IDeviceView 
       terminalTypeConfigurator(horizontalSelector),
 
       // Controllers
-      uartController(terminalView, terminalInput, deviceView, deviceInput, utilityService, uartService, sdService, hdUartService, argTransformer, userInputManager, uartAtShell, helpShell, uartEmulationShell),
+      uartController(terminalView, terminalInput, deviceView, deviceInput, utilityService, uartService, sdService, hdUartService, uartSnifferService, argTransformer, userInputManager, uartAtShell, helpShell, uartEmulationShell),
       i2cController(terminalView, terminalInput, utilityService, i2cService, argTransformer, userInputManager, i2cEepromShell, helpShell),
       oneWireController(terminalView, terminalInput, utilityService, oneWireService, argTransformer, userInputManager, ibuttonShell, oneWireEepromShell, helpShell),
       infraredController(terminalView, terminalInput, deviceView, utilityService, infraredService, littleFsService, i2cService, argTransformer, infraredTransformer, userInputManager, universalRemoteShell, helpShell),

@@ -13,8 +13,10 @@ and injecting shared instances of core components
 #include "Services/NvsService.h"
 #include "Services/LedService.h"
 #include "Services/UartService.h"
+#include "Services/UartSnifferService.h"
 #include "Services/I2cService.h"
 #include "Services/OneWireService.h"
+#include "Services/TwoWireService.h"
 #include "Services/InfraredService.h"
 #include "Services/UsbS3Service.h"
 #include "Services/HdUartService.h"
@@ -25,6 +27,9 @@ and injecting shared instances of core components
 #include "Services/WifiOpenScannerService.h"
 #include "Services/I2sService.h"
 #include "Services/SshService.h"
+#include "Services/NetcatService.h"
+#include "Services/NmapService.h"
+#include "Services/ICMPService.h"
 #include "Services/JtagService.h"
 #include "Services/CanService.h"
 #include "Services/SystemService.h"
@@ -255,6 +260,9 @@ private:
     NvsService nvsService;
     LedService ledService;
     UartService uartService;
+    UartService uartSnifferFirstPort;
+    UartService uartSnifferSecondPort;
+    UartSnifferService uartSnifferService;
     I2cService i2cService;
     OneWireService oneWireService;
     TwoWireService twoWireService;
