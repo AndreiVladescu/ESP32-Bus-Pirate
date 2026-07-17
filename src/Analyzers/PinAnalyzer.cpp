@@ -3,7 +3,7 @@
 #include <sstream>
 #include <cmath>
 
-PinAnalyzer::PinAnalyzer(PinService& pinService, IUtilityService& utilityService)
+PinAnalyzer::PinAnalyzer(IPinService& pinService, IUtilityService& utilityService)
     : pinService(pinService), utilityService(utilityService) {}
 
 void PinAnalyzer::begin(uint8_t pin_) {

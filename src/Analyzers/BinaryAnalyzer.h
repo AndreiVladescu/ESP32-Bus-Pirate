@@ -1,8 +1,11 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+#include <functional>
 #include <vector>
 #include <string>
-#include <Services/SpiService.h>
+
 #include "Interfaces/IInput.h"
 #include "Interfaces/ITerminalView.h"
 
@@ -54,4 +57,3 @@ private:
     static const FileSignature knownSignatures[];
     static const size_t knownSignaturesCount;
 };
-

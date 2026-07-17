@@ -5,7 +5,7 @@
 #include <vector>
 #include <functional>
 #include "Interfaces/IUtilityService.h"
-#include "Services/PinService.h"
+#include "Interfaces/IPinService.h"
 
 class PinAnalyzer {
 public:
@@ -65,7 +65,7 @@ public:
     };
 
 public:
-    PinAnalyzer(PinService& pinService, IUtilityService& utilityService);
+    PinAnalyzer(IPinService& pinService, IUtilityService& utilityService);
 
     void begin(uint8_t pin);
     void end();
@@ -76,7 +76,7 @@ public:
     void resetWindow();
 
 private:
-    PinService& pinService;
+    IPinService& pinService;
     IUtilityService& utilityService;
     uint8_t pin = 0;
 

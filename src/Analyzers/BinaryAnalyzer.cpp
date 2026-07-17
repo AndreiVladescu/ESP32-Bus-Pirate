@@ -1,5 +1,9 @@
 #include "BinaryAnalyzer.h"
+
+#include <algorithm>
+#include <cctype>
 #include <cmath>
+#include <cstdio>
 #include <cstring>
 #include <sstream>
 #include <iomanip>
@@ -88,12 +92,12 @@ BinaryAnalyzer::AnalysisResult BinaryAnalyzer::analyze(
 
     terminalView.print("In progress");
 
-    for (uint32_t addr = start; addr < totalSize; addr += blockSize, ++blocks) {
+    for (uint32_t addr = start; addr < totalSize; addr += blockSize) {
         uint32_t readAddr = (addr >= overlap) ? (addr - overlap) : 0;
         uint32_t readSize = (addr >= overlap) ? (blockSize + overlap) : (blockSize + addr);
         fetch(readAddr, buffer, readSize);
 
-        const uint8_t* blockData = buffer + (addr >= overlap ? overlap : 0);
+        const uint8_t* blockData = buffer + (addr - readAddr);
 
         BinaryBlockStats stats = analyzeBlock(blockData, blockSize);
         entropySum += stats.entropy;
@@ -115,6 +119,8 @@ BinaryAnalyzer::AnalysisResult BinaryAnalyzer::analyze(
             ss << " → Possible " << sensitive;
             foundSecrets.push_back(ss.str());
         }
+
+        ++blocks;
 
         if (blocks % dotInterval == 0) {
             terminalView.print(".");
