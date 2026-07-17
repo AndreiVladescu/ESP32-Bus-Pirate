@@ -10,8 +10,9 @@
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "States/GlobalState.h"
+#include "Interfaces/IModbusShell.h"
 
-class ModbusShell {
+class ModbusShell : public IModbusShell {
 public:
     ModbusShell(
         ITerminalView& view,
@@ -22,7 +23,7 @@ public:
         ModbusService& modbusService
     );
 
-    void run(const std::string& host, uint16_t port);
+    void run(const std::string& host, uint16_t port) override;
 
 private:
     // Actions

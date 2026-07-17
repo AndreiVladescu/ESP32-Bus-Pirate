@@ -6,24 +6,25 @@
 #include "Interfaces/IInput.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IUtilityService.h"
+#include "Interfaces/IShell.h"
 #include "Managers/UserInputManager.h"
 #include "Models/MeshtasticPacket.h"
 #include "Models/LoRaRadioProfile.h"
-#include "Services/LoRaService.h"
+#include "Interfaces/ILoRaService.h"
 #include "Services/MeshtasticService.h"
 #include "Transformers/ArgTransformer.h"
 
-class MeshtasticShell {
+class MeshtasticShell : public IShell {
 public:
     MeshtasticShell(ITerminalView& terminalView,
                     IInput& terminalInput,
                     IUtilityService& utilityService,
                     UserInputManager& userInputManager,
                     ArgTransformer& argTransformer,
-                    LoRaService& loRaService,
+                    ILoRaService& loRaService,
                     MeshtasticService& meshtasticService);
 
-    void run();
+    void run() override;
 
 private:
     inline static constexpr const char* kActions[] = {
@@ -64,7 +65,7 @@ private:
     IUtilityService& utilityService;
     UserInputManager& userInputManager;
     ArgTransformer& argTransformer;
-    LoRaService& loRaService;
+    ILoRaService& loRaService;
     MeshtasticService& meshtasticService;
 
     std::string presetName_ = "LONG_FAST";

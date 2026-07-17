@@ -2,20 +2,21 @@
 
 #include <string>
 #include <sstream>
-#include "Services/SdService.h"
+#include "Interfaces/ISdService.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IShell.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/CommandHistoryManager.h"
 #include "Managers/UserInputManager.h"
 
-class SdCardShell {
+class SdCardShell : public IShell {
 public:
-    SdCardShell(SdService& sdService, ITerminalView& view, IInput& input,  ArgTransformer& argTransformer, UserInputManager& userInputManager);
-    void run();
+    SdCardShell(ISdService& sdService, ITerminalView& view, IInput& input,  ArgTransformer& argTransformer, UserInputManager& userInputManager);
+    void run() override;
 
 private:
-    SdService& sd;
+    ISdService& sd;
     ITerminalView& terminalView;
     IInput& terminalInput;
     ArgTransformer& argTransformer;

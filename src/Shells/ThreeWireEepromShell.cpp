@@ -4,7 +4,7 @@ ThreeWireEepromShell::ThreeWireEepromShell(
     ITerminalView& terminalView,
     IInput& terminalInput,
     UserInputManager& userInputManager,
-    ThreeWireService& threeWireService,
+    IThreeWireService& threeWireService,
     ArgTransformer& argTransformer)
     : terminalView(terminalView),
       terminalInput(terminalInput),

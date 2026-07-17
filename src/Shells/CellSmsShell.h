@@ -8,25 +8,25 @@
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
 #include "Transformers/AtTransformer.h"
-#include "Services/CellService.h"
+#include "Interfaces/ICellService.h"
+#include "Interfaces/IShell.h"
 
 class ITerminalView;
 class IInput;
 class UserInputManager;
 class ArgTransformer;
 class AtTransformer;
-class CellService;
 
-class CellSmsShell {
+class CellSmsShell : public IShell {
 public:
     CellSmsShell(ITerminalView& terminalView,
                  IInput& terminalInput,
                  UserInputManager& userInputManager,
                  ArgTransformer& argTransformer,
                  AtTransformer& atTransformer,
-                 CellService& cellService);
+                 ICellService& cellService);
 
-    void run();
+    void run() override;
 
 private:
     void cmdList();
@@ -68,5 +68,5 @@ private:
     UserInputManager& userInputManager;
     ArgTransformer& argTransformer;
     AtTransformer& atTransformer;
-    CellService& cellService;
+    ICellService& cellService;
 };

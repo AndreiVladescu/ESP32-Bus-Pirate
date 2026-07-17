@@ -3,7 +3,7 @@
 I2cEepromShell::I2cEepromShell(
     ITerminalView& view,
     IInput& input,
-    I2cService& i2cService,
+    II2cService& i2cService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
     BinaryAnalyzer& binaryAnalyzer

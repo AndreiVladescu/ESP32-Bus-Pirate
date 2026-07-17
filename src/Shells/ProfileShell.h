@@ -5,27 +5,28 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUtilityService.h"
+#include "Interfaces/IShell.h"
 #include "Managers/UserInputManager.h"
-#include "Services/LittleFsService.h"
+#include "Interfaces/ILittleFsService.h"
 #include "Transformers/ProfileTransformer.h"
 
-class ProfileShell {
+class ProfileShell : public IShell {
 public:
     ProfileShell(ITerminalView& tv,
                  IInput& in,
                  IUtilityService& utilityService,
                  UserInputManager& uim,
-                 LittleFsService& lfs,
+                 ILittleFsService& lfs,
                  ProfileTransformer& profileTransformer);
 
-    void run();
+    void run() override;
 
 private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;
     UserInputManager& userInputManager;
-    LittleFsService& littleFsService;
+    ILittleFsService& littleFsService;
     ProfileTransformer& profileTransformer;
 
     inline static constexpr const char* actions[] = {

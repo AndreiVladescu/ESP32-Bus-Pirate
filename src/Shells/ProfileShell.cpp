@@ -5,7 +5,7 @@ ProfileShell::ProfileShell(ITerminalView& tv,
                            IInput& in,
                            IUtilityService& utilityService,
                            UserInputManager& uim,
-                           LittleFsService& lfs,
+                           ILittleFsService& lfs,
                            ProfileTransformer& pt)
     : terminalView(tv),
       terminalInput(in),

@@ -1,7 +1,12 @@
 #include "SpiFlashShell.h"
 
+#include <iomanip>
+#include <sstream>
+
+#include "Data/FlashDatabase.h"
+
 SpiFlashShell::SpiFlashShell(
-    SpiService& spiService,
+    ISpiService& spiService,
     ITerminalView& view,
     IInput& input,
     ArgTransformer& argTransformer,

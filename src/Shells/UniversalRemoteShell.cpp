@@ -4,7 +4,7 @@ UniversalRemoteShell::UniversalRemoteShell(
     ITerminalView& view,
     IInput& input,
     IUtilityService& utilityService,
-    InfraredService& irService,
+    IInfraredService& irService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager
 ) : infraredService(irService),

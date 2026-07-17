@@ -2,17 +2,18 @@
 
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IShell.h"
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
-#include "Services/SpiService.h"
+#include "Interfaces/ISpiService.h"
 #include "Analyzers/BinaryAnalyzer.h"
 #include "Models/TerminalCommand.h"
 #include "States/GlobalState.h"
 
-class SpiFlashShell {
+class SpiFlashShell : public IShell {
 public:
     SpiFlashShell(
-        SpiService& spiService,
+        ISpiService& spiService,
         ITerminalView& view,
         IInput& input,
         ArgTransformer& argTransformer,
@@ -20,7 +21,7 @@ public:
         BinaryAnalyzer& binaryAnalyzer
     );
 
-    void run();
+    void run() override;
 
 private:
     inline static constexpr const char* actions[] = {
@@ -37,7 +38,7 @@ private:
     };
     inline static constexpr size_t actionCount = sizeof(actions) / sizeof(actions[0]);
     
-    SpiService& spiService;
+    ISpiService& spiService;
     ITerminalView& terminalView;
     IInput& terminalInput;
     ArgTransformer& argTransformer;

@@ -3,12 +3,13 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUtilityService.h"
+#include "Interfaces/IUsbAdapterShell.h"
 #include "Managers/UserInputManager.h"
 #include "Services/NvsService.h"
 #include "Services/SystemService.h"
 #include "States/GlobalState.h"
 
-class UsbAdapterShell {
+class UsbAdapterShell : public IUsbAdapterShell {
 public:
     UsbAdapterShell(ITerminalView& tv,
                     IInput& in,
@@ -17,13 +18,13 @@ public:
                     NvsService& nvs,
                     SystemService& systemService);
 
-    void run();
+    void run() override;
     void rebootUsbUartBridge();
     void rebootFlashromSerprog();
     void rebootAvrDudeBusPirate();
     void rebootBpio2();
     void rebootSumpLogicAnalyzer();
-    void rebootOpenOcdBusPirate();
+    void rebootOpenOcdBusPirate() override;
     void rebootInfraredToy();
     void rebootSubGhzRawCdc();
 

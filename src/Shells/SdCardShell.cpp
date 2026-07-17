@@ -1,6 +1,6 @@
 #include "SdCardShell.h"
 
-SdCardShell::SdCardShell(SdService& sdService, ITerminalView& view, IInput& input, ArgTransformer& argTransformer, UserInputManager& userInputManager)
+SdCardShell::SdCardShell(ISdService& sdService, ITerminalView& view, IInput& input, ArgTransformer& argTransformer, UserInputManager& userInputManager)
     : sd(sdService), terminalView(view), terminalInput(input), currentDir("/"), argTransformer(argTransformer), userInputManager(userInputManager) {}
 
 void SdCardShell::run() {

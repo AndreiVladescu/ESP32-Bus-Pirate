@@ -8,7 +8,7 @@ UartAtShell::UartAtShell(ITerminalView& terminalView,
                          IUtilityService& utilityService,
                          UserInputManager& userInputManager,
                          ArgTransformer& argTransformer,
-                         UartService& uartService)
+                         IUartService& uartService)
 : terminalView(terminalView),
   terminalInput(terminalInput),
   utilityService(utilityService),

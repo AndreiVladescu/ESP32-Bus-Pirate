@@ -1,17 +1,18 @@
 #pragma once
 
-#include "Services/SpiService.h"
+#include "Interfaces/ISpiService.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IShell.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "Analyzers/BinaryAnalyzer.h"
 #include "States/GlobalState.h"
 
-class SpiEepromShell {
+class SpiEepromShell : public IShell {
 public:
     SpiEepromShell(
-        SpiService& spiService,
+        ISpiService& spiService,
         ITerminalView& view,
         IInput& input,
         ArgTransformer& argTransformer,
@@ -19,10 +20,10 @@ public:
         BinaryAnalyzer& binaryAnalyzer
     );
 
-    void run();
+    void run() override;
 
 private:
-    SpiService& spiService;
+    ISpiService& spiService;
     ITerminalView& terminalView;
     IInput& terminalInput;
     ArgTransformer& argTransformer;

@@ -1,5 +1,6 @@
 #include "Shells/MeshtasticShell.h"
 
+#include <Arduino.h>
 #include <algorithm>
 
 MeshtasticShell::MeshtasticShell(ITerminalView& terminalView,
@@ -7,7 +8,7 @@ MeshtasticShell::MeshtasticShell(ITerminalView& terminalView,
                                  IUtilityService& utilityService,
                                  UserInputManager& userInputManager,
                                  ArgTransformer& argTransformer,
-                                 LoRaService& loRaService,
+                                 ILoRaService& loRaService,
                                  MeshtasticService& meshtasticService)
     : terminalView(terminalView),
       terminalInput(terminalInput),
@@ -287,12 +288,12 @@ void MeshtasticShell::cmdReceive() {
 
         std::vector<uint8_t> frame;
         const int16_t result = loRaService.pollReceive(frame);
-        if (result == LoRaService::RECEIVE_ERROR) {
+        if (result == ILoRaService::RECEIVE_ERROR) {
             errors++;
             utilityService.sleepMs(1);
             continue;
         }
-        if (result != LoRaService::RECEIVE_OK) {
+        if (result != ILoRaService::RECEIVE_OK) {
             utilityService.sleepMs(1);
             continue;
         }

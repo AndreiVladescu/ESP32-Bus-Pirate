@@ -4,21 +4,22 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUtilityService.h"
+#include "Interfaces/IShell.h"
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
-#include "Services/UartService.h"
+#include "Interfaces/IUartService.h"
 #include "Data/UartAtCommands.h"
 
-class UartAtShell {
+class UartAtShell : public IShell {
 public:
     UartAtShell(ITerminalView& terminalView,
                 IInput& terminalInput,
                 IUtilityService& utilityService,
                 UserInputManager& userInputManager,
                 ArgTransformer& argTransformer,
-                UartService& uartService);
+                IUartService& uartService);
 
-    void run();
+    void run() override;
 
 private:
     bool selectMode(AtMode& outMode);
@@ -44,5 +45,5 @@ private:
     IUtilityService&   utilityService;
     UserInputManager&  userInputManager;
     ArgTransformer&    argTransformer;
-    UartService&       uartService;
+    IUartService&       uartService;
 };

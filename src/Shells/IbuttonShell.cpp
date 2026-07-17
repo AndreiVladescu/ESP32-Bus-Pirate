@@ -8,7 +8,7 @@ IbuttonShell::IbuttonShell(ITerminalView& terminalView,
                            IUtilityService& utilityService,
                            UserInputManager& userInputManager,
                            ArgTransformer& argTransformer,
-                           OneWireService& oneWireService)
+                           IOneWireService& oneWireService)
     : terminalView(terminalView),
       terminalInput(terminalInput),
       utilityService(utilityService),

@@ -8,16 +8,16 @@
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
 #include "Transformers/AtTransformer.h"
-#include "Services/CellService.h"
+#include "Interfaces/ICellService.h"
+#include "Interfaces/IShell.h"
 
 class ITerminalView;
 class IInput;
 class UserInputManager;
 class ArgTransformer;
 class AtTransformer;
-class CellService;
 
-class CellCallShell {
+class CellCallShell : public IShell {
 public:
     CellCallShell(ITerminalView& terminalView,
                  IInput& terminalInput,
@@ -25,9 +25,9 @@ public:
                  UserInputManager& userInputManager,
                  ArgTransformer& argTransformer,
                  AtTransformer& atTransformer,
-                 CellService& cellService);
+                 ICellService& cellService);
 
-    void run();
+    void run() override;
 
 private:
     void cmdDial();
@@ -41,7 +41,7 @@ private:
     UserInputManager& userInputManager;
     ArgTransformer& argTransformer;
     AtTransformer& atTransformer;
-    CellService& cellService;
+    ICellService& cellService;
 
     inline static const char* kActions[] = {
         " 📞 Dial number",

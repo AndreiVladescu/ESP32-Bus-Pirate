@@ -1,29 +1,30 @@
 #pragma once
 #include <string>
 
-#include "Services/FmService.h" 
+#include "Interfaces/IFmService.h"
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IShell.h"
 
 class ITerminalView;
 class IInput;
 class UserInputManager;
 class ArgTransformer;
-class FmService;
+class IFmService;
 
-class FmBroadcastShell {
+class FmBroadcastShell : public IShell {
 public:
     FmBroadcastShell(
         ITerminalView& terminalView,
         IInput& terminalInput,
         UserInputManager& userInputManager,
         ArgTransformer& argTransformer,
-        FmService& fmService
+        IFmService& fmService
     );
 
-    void run();
+    void run() override;
 
 private:
     void cmdStatus_();
@@ -41,7 +42,7 @@ private:
     IInput& terminalInput;
     UserInputManager& userInputManager;
     ArgTransformer& argTransformer;
-    FmService& fmService;
+    IFmService& fmService;
 
     inline static const char* kActions[] = {
         "  📻 Station",

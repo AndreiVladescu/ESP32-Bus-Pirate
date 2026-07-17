@@ -3,26 +3,27 @@
 
 #include <vector>
 #include <string>
-#include "Services/TwoWireService.h"
+#include "Interfaces/ITwoWireService.h"
 #include "Managers/UserInputManager.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IUtilityService.h"
+#include "Interfaces/IShell.h"
 
-class SmartCardShell {
+class SmartCardShell : public IShell {
 public:
     SmartCardShell(
-        TwoWireService& twoWireService, 
-        ITerminalView& terminalView, 
-        IInput& terminalInput, 
+        ITwoWireService& twoWireService,
+        ITerminalView& terminalView,
+        IInput& terminalInput,
         IUtilityService& utilityService,
         ArgTransformer& argTransformer,
         UserInputManager& userInputManager
     );
-    void run();
+    void run() override;
 
 private:
-    TwoWireService& twoWireService;
+    ITwoWireService& twoWireService;
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;

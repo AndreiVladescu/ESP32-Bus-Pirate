@@ -7,28 +7,29 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUtilityService.h"
+#include "Interfaces/IShell.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
-#include "Services/UartService.h"
+#include "Interfaces/IUartService.h"
 
-class UartEmulationShell {
+class UartEmulationShell : public IShell {
 public:
     UartEmulationShell(
         ITerminalView& view,
         IInput& input,
         IUtilityService& utilityService,
-        UartService& uartService,
+        IUartService& uartService,
         ArgTransformer& argTransformer,
         UserInputManager& userInputManager
     );
 
-    void run();
+    void run() override;
 
 private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;
-    UartService& uartService;
+    IUartService& uartService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
 

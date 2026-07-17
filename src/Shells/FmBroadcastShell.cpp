@@ -8,7 +8,7 @@ FmBroadcastShell::FmBroadcastShell(
     IInput& terminalInput,
     UserInputManager& userInputManager,
     ArgTransformer& argTransformer,
-    FmService& fmService
+    IFmService& fmService
 )
     : terminalView(terminalView),
       terminalInput(terminalInput),

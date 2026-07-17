@@ -6,7 +6,7 @@ UartEmulationShell::UartEmulationShell(
     ITerminalView& view,
     IInput& input,
     IUtilityService& utilityService,
-    UartService& uartService,
+    IUartService& uartService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager
 )

@@ -1,24 +1,25 @@
 #pragma once
 
-#include "Services/OneWireService.h"
+#include "Interfaces/IOneWireService.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "Analyzers/BinaryAnalyzer.h"
+#include "Interfaces/IShell.h"
 
-class OneWireEepromShell {
+class OneWireEepromShell : public IShell {
 public:
     OneWireEepromShell(
         ITerminalView& view,
         IInput& input,
-        OneWireService& oneWireService,
+        IOneWireService& oneWireService,
         ArgTransformer& argTransformer,
         UserInputManager& userInputManager,
         BinaryAnalyzer& binaryAnalyzer
     );
 
-    void run();
+    void run() override;
 
 private:
     void cmdProbe();
@@ -28,7 +29,7 @@ private:
     void cmdErase();
     void cmdAnalyze();
 
-    OneWireService& oneWireService;
+    IOneWireService& oneWireService;
     ITerminalView& terminalView;
     IInput& terminalInput;
     ArgTransformer& argTransformer;

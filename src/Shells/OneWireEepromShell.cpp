@@ -3,7 +3,7 @@
 OneWireEepromShell::OneWireEepromShell(
     ITerminalView& view,
     IInput& input,
-    OneWireService& oneWireService,
+    IOneWireService& oneWireService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
     BinaryAnalyzer& binaryAnalyzer

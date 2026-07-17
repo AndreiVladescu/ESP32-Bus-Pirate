@@ -7,18 +7,19 @@
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
 #include "States/GlobalState.h"
-#include "Services/OneWireService.h"
+#include "Interfaces/IOneWireService.h"
+#include "Interfaces/IShell.h"
 
-class IbuttonShell {
+class IbuttonShell : public IShell {
 public:
     IbuttonShell(ITerminalView& terminalView,
                  IInput& terminalInput,
                  IUtilityService& utilityService,
                  UserInputManager& userInputManager,
                  ArgTransformer& argTransformer,
-                 OneWireService& oneWireService);
+                 IOneWireService& oneWireService);
 
-    void run();
+    void run() override;
 
 private:
     void cmdReadId();
@@ -30,6 +31,6 @@ private:
     IUtilityService& utilityService;
     UserInputManager& userInputManager;
     ArgTransformer& argTransformer;
-    OneWireService& oneWireService;
+    IOneWireService& oneWireService;
     GlobalState& state = GlobalState::getInstance();
 };

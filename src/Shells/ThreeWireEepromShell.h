@@ -4,20 +4,21 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Managers/UserInputManager.h"
-#include "Services/ThreeWireService.h"
+#include "Interfaces/IThreeWireService.h"
 #include "Transformers/ArgTransformer.h"
 #include "States/GlobalState.h"
+#include "Interfaces/IShell.h"
 
-class ThreeWireEepromShell {
+class ThreeWireEepromShell : public IShell {
 public:
     ThreeWireEepromShell(
         ITerminalView& terminalView,
         IInput& terminalInput,
         UserInputManager& userInputManager,
-        ThreeWireService& threeWireService,
+        IThreeWireService& threeWireService,
         ArgTransformer& argTransformer);
 
-    void run();
+    void run() override;
 
 private:
     void cmdProbe();
@@ -30,7 +31,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     UserInputManager& userInputManager;
-    ThreeWireService& threeWireService;
+    IThreeWireService& threeWireService;
     ArgTransformer& argTransformer;
     GlobalState& state = GlobalState::getInstance();
 };

@@ -6,7 +6,7 @@ CellCallShell::CellCallShell(ITerminalView& terminalView,
                              UserInputManager& userInputManager,
                              ArgTransformer& argTransformer,
                              AtTransformer& atTransformer,
-                             CellService& cellService)
+                             ICellService& cellService)
     : terminalView(terminalView),
       terminalInput(terminalInput),
       utilityService(utilityService),

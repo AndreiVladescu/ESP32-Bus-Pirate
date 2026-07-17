@@ -1,7 +1,7 @@
 #include "SpiEepromShell.h"
 
 SpiEepromShell::SpiEepromShell(
-    SpiService& spiService,
+    ISpiService& spiService,
     ITerminalView& view,
     IInput& input,
     ArgTransformer& argTransformer,

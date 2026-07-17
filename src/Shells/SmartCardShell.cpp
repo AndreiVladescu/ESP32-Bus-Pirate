@@ -2,7 +2,7 @@
 #include "SmartCardShell.h"
 
 SmartCardShell::SmartCardShell(
-    TwoWireService& twoWireService,
+    ITwoWireService& twoWireService,
     ITerminalView& terminalView,
     IInput& terminalInput,
     IUtilityService& utilityService,

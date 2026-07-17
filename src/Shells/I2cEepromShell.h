@@ -4,21 +4,22 @@
 #include "Interfaces/IInput.h"
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
-#include "Services/I2cService.h"
+#include "Interfaces/II2cService.h"
 #include "Analyzers/BinaryAnalyzer.h"
+#include "Interfaces/II2cEepromShell.h"
 
-class I2cEepromShell {
+class I2cEepromShell : public II2cEepromShell {
 public:
     I2cEepromShell(
         ITerminalView& view,
         IInput& input,
-        I2cService& i2cService,
+        II2cService& i2cService,
         ArgTransformer& argTransformer,
         UserInputManager& userInputManager,
         BinaryAnalyzer & binaryAnalyzer
     );
 
-    void run(uint8_t addr = 0x50);
+    void run(uint8_t addr = 0x50) override;
 
 private:
     // Available actions
@@ -60,7 +61,7 @@ private:
 
     ITerminalView& terminalView;
     IInput& terminalInput;
-    I2cService& i2cService;
+    II2cService& i2cService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
     BinaryAnalyzer& binaryAnalyzer;

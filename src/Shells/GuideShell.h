@@ -4,15 +4,16 @@
 
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
+#include "Interfaces/IShell.h"
 #include "Managers/UserInputManager.h"
 
-class GuideShell {
+class GuideShell : public IShell {
 public:
     GuideShell(ITerminalView& tv,
                IInput& in,
                UserInputManager& uim);
 
-    void run();
+    void run() override;
 
 private:
     ITerminalView& terminalView;

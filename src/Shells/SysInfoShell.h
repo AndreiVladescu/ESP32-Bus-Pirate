@@ -5,6 +5,7 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
+#include "Interfaces/IShell.h"
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
 #include "Services/SystemService.h"
@@ -12,7 +13,7 @@
 #include "Services/WifiService.h"
 #include "States/GlobalState.h"
 
-class SysInfoShell {
+class SysInfoShell : public IShell {
 public:
     SysInfoShell(ITerminalView& terminalView,
                  IInput& terminalInput,
@@ -23,7 +24,7 @@ public:
                  LittleFsService& littleFsService,
                  WifiService& wifiService);
 
-    void run();
+    void run() override;
 
 private:
     inline static constexpr const char* actions[] = {
