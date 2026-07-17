@@ -6,23 +6,22 @@
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
 #include "Interfaces/IUtilityService.h"
-#include "Services/WifiService.h"
-#include "Services/WifiOpenScannerService.h"
-#include "Services/EthernetService.h"
-#include "Services/SshService.h"
-#include "Services/NetcatService.h"
-#include "Services/NmapService.h"
-#include "Services/ICMPService.h"
-#include "Services/NvsService.h"
-#include "Services/TelnetService.h"
-#include "Services/HttpService.h"
-#include "Services/ModbusService.h"
+#include "Interfaces/IWifiService.h"
+#include "Interfaces/IWifiOpenScannerService.h"
+#include "Interfaces/IEthernetService.h"
+#include "Interfaces/ISshService.h"
+#include "Interfaces/INetcatService.h"
+#include "Interfaces/INmapService.h"
+#include "Interfaces/IICMPService.h"
+#include "Interfaces/INvsService.h"
+#include "Interfaces/ITelnetService.h"
+#include "Interfaces/IHttpService.h"
+#include "Interfaces/IJsonTransformer.h"
+#include "Interfaces/IModbusShell.h"
 #include "Transformers/ArgTransformer.h"
-#include "Transformers/JsonTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "States/GlobalState.h"
 #include "Models/TerminalCommand.h"
-#include "Shells/ModbusShell.h"
 #include "Shells/HelpShell.h"
 
 class ANetworkController {
@@ -31,23 +30,23 @@ public:
     ANetworkController(
         ITerminalView& terminalView,
         IDeviceView& deviceView,
-        IInput& terminalInput, 
+        IInput& terminalInput,
         IInput& deviceInput,
         IUtilityService& utilityService,
-        WifiService& wifiService, 
-        WifiOpenScannerService& wifiOpenNetworkService,
-        EthernetService& ethernetService,
-        SshService& sshService,
-        NetcatService& netcatService,
-        NmapService& nmapService,
-        ICMPService& icmpService,
-        NvsService& nvsService,
-        HttpService& httpService,
-        TelnetService& telnetService,
+        IWifiService& wifiService,
+        IWifiOpenScannerService& wifiOpenNetworkService,
+        IEthernetService& ethernetService,
+        ISshService& sshService,
+        INetcatService& netcatService,
+        INmapService& nmapService,
+        IICMPService& icmpService,
+        INvsService& nvsService,
+        IHttpService& httpService,
+        ITelnetService& telnetService,
         ArgTransformer& argTransformer,
-        JsonTransformer& jsonTransformer,
+        IJsonTransformer& jsonTransformer,
         UserInputManager& userInputManager,
-        ModbusShell& modbusShell,
+        IModbusShell& modbusShell,
         HelpShell& helpShell
     );
 
@@ -64,7 +63,7 @@ protected:
     void handleHttp(const TerminalCommand &cmd);
     void handleHttpGet(const TerminalCommand &cmd);
     void handleHttpAnalyze(const TerminalCommand &cmd);
-    
+
     // Lookup
     void handleLookup(const TerminalCommand& cmd);
     void handleLookupMac(const TerminalCommand& cmd);
@@ -78,24 +77,24 @@ protected:
     IInput&            deviceInput;
     IUtilityService&   utilityService;
 
-    WifiService&       wifiService;
-    EthernetService&   ethernetService;
+    IWifiService&       wifiService;
+    IEthernetService&   ethernetService;
 
-    NvsService&        nvsService;
+    INvsService&        nvsService;
 
-    WifiOpenScannerService& wifiOpenScannerService;
-    SshService&        sshService;
-    NetcatService&     netcatService;
-    NmapService&       nmapService;
-    ICMPService&       icmpService;
-    HttpService&       httpService;
-    TelnetService&     telnetService;
+    IWifiOpenScannerService& wifiOpenScannerService;
+    ISshService&        sshService;
+    INetcatService&     netcatService;
+    INmapService&       nmapService;
+    IICMPService&       icmpService;
+    IHttpService&       httpService;
+    ITelnetService&     telnetService;
 
-    ModbusShell&       modbusShell;
+    IModbusShell&       modbusShell;
     HelpShell&        helpShell;
 
     ArgTransformer&    argTransformer;
-    JsonTransformer&   jsonTransformer;
+    IJsonTransformer&   jsonTransformer;
     UserInputManager&  userInputManager;
     GlobalState&       globalState = GlobalState::getInstance();
 };

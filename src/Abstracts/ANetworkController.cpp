@@ -1,28 +1,29 @@
 #include "ANetworkController.h"
+#include <freertos/FreeRTOS.h>
 
 /*
 Constructor
 */
 ANetworkController::ANetworkController(
-    ITerminalView& terminalView, 
+    ITerminalView& terminalView,
     IDeviceView& deviceView,
-    IInput& terminalInput, 
+    IInput& terminalInput,
     IInput& deviceInput,
     IUtilityService& utilityService,
-    WifiService& wifiService, 
-    WifiOpenScannerService& wifiOpenScannerService,
-    EthernetService& ethernetService,
-    SshService& sshService,
-    NetcatService& netcatService,
-    NmapService& nmapService,
-    ICMPService& icmpService,
-    NvsService& nvsService,
-    HttpService& httpService,
-    TelnetService& telnetService,
+    IWifiService& wifiService,
+    IWifiOpenScannerService& wifiOpenScannerService,
+    IEthernetService& ethernetService,
+    ISshService& sshService,
+    INetcatService& netcatService,
+    INmapService& nmapService,
+    IICMPService& icmpService,
+    INvsService& nvsService,
+    IHttpService& httpService,
+    ITelnetService& telnetService,
     ArgTransformer& argTransformer,
-    JsonTransformer& jsonTransformer,
+    IJsonTransformer& jsonTransformer,
     UserInputManager& userInputManager,
-    ModbusShell& modbusShell,
+    IModbusShell& modbusShell,
     HelpShell& helpShell
 )
 : terminalView(terminalView),
@@ -62,8 +63,8 @@ void ANetworkController::handlePing(const TerminalCommand &cmd)
     if (host.empty() || host == "-h" || host == "--help") {
         terminalView.println(icmpService.getPingHelp());
         return;
-    }   
-    
+    }
+
     auto args = argTransformer.splitArgs(cmd.getArgs());
     int pingCount = 5, pingTimeout = 1000, pingInterval = 200;
 
@@ -185,7 +186,7 @@ void ANetworkController::handleDiscovery(const TerminalCommand &cmd)
         terminalView.println(line);
     }
 
-    ICMPService::clearICMPLogging();
+    icmpService.clearICMPLogging();
     icmpService.clearDiscoveryFlag();
 }
 
@@ -280,7 +281,7 @@ void ANetworkController::handleNmap(const TerminalCommand &cmd)
     // Parse args
     // Parse hosts first
     auto hosts_arg = cmd.getSubcommand();
-    
+
     // First helper invoke
     if (hosts_arg.compare("-h") == 0 || hosts_arg.compare("--help") == 0  || hosts_arg.empty()){
         terminalView.println(nmapService.getHelpText());
@@ -300,9 +301,9 @@ void ANetworkController::handleNmap(const TerminalCommand &cmd)
 
     nmapService.setArgTransformer(argTransformer);
     auto tokens = argTransformer.splitArgs(cmd.getArgs());
-    auto options = NmapService::parseNmapArgs(tokens);
+    auto options = nmapService.parseNmapArgs(tokens);
     this->nmapService.setOptions(options);
-    
+
     // Second helper
     if (options.help) {
         terminalView.println(nmapService.getHelpText());
@@ -331,14 +332,14 @@ void ANetworkController::handleNmap(const TerminalCommand &cmd)
     // Re-use it for ICMP pings
     nmapService.setICMPService(&icmpService);
     nmapService.startTask(options.verbosity);
-    
+
     while(!nmapService.isReady()){
         utilityService.sleepMs(100);
     }
 
     terminalView.println(nmapService.getReport());
     nmapService.clean();
-    
+
     terminalView.println("\r\n\nNmap: Scan finished.");
 }
 
@@ -573,7 +574,7 @@ void ANetworkController::handleHttpAnalyze(const TerminalCommand& cmd)
     // === ssllabs.com ====
     const std::string ssllabsUrl =
         "https://api.ssllabs.com/api/v3/analyze?host=" + url;
-        
+
 
     terminalView.println("HTTP Analyze: " + ssllabsUrl + " (SSL Labs)...");
     resp = httpService.fetchJson(ssllabsUrl, 16384);
