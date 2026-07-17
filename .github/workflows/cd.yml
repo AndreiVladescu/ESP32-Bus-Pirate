@@ -52,13 +52,14 @@ jobs:
           python -m pip install --upgrade platformio
           pio --version
 
-      - name: Build and package all firmware environments
+      - name: Build merged firmware images
         shell: bash
         run: |
           set -euo pipefail
 
           OUTPUT_DIR="${RUNNER_TEMP}/upstream-builds"
           DOWNLOAD_DIR="${OUTPUT_DIR}/downloads"
+
           SOURCE_SHA="$(git rev-parse HEAD)"
           SHORT_SHA="$(git rev-parse --short=7 HEAD)"
           BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
@@ -91,20 +92,33 @@ jobs:
           cat > "${OUTPUT_DIR}/README.md" <<EOF
           # ESP32 Bit Pirate — Upstream firmware
 
-          These are experimental upstream builds generated automatically from
-          the latest commit that passed the native test workflow.
+          Experimental firmware images generated automatically from the latest
+          commit on the \`pioarduino\` branch that passed Continuous Integration.
 
-          **These files are not stable releases.**
+          **These files are development builds, not stable releases.**
 
           - Branch: \`pioarduino\`
           - Commit: [\`${SOURCE_SHA}\`](https://github.com/${GITHUB_REPOSITORY}/commit/${SOURCE_SHA})
           - Build date: \`${BUILD_DATE}\`
           - Channel: \`upstream\`
 
+          ## Flash from your browser
+
+          Each download is a complete merged firmware image containing the
+          bootloader, partition table and application firmware.
+
+          1. Download the firmware matching your board.
+          2. Open the [ESP Tool](https://geo-tp.github.io/ESP32-Bit-Pirate/web-tools/esp-tool/).
+          3. Connect the board through Web Serial.
+          4. Drag and drop the downloaded \`.bin\` file into the tool.
+          5. Start flashing.
+
+          No separate bootloader, partition file or offset configuration is required.
+
           ## Downloads
 
-          | Environment | Firmware | Complete package |
-          |---|---|---|
+          | Environment | Complete firmware |
+          |---|---|
           EOF
 
           for ENVIRONMENT in "${ENVIRONMENTS[@]}"; do
@@ -113,64 +127,29 @@ jobs:
             pio run -e "${ENVIRONMENT}"
 
             BUILD_DIR=".pio/build/${ENVIRONMENT}"
-            PACKAGE_DIR="${RUNNER_TEMP}/package-${ENVIRONMENT}"
-
+            FACTORY_IMAGE="${BUILD_DIR}/firmware.factory.bin"
             FIRMWARE_NAME="esp32-bit-pirate-${ENVIRONMENT}-upstream.bin"
-            ARCHIVE_NAME="esp32-bit-pirate-${ENVIRONMENT}-upstream.zip"
+            DESTINATION="${DOWNLOAD_DIR}/${FIRMWARE_NAME}"
 
-            rm -rf "${PACKAGE_DIR}"
-            mkdir -p "${PACKAGE_DIR}"
-
-            # Copy firmware, bootloader, partitions and debugging files.
-            find "${BUILD_DIR}" \
-              -maxdepth 1 \
-              -type f \
-              \( \
-                -name "*.bin" \
-                -o -name "*.elf" \
-                -o -name "*.map" \
-              \) \
-              -exec cp {} "${PACKAGE_DIR}/" \;
-
-            if [[ ! -f "${PACKAGE_DIR}/firmware.bin" ]]; then
-              echo "firmware.bin was not generated for ${ENVIRONMENT}."
+            if [[ ! -f "${FACTORY_IMAGE}" ]]; then
+              echo "Merged firmware was not generated for ${ENVIRONMENT}."
+              echo "Expected file: ${FACTORY_IMAGE}"
               exit 1
             fi
 
-            cat > "${PACKAGE_DIR}/BUILD_INFO.txt" <<EOF
-          Project: ESP32-Bit-Pirate
-          Channel: upstream
-          Stability: experimental
-          Environment: ${ENVIRONMENT}
-          Branch: pioarduino
-          Commit: ${SOURCE_SHA}
-          Build date: ${BUILD_DATE}
-          Workflow run: ${GITHUB_RUN_ID}
-          EOF
+            cp "${FACTORY_IMAGE}" "${DESTINATION}"
 
-            (
-              cd "${PACKAGE_DIR}"
+            if [[ ! -s "${DESTINATION}" ]]; then
+              echo "Generated firmware is empty for ${ENVIRONMENT}."
+              exit 1
+            fi
 
-              find . \
-                -maxdepth 1 \
-                -type f \
-                ! -name "SHA256SUMS.txt" \
-                -printf "%f\n" \
-                | sort \
-                | xargs sha256sum \
-                > SHA256SUMS.txt
+            FIRMWARE_SIZE="$(stat --printf='%s' "${DESTINATION}")"
 
-              zip -9 -q \
-                "${DOWNLOAD_DIR}/${ARCHIVE_NAME}" \
-                ./*
-            )
-
-            cp \
-              "${PACKAGE_DIR}/firmware.bin" \
-              "${DOWNLOAD_DIR}/${FIRMWARE_NAME}"
+            echo "Created ${FIRMWARE_NAME} (${FIRMWARE_SIZE} bytes)"
 
             cat >> "${OUTPUT_DIR}/README.md" <<EOF
-          | \`${ENVIRONMENT}\` | [Download BIN](downloads/${FIRMWARE_NAME}) | [Download ZIP](downloads/${ARCHIVE_NAME}) |
+          | \`${ENVIRONMENT}\` | [Download BIN](downloads/${FIRMWARE_NAME}) |
           EOF
 
             echo "::endgroup::"
@@ -178,14 +157,14 @@ jobs:
 
           (
             cd "${DOWNLOAD_DIR}"
-            sha256sum ./* > "${OUTPUT_DIR}/SHA256SUMS.txt"
+            sha256sum ./*.bin > "${OUTPUT_DIR}/SHA256SUMS.txt"
           )
 
           cat >> "${OUTPUT_DIR}/README.md" <<EOF
 
           ## Verification
 
-          Checksums are available in
+          SHA-256 checksums are available in
           [SHA256SUMS.txt](SHA256SUMS.txt).
 
           Generated automatically from commit \`${SHORT_SHA}\`.
@@ -203,7 +182,7 @@ jobs:
           git config user.email \
             "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # Create a new history containing only the latest upstream build.
+          # Create a fresh history containing only the latest upstream builds.
           git checkout --orphan upstream-builds-publish
           git rm -rf .
           git clean -fdx
@@ -213,7 +192,6 @@ jobs:
           git add --all
           git commit -m "upstream: build ${SOURCE_SHA}"
 
-          # Replace the previous upstream-builds branch completely.
           git push \
             origin \
             HEAD:refs/heads/upstream-builds \
