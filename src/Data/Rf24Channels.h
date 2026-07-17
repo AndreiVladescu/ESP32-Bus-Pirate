@@ -1,5 +1,9 @@
 #pragma once
+#if __has_include("Vendors/Arduino.h")
+#include "Vendors/Arduino.h"
+#else
 #include <Arduino.h>
+#endif
 
 // Group struct
 struct Rf24ChannelGroup {

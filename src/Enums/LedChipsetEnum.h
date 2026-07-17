@@ -3,7 +3,11 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#if __has_include("Vendors/FastLED.h")
+#include "Vendors/FastLED.h"
+#else
 #include <FastLED.h>
+#endif
 
 // Enum is from FastLED, ESPIChipsets
 
