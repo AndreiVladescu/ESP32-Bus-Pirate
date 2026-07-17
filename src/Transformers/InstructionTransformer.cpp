@@ -64,6 +64,7 @@ std::vector<Instruction> InstructionTransformer::transform(const std::string& ra
 
         if (c == ']') {
             if (!token.empty() && currentInstruction) {
+                if (token.back() == ',') token.pop_back();
                 currentInstruction->addToken(token);
                 token.clear();
             }
@@ -82,6 +83,7 @@ std::vector<Instruction> InstructionTransformer::transform(const std::string& ra
             currentRaw += c;
             if (std::isspace(c)) {
                 if (!token.empty() && currentInstruction) {
+                    if (token.back() == ',') token.pop_back();
                     currentInstruction->addToken(token);
                     token.clear();
                 }
@@ -168,13 +170,33 @@ bool InstructionTransformer::isInstructionCommand(const std::string& raw) const 
 }
 
 bool InstructionTransformer::isHex(const std::string& token) const {
-    return token.size() > 2 &&
-           token[0] == '0' &&
-           std::tolower(token[1]) == 'x';
+    if (token.size() <= 2 || token[0] != '0' || std::tolower(token[1]) != 'x') {
+        return false;
+    }
+
+    if (!std::all_of(token.begin() + 2, token.end(),
+                     [](unsigned char c) { return std::isxdigit(c); })) {
+        return false;
+    }
+
+    try {
+        return std::stoul(token, nullptr, 16) <= 0xFF;
+    } catch (...) {
+        return false;
+    }
 }
 
 bool InstructionTransformer::isDecimal(const std::string& token) const {
-    return !token.empty() && std::all_of(token.begin(), token.end(), ::isdigit);
+    if (token.empty() || !std::all_of(token.begin(), token.end(),
+                                     [](unsigned char c) { return std::isdigit(c); })) {
+        return false;
+    }
+
+    try {
+        return std::stoul(token) <= 0xFF;
+    } catch (...) {
+        return false;
+    }
 }
 
 bool InstructionTransformer::isCharLiteral(const std::string& token) const {
@@ -285,4 +307,3 @@ bool InstructionTransformer::isRepeatedSymbol(const std::string& token) const {
         return c == first;
     });
 }
-

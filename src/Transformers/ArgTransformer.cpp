@@ -1,20 +1,19 @@
 #include "ArgTransformer.h"
 #include <array>
+#include <cerrno>
+#include <climits>
 
 uint8_t ArgTransformer::parseByte(const std::string& str, int index) const {
-    std::istringstream ss(str);
-    int value = 0;
-
-    if (str.rfind("0x", 0) == 0 || str.rfind("0X", 0) == 0)
-        ss >> std::hex >> value;
-    else
-        ss >> std::dec >> value;
-
-    if (ss.fail() || value < 0 || value > 255) {
+    (void)index;
+    try {
+        size_t parsedChars = 0;
+        const int base = str.rfind("0x", 0) == 0 || str.rfind("0X", 0) == 0 ? 16 : 10;
+        const unsigned long value = std::stoul(str, &parsedChars, base);
+        if (parsedChars != str.size() || value > 0xFF) return 0xFF;
+        return static_cast<uint8_t>(value);
+    } catch (...) {
         return 0xFF;
     }
-
-    return static_cast<uint8_t>(value);
 }
 
 std::vector<uint8_t> ArgTransformer::parseByteList(const std::string& input) const {
@@ -22,14 +21,16 @@ std::vector<uint8_t> ArgTransformer::parseByteList(const std::string& input) con
     std::string token;
     std::vector<uint8_t> bytes;
 
-    int index = 0;
     while (iss >> token) {
-        uint8_t parsed = parseByte(token, index);
-        if (parsed == 0xFF && token != "0xFF" && token != "255") {
-            continue; // ignore
+        try {
+            size_t parsedChars = 0;
+            const int base = token.rfind("0x", 0) == 0 || token.rfind("0X", 0) == 0 ? 16 : 10;
+            const unsigned long value = std::stoul(token, &parsedChars, base);
+            if (parsedChars == token.size() && value <= 0xFF) {
+                bytes.push_back(static_cast<uint8_t>(value));
+            }
+        } catch (...) {
         }
-        bytes.push_back(parsed);
-        index++;
     }
 
     return bytes;
@@ -42,9 +43,11 @@ std::vector<uint8_t> ArgTransformer::parseHexList(const std::string& input) cons
 
     while (iss >> token) {
         try {
-            // Convertir chaque token en uint8_t
-            uint8_t value = static_cast<uint8_t>(std::stoul(token, nullptr, 16));
-            result.push_back(value);
+            size_t parsedChars = 0;
+            const unsigned long value = std::stoul(token, &parsedChars, 16);
+            if (parsedChars == token.size() && value <= 0xFF) {
+                result.push_back(static_cast<uint8_t>(value));
+            }
         } catch (...) {
         }
     }
@@ -127,7 +130,14 @@ uint32_t ArgTransformer::parseHexOrDec32(const std::string& str) const {
         if (base == 16 && !isxdigit(c)) return 0;
     }
 
-    unsigned long value = strtoul(str.c_str(), nullptr, base);
+    if (*cstr == '\0') return 0;
+
+    errno = 0;
+    char* end = nullptr;
+    unsigned long long value = strtoull(str.c_str(), &end, base);
+    if (end == str.c_str() || *end != '\0' || errno == ERANGE || value > 0xFFFFFFFFULL) {
+        return 0;
+    }
     return static_cast<uint32_t>(value);
 }
 
@@ -224,6 +234,7 @@ bool ArgTransformer::parseInt(const std::string& input, int& output) {
     long v = strtol(p, &end, base);
     if (end == p || *end != '\0') return false;
     if (errno == ERANGE) return false;
+    if (v < INT_MIN || v > INT_MAX) return false;
 
     output = (int)v;
     return true;
@@ -238,6 +249,8 @@ bool ArgTransformer::isValidNumber(const std::string& input) {
         base = 16;
         s = s.substr(2);
     }
+
+    if (s.empty()) return false;
 
     for (char c : s) {
         if ((base == 10 && !isdigit(c)) ||
@@ -496,7 +509,7 @@ std::string ArgTransformer::toAsciiLine(uint32_t startAddr, const std::vector<ui
 std::string ArgTransformer::formatHexAscii(const uint8_t* data, size_t len, bool withAscii, size_t bytesPerRow) {
     std::stringstream out;
 
-    if (!data || len == 0) return "";
+    if (!data || len == 0 || bytesPerRow == 0) return "";
 
     for (size_t row = 0; row < len; row += bytesPerRow) {
         const size_t lineLen = std::min(bytesPerRow, len - row);
@@ -622,7 +635,10 @@ std::string ArgTransformer::normalizeLines(const std::string& in) {
     std::string out;
     out.reserve(in.size() * 2);
     for (size_t i = 0; i < in.size(); i++) {
-        if (in[i] == '\n') {
+        if (in[i] == '\r' && i + 1 < in.size() && in[i + 1] == '\n') {
+            out += "\r\n";
+            ++i;
+        } else if (in[i] == '\n') {
             out += "\r\n";
         } else {
             out += in[i];
@@ -650,6 +666,7 @@ std::vector<uint8_t> ArgTransformer::parse01List(const std::string& line) {
   } else {
     for (char c : line) {
       if (c=='0' || c=='1') bits.push_back(c=='1' ? 1 : 0);
+      else if (!std::isspace(static_cast<unsigned char>(c))) return {};
     }
   }
   return bits;

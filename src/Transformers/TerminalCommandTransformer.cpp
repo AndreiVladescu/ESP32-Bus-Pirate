@@ -12,8 +12,10 @@ TerminalCommand TerminalCommandTransformer::transform(const std::string& raw) co
     iss >> root >> subcommand;
     std::getline(iss, args);
 
-    if (!args.empty() && args[0] == ' ') {
-        args.erase(0, 1);
+    if (!args.empty()) {
+        const size_t firstNonSpace = args.find_first_not_of(' ');
+        if (firstNonSpace == std::string::npos) args.clear();
+        else args.erase(0, firstNonSpace);
     }
 
     TerminalCommand cmd;
@@ -143,7 +145,10 @@ std::vector<TerminalCommand> TerminalCommandTransformer::transformRepeatCommand(
 bool TerminalCommandTransformer::isPipelineCommand(const std::string& raw) const {
     if (raw.empty()) return false;
 
-    char first = raw[0];
+    const size_t start = raw.find_first_not_of(" \t\r\n");
+    if (start == std::string::npos) return false;
+
+    char first = raw[start];
     if (first == '[' || first == '>' || first == '{' || first == '(') {
         return false;
     }

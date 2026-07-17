@@ -208,10 +208,10 @@ std::string InfraredRemoteTransformer::hexByte(uint8_t b) {
 }
 
 std::string InfraredRemoteTransformer::toHexBytesLE(uint16_t v, size_t byteCount) {
-    uint8_t lo = static_cast<uint8_t>(v & 0xFFu);
-    uint8_t hi = static_cast<uint8_t>((v >> 8) & 0xFFu);
-
     std::ostringstream oss;
-    oss << InfraredRemoteTransformer::hexByte(lo) << " " << InfraredRemoteTransformer::hexByte(hi);
+    for (size_t i = 0; i < byteCount; ++i) {
+        if (i) oss << " ";
+        oss << InfraredRemoteTransformer::hexByte(static_cast<uint8_t>((v >> (i * 8)) & 0xFFu));
+    }
     return oss.str();
 }

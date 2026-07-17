@@ -109,7 +109,10 @@ static bool getStr(const std::map<std::string,std::string>& kv,
                    const char* key,
                    std::string& out) {
     auto it = kv.find(key);
-    if (it == kv.end()) return false;
+    if (it == kv.end()) {
+        out.clear();
+        return false;
+    }
     out = it->second;
     return true;
 }
@@ -297,7 +300,7 @@ bool ProfileTransformer::fromProfileText(
 
     if (getStr(kv, "i2s.level", v)) {
         if (!parseU8(v, u8)) { error = "Invalid i2s.level";}
-        gs.setI2sPercentLevel(u8);
+        else gs.setI2sPercentLevel(u8);
     }
 
     // -----------------------------
@@ -389,27 +392,27 @@ bool ProfileTransformer::fromProfileText(
     // -----------------------------
     if (getStr(kv, "eth.cs", v)) {
         if (!parseU8(v, u8)) { error = "Invalid eth.cs";}
-        gs.setEthernetCsPin(u8);
+        else gs.setEthernetCsPin(u8);
     }
     if (getStr(kv, "eth.clk", v)) {
         if (!parseU8(v, u8)) { error = "Invalid eth.clk";}
-        gs.setEthernetSckPin(u8);
+        else gs.setEthernetSckPin(u8);
     }
     if (getStr(kv, "eth.miso", v)) {
         if (!parseU8(v, u8)) { error = "Invalid eth.miso";}
-        gs.setEthernetMisoPin(u8);
+        else gs.setEthernetMisoPin(u8);
     }
     if (getStr(kv, "eth.mosi", v)) {
         if (!parseU8(v, u8)) { error = "Invalid eth.mosi";}
-        gs.setEthernetMosiPin(u8);
+        else gs.setEthernetMosiPin(u8);
     }
     if (getStr(kv, "eth.irq", v)) {
         if (!parseU8(v, u8)) { error = "Invalid eth.irq";}
-        gs.setEthernetIrqPin(u8);
+        else gs.setEthernetIrqPin(u8);
     }
     if (getStr(kv, "eth.freq", v)) {
         if (!parseU32(v, u32)) { error = "Invalid eth.freq";}
-        gs.setEthernetFrequency(u32);
+        else gs.setEthernetFrequency(u32);
     }
 
     // -----------------------------
@@ -417,15 +420,15 @@ bool ProfileTransformer::fromProfileText(
     // -----------------------------
     if (getStr(kv, "fm.sda", v)) {
         if (!parseU8(v, u8)) { error = "Invalid fm.sda";}
-        gs.setTwoWireIoPin(u8);
+        else gs.setTwoWireIoPin(u8);
     }
     if (getStr(kv, "fm.scl", v)) {
         if (!parseU8(v, u8)) { error = "Invalid fm.scl";}
-        gs.setTwoWireClkPin(u8);
+        else gs.setTwoWireClkPin(u8);
     }
     if (getStr(kv, "fm.rst", v)) {
         if (!parseU8(v, u8)) { error = "Invalid fm.rst";}
-        gs.setTwoWireRstPin(u8);
+        else gs.setTwoWireRstPin(u8);
     }
 
     // -----------------------------
@@ -433,15 +436,15 @@ bool ProfileTransformer::fromProfileText(
     // -----------------------------
     if (getStr(kv, "cell.tx", v)) {
         if (!parseU8(v, u8)) { error = "Invalid cell.tx";}
-        gs.setUartTxPin(u8);
+        else gs.setUartTxPin(u8);
     }
     if (getStr(kv, "cell.rx", v)) {
         if (!parseU8(v, u8)) { error = "Invalid cell.rx";}
-        gs.setUartRxPin(u8);
+        else gs.setUartRxPin(u8);
     }
     if (getStr(kv, "cell.baud", v)) {
         if (!parseU32(v, u32)) { error = "Invalid cell.baud";}
-        gs.setUartBaudRate((unsigned long)u32);
+        else gs.setUartBaudRate((unsigned long)u32);
     }
 
     if (!error.empty()) {

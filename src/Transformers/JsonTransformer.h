@@ -2,15 +2,20 @@
 
 #include <string>
 #include <vector>
+#if __has_include("Vendors/ArduinoJson.h")
+#include "Vendors/ArduinoJson.h"
+#else
 #include <ArduinoJson.h>
+#endif
+#include "Interfaces/IJsonTransformer.h"
 
-class JsonTransformer {
+class JsonTransformer : public IJsonTransformer {
 public:
     // Transform JSON to a vector of formatted lines
-    std::vector<std::string> toLines(const std::string& json);
+    std::vector<std::string> toLines(const std::string& json) override;
 
     // Remove chunked transfer encoding
-    std::string dechunk(const std::string& chunked);
+    std::string dechunk(const std::string& chunked) override;
 
 
     // Escape a string for JSON

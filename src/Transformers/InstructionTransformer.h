@@ -7,7 +7,6 @@
 #include <algorithm>
 #include "Models/ByteCode.h"
 #include "Models/Instruction.h"
-#include "Arduino.h"
 
 class InstructionTransformer {
 public:
