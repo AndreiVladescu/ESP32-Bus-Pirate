@@ -1,5 +1,4 @@
 #include "ActionDispatcher.h"
-#include "Data/AutoCompleteWords.h"
 
 /*
 Constructor
@@ -18,7 +17,7 @@ void ActionDispatcher::setup(TerminalTypeEnum terminalType, std::string terminal
         provider.getSystemService().setDebugOutput(false); // no serial debug logs
         provider.getTerminalView().initialize();
         provider.getTerminalView().waitPress();
-        provider.getTerminalInput().waitPress();
+        provider.getCommandLineManager().waitPress();
         provider.getTerminalView().welcome(terminalType, terminalInfos);
     } else {
         provider.getTerminalView().initialize();
@@ -31,13 +30,17 @@ Run loop
 */
 void ActionDispatcher::run() {
     while (true) {
-        auto mode = ModeEnumMapper::toString(state.getCurrentMode());
+        const auto mode =
+            ModeEnumMapper::toString(state.getCurrentMode());
+
         provider.getTerminalView().printPrompt(mode);
-        std::string action = getUserAction();
-        if (action.empty()) {
-            continue;
+
+        const std::string action =
+            provider.getCommandLineManager().readCommand(mode);
+
+        if (!action.empty()) {
+            dispatch(action);
         }
-        dispatch(action);
     }
 }
 
@@ -416,187 +419,4 @@ void ActionDispatcher::releaseMode(ModeEnum currentMode, ModeEnum newMode) {
         default:
             break;
     }
-}
-
-/*
-User Action
-*/
-std::string ActionDispatcher::getUserAction() {
-    std::string inputLine;
-    auto mode = ModeEnumMapper::toString(state.getCurrentMode());
-    size_t cursorIndex = 0;
-
-    while (true) {
-        provider.getDeviceInput().readChar(); // to check shutdown request for T-Embeds
-        char c = provider.getTerminalInput().readChar();
-        if (c == KEY_NONE) continue;
-
-        if (handleCardputerEscapeSequence(c, cursorIndex, inputLine, mode)) continue;
-        if (handleEscapeSequence(c, inputLine, cursorIndex, mode)) continue;
-        if (handleEnterKey(c, inputLine)) return inputLine;
-        if (handleBackspace(c, inputLine, cursorIndex, mode)) continue;
-        if (handlePrintableChar(c, inputLine, cursorIndex, mode));
-        if (handleTabCompletion(c, inputLine, cursorIndex, mode));
-    }
-}
-
-/*
-User Action: Cardputer Special Arrows, standalone mode only
-*/
-bool ActionDispatcher::handleCardputerEscapeSequence(char c, size_t& cursorIndex, std::string& inputLine, const std::string& mode) {
-    if (state.getTerminalMode() != TerminalTypeEnum::Standalone) {
-        return false;
-    }
-
-    if (c == CARDPUTER_SPECIAL_ARROW_UP) {
-        provider.getTerminalView().print(std::string(1, CARDPUTER_SPECIAL_ARROW_UP));
-    } else if (c == CARDPUTER_SPECIAL_ARROW_DOWN) {
-        provider.getTerminalView().print(std::string(1, CARDPUTER_SPECIAL_ARROW_DOWN));
-    } else if (c == '\t') {
-        if (c != '\t') return false;
-
-        // Clear current line
-        inputLine.clear();
-
-        // Recall previous command from history
-        inputLine = provider.getCommandHistoryManager().up();
-
-        // Move cursor to end and redraw
-        cursorIndex = inputLine.length();
-        provider.getTerminalView().print("\r" + mode + "> " + inputLine + "\033[K");
-
-        return true;
-    } else {
-        return false;
-    }
-
-    return true;
-}
-
-/*
-User Action: Escape
-*/
-bool ActionDispatcher::handleEscapeSequence(char c, std::string& inputLine, size_t& cursorIndex, const std::string& mode) {
-    if (c != '\x1B') return false;
-
-    if (provider.getTerminalInput().readChar() == '[') {
-        char next = provider.getTerminalInput().readChar();
-
-        if (next == 'A') {
-            inputLine = provider.getCommandHistoryManager().up();
-            cursorIndex = inputLine.length();
-        } else if (next == 'B') {
-            inputLine = provider.getCommandHistoryManager().down();
-            cursorIndex = inputLine.length();
-        } else if (next == 'C') {
-            if (cursorIndex < inputLine.length()) {
-                cursorIndex++;
-                provider.getTerminalView().print("\x1B[C");
-            }
-            return true;
-        } else if (next == 'D') {
-            if (cursorIndex > 0) {
-                cursorIndex--;
-                provider.getTerminalView().print("\x1B[D");
-            }
-            return true;
-        } else {
-            return false;
-        }
-
-        provider.getTerminalView().print("\r" + mode + "> " + inputLine + "\033[K");
-        return true;
-    }
-
-    return false;
-}
-
-/*
-User Action: Enter
-*/
-bool ActionDispatcher::handleEnterKey(char c, const std::string& inputLine) {
-    if (c != '\r' && c != '\n') return false;
-
-    provider.getTerminalView().println("");
-    provider.getCommandHistoryManager().add(inputLine);
-    return true;
-}
-
-bool ActionDispatcher::handleTabCompletion(char c,
-                                           std::string& inputLine,
-                                           size_t& cursorIndex,
-                                           const std::string& mode) {
-    if (c != '\t') return false;
-
-    // prefix up to cursor
-    std::string prefix = inputLine.substr(0, cursorIndex);
-
-    // history autocomplete
-    std::string suggestion =
-        provider.getCommandHistoryManager().autocomplete(prefix);
-
-    // fallback dictionary autocomplete
-    if (suggestion.empty()) {
-        for (size_t i = 0; autoCompleteWords[i] != nullptr; ++i) {
-            std::string w(autoCompleteWords[i]);
-
-            if (w.size() >= prefix.size() &&
-                w.compare(0, prefix.size(), prefix) == 0) {
-                suggestion = w;
-                break;
-            }
-        }
-    }
-
-    // apply suggestion
-    if (!suggestion.empty()) {
-        inputLine = suggestion;
-        cursorIndex = inputLine.length();
-        provider.getTerminalView().print("\r" + mode + "> " + inputLine + "\033[K");
-    }
-
-    return true;
-}
-
-/*
-User Action: Backspace
-*/
-bool ActionDispatcher::handleBackspace(char c, std::string& inputLine, size_t& cursorIndex, const std::string& mode) {
-    if (c != '\b' && c != 127) return false;
-    if (cursorIndex == 0) return true;
-
-    cursorIndex--;
-    inputLine.erase(cursorIndex, 1);
-
-    provider.getTerminalView().print("\r" + mode + "> " + inputLine + " \033[K");
-
-    int moveBack = inputLine.length() - cursorIndex;
-    for (int i = 0; i <= moveBack; ++i) {
-        provider.getTerminalView().print("\x1B[D");
-    }
-
-    return true;
-}
-
-/*
-User Action: Printable
-*/
-bool ActionDispatcher::handlePrintableChar(char c, std::string& inputLine, size_t& cursorIndex, const std::string& mode) {
-    if (!std::isprint((unsigned char)c)) return false;
-
-    if (inputLine.size() >= MAX_ALLOWED_COMMAND_LENGTH) {
-        return true; // ignore extra chars
-    }
-
-    inputLine.insert(cursorIndex, 1, c);
-    cursorIndex++;
-
-    provider.getTerminalView().print("\r" + mode + "> " + inputLine + "\033[K");
-
-    size_t moveBack = inputLine.length() - cursorIndex;
-    for (size_t i = 0; i < moveBack; ++i) {
-        provider.getTerminalView().print("\x1B[D");
-    }
-
-    return true;
 }

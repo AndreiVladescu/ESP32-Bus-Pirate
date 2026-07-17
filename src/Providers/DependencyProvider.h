@@ -85,6 +85,7 @@ and injecting shared instances of core components
 #include "Transformers/PinoutTransformer.h"
 #include "Transformers/LoRaTransformer.h"
 #include "Managers/CommandHistoryManager.h"
+#include "Managers/CommandLineManager.h"
 #include "Analyzers/BinaryAnalyzer.h"
 #include "Managers/UserInputManager.h"
 #include "Analyzers/PinAnalyzer.h"
@@ -208,6 +209,7 @@ public:
 
     // Managers
     CommandHistoryManager &getCommandHistoryManager();
+    CommandLineManager &getCommandLineManager();
     UserInputManager &getUserInputManager();
     BinaryAnalyzer &getBinaryAnalyzer();
     SubGhzAnalyzer &getSubGhzAnalyzer();
@@ -338,6 +340,7 @@ private:
 
     // Managers
     CommandHistoryManager commandHistoryManager;
+    CommandLineManager commandLineManager;
     UserInputManager userInputManager;
     BinaryAnalyzer binaryAnalyzer;
     SubGhzAnalyzer subGhzAnalyzer;

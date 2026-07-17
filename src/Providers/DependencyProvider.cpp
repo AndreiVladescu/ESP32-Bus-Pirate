@@ -60,6 +60,7 @@ DependencyProvider::DependencyProvider(ITerminalView &terminalView, IDeviceView 
 
       // Managers
       commandHistoryManager(),
+      commandLineManager(terminalView, terminalInput, deviceInput, commandHistoryManager),
       binaryAnalyzer(terminalView, terminalInput),
       userInputManager(terminalView, terminalInput, argTransformer),
       subGhzAnalyzer(),
@@ -209,6 +210,7 @@ PinoutTransformer &DependencyProvider::getPinoutTransformer() { return pinoutTra
 
 // Managers
 CommandHistoryManager &DependencyProvider::getCommandHistoryManager() { return commandHistoryManager; }
+CommandLineManager &DependencyProvider::getCommandLineManager() { return commandLineManager; }
 UserInputManager &DependencyProvider::getUserInputManager() { return userInputManager; }
 BinaryAnalyzer &DependencyProvider::getBinaryAnalyzer() { return binaryAnalyzer; }
 SubGhzAnalyzer &DependencyProvider::getSubGhzAnalyzer() { return subGhzAnalyzer; }

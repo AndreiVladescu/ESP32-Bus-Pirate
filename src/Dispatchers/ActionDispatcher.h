@@ -26,7 +26,6 @@ public:
     void dispatch(const std::string& raw);
 
 private:
-    size_t MAX_ALLOWED_COMMAND_LENGTH = 512;
     DependencyProvider& provider;
     GlobalState& state = GlobalState::getInstance();
 
@@ -47,25 +46,4 @@ private:
 
     // Release mode resources if needed
     void releaseMode(ModeEnum currentMode, ModeEnum newMode);
-
-    // Read user input with cursor support
-    std::string getUserAction();
-
-    // Handle ANSI escape sequences (arrows, etc.)
-    bool handleEscapeSequence(char c, std::string& inputLine, size_t& cursorIndex, const std::string& mode);
-
-    // Handle Tab key for autocompletion
-    bool handleTabCompletion(char c, std::string& inputLine, size_t& cursorIndex, const std::string& mode);
-
-    // Handle Cardputer arrows
-    bool handleCardputerEscapeSequence(char c, size_t& cursorIndex, std::string& inputLine, const std::string& mode);
-
-    // Handle backspace logic
-    bool handleBackspace(char c, std::string& inputLine, size_t& cursorIndex, const std::string& mode);
-
-    // Handle printable characters insertion
-    bool handlePrintableChar(char c, std::string& inputLine, size_t& cursorIndex, const std::string& mode);
-
-    // Handle Enter key and dispatch line
-    bool handleEnterKey(char c, const std::string& inputLine);
 };
