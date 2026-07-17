@@ -1,0 +1,220 @@
+name: Upstream Firmware Delivery
+
+on:
+  workflow_run:
+    workflows:
+      - Continuous Integration
+    types:
+      - completed
+    branches:
+      - pioarduino
+
+permissions:
+  contents: write
+
+concurrency:
+  group: upstream-firmware-delivery
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish:
+    name: Build and publish upstream firmware
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Check out tested commit
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-platformio-${{ hashFiles('platformio.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-platformio-
+
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade platformio
+          pio --version
+
+      - name: Build and package all firmware environments
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          OUTPUT_DIR="${RUNNER_TEMP}/upstream-builds"
+          DOWNLOAD_DIR="${OUTPUT_DIR}/downloads"
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          SHORT_SHA="$(git rev-parse --short=7 HEAD)"
+          BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+
+          rm -rf "${OUTPUT_DIR}"
+          mkdir -p "${DOWNLOAD_DIR}"
+
+          # Find every [env:...] section except native-tests.
+          mapfile -t ENVIRONMENTS < <(
+            awk -F'[][]' '
+              /^\[env:[^]]+\]$/ {
+                environment = $2
+                sub(/^env:/, "", environment)
+
+                if (environment != "native-tests") {
+                  print environment
+                }
+              }
+            ' platformio.ini
+          )
+
+          if [[ "${#ENVIRONMENTS[@]}" -eq 0 ]]; then
+            echo "No firmware environments found in platformio.ini."
+            exit 1
+          fi
+
+          echo "Environments to build:"
+          printf ' - %s\n' "${ENVIRONMENTS[@]}"
+
+          cat > "${OUTPUT_DIR}/README.md" <<EOF
+          # ESP32 Bit Pirate — Upstream firmware
+
+          These are experimental upstream builds generated automatically from
+          the latest commit that passed the native test workflow.
+
+          **These files are not stable releases.**
+
+          - Branch: \`pioarduino\`
+          - Commit: [\`${SOURCE_SHA}\`](https://github.com/${GITHUB_REPOSITORY}/commit/${SOURCE_SHA})
+          - Build date: \`${BUILD_DATE}\`
+          - Channel: \`upstream\`
+
+          ## Downloads
+
+          | Environment | Firmware | Complete package |
+          |---|---|---|
+          EOF
+
+          for ENVIRONMENT in "${ENVIRONMENTS[@]}"; do
+            echo "::group::Build ${ENVIRONMENT}"
+
+            pio run -e "${ENVIRONMENT}"
+
+            BUILD_DIR=".pio/build/${ENVIRONMENT}"
+            PACKAGE_DIR="${RUNNER_TEMP}/package-${ENVIRONMENT}"
+
+            FIRMWARE_NAME="esp32-bit-pirate-${ENVIRONMENT}-upstream.bin"
+            ARCHIVE_NAME="esp32-bit-pirate-${ENVIRONMENT}-upstream.zip"
+
+            rm -rf "${PACKAGE_DIR}"
+            mkdir -p "${PACKAGE_DIR}"
+
+            # Copy firmware, bootloader, partitions and debugging files.
+            find "${BUILD_DIR}" \
+              -maxdepth 1 \
+              -type f \
+              \( \
+                -name "*.bin" \
+                -o -name "*.elf" \
+                -o -name "*.map" \
+              \) \
+              -exec cp {} "${PACKAGE_DIR}/" \;
+
+            if [[ ! -f "${PACKAGE_DIR}/firmware.bin" ]]; then
+              echo "firmware.bin was not generated for ${ENVIRONMENT}."
+              exit 1
+            fi
+
+            cat > "${PACKAGE_DIR}/BUILD_INFO.txt" <<EOF
+          Project: ESP32-Bit-Pirate
+          Channel: upstream
+          Stability: experimental
+          Environment: ${ENVIRONMENT}
+          Branch: pioarduino
+          Commit: ${SOURCE_SHA}
+          Build date: ${BUILD_DATE}
+          Workflow run: ${GITHUB_RUN_ID}
+          EOF
+
+            (
+              cd "${PACKAGE_DIR}"
+
+              find . \
+                -maxdepth 1 \
+                -type f \
+                ! -name "SHA256SUMS.txt" \
+                -printf "%f\n" \
+                | sort \
+                | xargs sha256sum \
+                > SHA256SUMS.txt
+
+              zip -9 -q \
+                "${DOWNLOAD_DIR}/${ARCHIVE_NAME}" \
+                ./*
+            )
+
+            cp \
+              "${PACKAGE_DIR}/firmware.bin" \
+              "${DOWNLOAD_DIR}/${FIRMWARE_NAME}"
+
+            cat >> "${OUTPUT_DIR}/README.md" <<EOF
+          | \`${ENVIRONMENT}\` | [Download BIN](downloads/${FIRMWARE_NAME}) | [Download ZIP](downloads/${ARCHIVE_NAME}) |
+          EOF
+
+            echo "::endgroup::"
+          done
+
+          (
+            cd "${DOWNLOAD_DIR}"
+            sha256sum ./* > "${OUTPUT_DIR}/SHA256SUMS.txt"
+          )
+
+          cat >> "${OUTPUT_DIR}/README.md" <<EOF
+
+          ## Verification
+
+          Checksums are available in
+          [SHA256SUMS.txt](SHA256SUMS.txt).
+
+          Generated automatically from commit \`${SHORT_SHA}\`.
+          EOF
+
+      - name: Replace upstream-builds branch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          OUTPUT_DIR="${RUNNER_TEMP}/upstream-builds"
+          SOURCE_SHA="$(git rev-parse --short=7 HEAD)"
+
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Create a new history containing only the latest upstream build.
+          git checkout --orphan upstream-builds-publish
+          git rm -rf .
+          git clean -fdx
+
+          cp -a "${OUTPUT_DIR}/." .
+
+          git add --all
+          git commit -m "upstream: build ${SOURCE_SHA}"
+
+          # Replace the previous upstream-builds branch completely.
+          git push \
+            origin \
+            HEAD:refs/heads/upstream-builds \
+            --force
