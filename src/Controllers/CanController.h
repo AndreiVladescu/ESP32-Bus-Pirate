@@ -4,7 +4,7 @@
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUtilityService.h"
 #include "Models/TerminalCommand.h"
-#include "Services/CanService.h"
+#include "Interfaces/ICanService.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "States/GlobalState.h"
@@ -13,7 +13,7 @@
 class CanController {
 public:
     CanController(ITerminalView& terminalView, IInput& terminalInput, UserInputManager& userInputManager,
-                  IUtilityService& utilityService, CanService& canService, ArgTransformer& argTransformer, HelpShell& helpShell);
+                  IUtilityService& utilityService, ICanService& canService, ArgTransformer& argTransformer, HelpShell& helpShell);
     
     // Entry point to handle CAN commands
     void handleCommand(const TerminalCommand& cmd);
@@ -25,7 +25,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;
-    CanService& canService;
+    ICanService& canService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
     HelpShell& helpShell;
@@ -45,7 +45,7 @@ private:
     void handleReceive(const TerminalCommand& cmd);
 
     // Configuring the CAN controller
-    void handleConfig();
+    bool handleConfig();
 
     // Help message for CAN commands
     void handleHelp();

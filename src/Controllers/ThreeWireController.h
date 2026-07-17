@@ -6,13 +6,13 @@
 #include <vector>
 #include "Interfaces/ITerminalView.h"
 #include "States/GlobalState.h"
-#include "Services/ThreeWireService.h"
+#include "Interfaces/IThreeWireService.h"
 #include "Interfaces/IInput.h"
 #include "Models/TerminalCommand.h"
 #include "Models/ByteCode.h"
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
-#include "Shells/ThreeWireEepromShell.h"
+#include "Interfaces/IShell.h"
 #include "Shells/HelpShell.h"
 
 class ThreeWireController {
@@ -21,9 +21,9 @@ public:
         ITerminalView& terminalView,
         IInput& terminalInput,
         UserInputManager& userInputManager,
-        ThreeWireService& threeWireService,
+        IThreeWireService& threeWireService,
         ArgTransformer& argTransformer,
-        ThreeWireEepromShell& threeWireEepromShell,
+        IShell& threeWireEepromShell,
         HelpShell& helpShell
     );
 
@@ -39,10 +39,10 @@ public:
 private:
     ITerminalView& terminalView;
     IInput& terminalInput;
-    ThreeWireService threeWireService;
+    IThreeWireService& threeWireService;
     UserInputManager& userInputManager;
     ArgTransformer& argTransformer;
-    ThreeWireEepromShell& threeWireEepromShell;
+    IShell& threeWireEepromShell;
     HelpShell& helpShell;
     GlobalState& state = GlobalState::getInstance();
     bool configured = false;

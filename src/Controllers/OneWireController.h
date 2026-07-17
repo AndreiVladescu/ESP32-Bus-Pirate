@@ -1,31 +1,33 @@
+#pragma once
+
 #include <string>
 #include <sstream>
 #include <iomanip>
 
-#include "Services/OneWireService.h"
+#include "Interfaces/IOneWireService.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IUtilityService.h"
+#include "Interfaces/IShell.h"
 #include "Models/TerminalCommand.h"
+#include "Models/ByteCode.h"
 #include "States/GlobalState.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
-#include "Shells/IbuttonShell.h"
-#include "Shells/OneWireEepromShell.h"
 #include "Shells/HelpShell.h"
 
 class OneWireController {
 public:
     // Constructor
     OneWireController(
-      ITerminalView& terminalView, 
-      IInput& terminalInput, 
+      ITerminalView& terminalView,
+      IInput& terminalInput,
       IUtilityService& utilityService,
-      OneWireService& service, 
+      IOneWireService& service,
       ArgTransformer& argTransformer,
-      UserInputManager& userInputManager, 
-      IbuttonShell& ibuttonShell,
-      OneWireEepromShell& eepromShell,
+      UserInputManager& userInputManager,
+      IShell& ibuttonShell,
+      IShell& eepromShell,
       HelpShell& helpShell
     );
 
@@ -33,7 +35,7 @@ public:
     void handleCommand(const TerminalCommand& cmd);
 
     // Entry point for handle parsed bytecode instructions
-    void handleInstruction(std::vector<ByteCode>& bytecodes);
+    void handleInstruction(const std::vector<ByteCode>& bytecodes);
 
     // Ensure initialized/configured
     void ensureConfigured();
@@ -42,11 +44,11 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;
-    OneWireService& oneWireService;
+    IOneWireService& oneWireService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
-    IbuttonShell& ibuttonShell;
-    OneWireEepromShell& eepromShell;
+    IShell& ibuttonShell;
+    IShell& eepromShell;
     HelpShell& helpShell;
     GlobalState& state = GlobalState::getInstance();
     bool configured = false;
@@ -83,7 +85,7 @@ private:
 
     // Interactive iButton shell
     void handleIbutton(const TerminalCommand& command);
-    
+
     // Write to scratchpad memory
     void handleScratchpadWrite(std::vector<uint8_t> scratchpadBytes);
 

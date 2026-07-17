@@ -6,10 +6,10 @@ Constructor
 JtagController::JtagController(
     ITerminalView& terminalView,
     IInput& terminalInput,
-    JtagService& jtagService,
+    IJtagService& jtagService,
     UserInputManager& userInputManager,
     HelpShell& helpShell,
-    UsbAdapterShell& usbAdapterShell
+    IUsbAdapterShell& usbAdapterShell
 ) : terminalView(terminalView),
     terminalInput(terminalInput),
     jtagService(jtagService),
@@ -33,7 +33,8 @@ Scan
 void JtagController::handleScan(const TerminalCommand& cmd) {
     auto type = cmd.getSubcommand();
 
-    if (type[0] == 's') handleScanSwd();
+    if (type.empty()) terminalView.println("Usage: 'scan swd' or 'scan jtag'.");
+    else if (type[0] == 's') handleScanSwd();
     else if (type[0] == 'j') handleScanJtag();
     else terminalView.println("Usage: 'scan swd' or 'scan jtag'.");
 }
@@ -51,10 +52,12 @@ void JtagController::handleScanSwd() {
     bool found = jtagService.scanSwdDevice(swdCandidates, swdio, swclk, idcode);
 
     if (found) {
+        char idcodeText[11];
+        snprintf(idcodeText, sizeof(idcodeText), "0x%08X", idcode);
         terminalView.println("\n SWD device found!");
         terminalView.println("  • SWDIO  : GPIO " + std::to_string(swdio));
         terminalView.println("  • SWCLK  : GPIO " + std::to_string(swclk));
-        terminalView.println("  • IDCODE : 0x" + std::to_string(idcode));
+        terminalView.println("  • IDCODE : " + std::string(idcodeText));
         terminalView.println("  ✅ SWD scan done.\n");
     } else {
         terminalView.println("\nJTAG: No SWD device found on available GPIOs.");

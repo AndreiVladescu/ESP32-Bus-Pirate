@@ -6,7 +6,7 @@
 #include "Interfaces/IUtilityService.h"
 #include "Models/TerminalCommand.h"
 #include "Models/ByteCode.h"
-#include "Services/LedService.h"
+#include "Interfaces/ILedService.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "States/GlobalState.h"
@@ -15,7 +15,7 @@
 class LedController {
 public:
     LedController(ITerminalView& terminalView, IInput& terminalInput,
-                  IUtilityService& utilityService, LedService& ledService, ArgTransformer& argTransformer,
+                  IUtilityService& utilityService, ILedService& ledService, ArgTransformer& argTransformer,
                   UserInputManager& userInputManager, HelpShell& helpShell);
 
     // Dispatch user command for LED mode
@@ -59,7 +59,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;
-    LedService& ledService;
+    ILedService& ledService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
     HelpShell& helpShell;

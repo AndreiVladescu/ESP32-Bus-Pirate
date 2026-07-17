@@ -11,8 +11,8 @@
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "States/GlobalState.h"
-#include "Services/Rf24Service.h"
-#include "Services/PinService.h"
+#include "Interfaces/IRf24Service.h"
+#include "Interfaces/IPinService.h"
 #include "Data/Rf24Channels.h"
 #include "Shells/HelpShell.h"
 
@@ -22,8 +22,8 @@ public:
                    IInput& terminalInput,
                    IDeviceView& deviceView,
                    IUtilityService& utilityService,
-                   Rf24Service& rf24Service,
-                   PinService& pinService,
+                   IRf24Service& rf24Service,
+                   IPinService& pinService,
                    ArgTransformer& argTransformer,
                    UserInputManager& userInputManager,
                    HelpShell& helpShell)
@@ -60,8 +60,8 @@ private:
     IInput& terminalInput;
     IDeviceView& deviceView;
     IUtilityService& utilityService;
-    Rf24Service& rf24Service;
-    PinService& pinService;
+    IRf24Service& rf24Service;
+    IPinService& pinService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
     HelpShell& helpShell;

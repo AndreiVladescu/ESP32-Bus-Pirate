@@ -7,9 +7,9 @@ ThreeWireController::ThreeWireController(
     ITerminalView& terminalView,
     IInput& terminalInput,
     UserInputManager& userInputManager,
-    ThreeWireService& threeWireService,
+    IThreeWireService& threeWireService,
     ArgTransformer& argTransformer,
-    ThreeWireEepromShell& threeWireEepromShell,
+    IShell& threeWireEepromShell,
     HelpShell& helpShell)
   : terminalView(terminalView),
     terminalInput(terminalInput),
@@ -83,7 +83,7 @@ Ensure configured
 void ThreeWireController::ensureConfigured() {
     if (!configured) {
         handleConfig();
-        configured = true;
+        return;
     }
 
     // Pins could have been used elsewhere, reconfigure the service

@@ -3,35 +3,34 @@
 #include <vector>
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IUtilityService.h"
-#include "Services/SpiService.h" 
-#include "Services/SdService.h"
+#include "Interfaces/ISpiService.h"
+#include "Interfaces/ISdService.h"
 #include "Interfaces/IInput.h"
 #include "Models/TerminalCommand.h"
 #include "Models/ByteCode.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
-#include "Shells/SdCardShell.h"
-#include "Shells/SpiFlashShell.h"
+#include "Interfaces/IShell.h"
+#include "Analyzers/BinaryAnalyzer.h"
 #include "States/GlobalState.h"
 #include "Data/FlashDatabase.h"
-#include "Shells/SpiEepromShell.h"
 #include "Shells/HelpShell.h"
 
 class SpiController {
 public:
     // Constructor
     SpiController(
-        ITerminalView& terminalView, 
-        IInput& terminalInput, IUtilityService& utilityService, SpiService&
-        spiService, SdService& sdService, 
-        ArgTransformer& argTransformer, 
-        UserInputManager& userInputManager, 
-        BinaryAnalyzer& binaryAnalyzer, 
-        SdCardShell& sdCardShell,
-        SpiFlashShell& spiFlashShell,
-        SpiEepromShell& spiEepromShell,
+        ITerminalView& terminalView,
+        IInput& terminalInput, IUtilityService& utilityService, ISpiService&
+        spiService, ISdService& sdService,
+        ArgTransformer& argTransformer,
+        UserInputManager& userInputManager,
+        BinaryAnalyzer& binaryAnalyzer,
+        IShell& sdCardShell,
+        IShell& spiFlashShell,
+        IShell& spiEepromShell,
         HelpShell& helpShell
-    ); 
+    );
 
     // Entry point for handle raw user command
     void handleCommand(const TerminalCommand& cmd);
@@ -46,14 +45,14 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;
-    SpiService& spiService;
-    SdService& sdService;
+    ISpiService& spiService;
+    ISdService& sdService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
     BinaryAnalyzer& binaryAnalyzer;
-    SdCardShell& sdCardShell;
-    SpiFlashShell& spiFlashShell;
-    SpiEepromShell& spiEepromShell;
+    IShell& sdCardShell;
+    IShell& spiFlashShell;
+    IShell& spiEepromShell;
     HelpShell& helpShell;
     GlobalState& state = GlobalState::getInstance();
     bool configured = false;

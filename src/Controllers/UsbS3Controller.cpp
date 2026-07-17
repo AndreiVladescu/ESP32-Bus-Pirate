@@ -8,11 +8,11 @@ UsbS3Controller::UsbS3Controller(
     IInput& terminalInput,
     IInput& deviceInput,
     IUtilityService& utilityService,
-    UsbS3Service& usbService,
+    IUsbS3Service& usbService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
     HelpShell& helpShell,
-    UsbAdapterShell& usbAdapterShell,
+    IUsbAdapterShell& usbAdapterShell,
     MouseShell& mouseShell
 )
     : terminalView(terminalView),

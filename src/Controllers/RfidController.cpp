@@ -7,7 +7,7 @@ RfidController::RfidController(
     ITerminalView& view,
     IInput& input,
     IUtilityService& utilityService,
-    RfidService& rfidService,
+    IRfidService& rfidService,
     UserInputManager& uim,
     ArgTransformer& transformer,
     HelpShell& helpShell
@@ -54,8 +54,8 @@ void RfidController::handleRead(const TerminalCommand&) {
             lastPrint = now;
 
             // Read and display tag infos if any
-            int rc = rfidService.read(mode);
-            if (rc == RFIDInterface::SUCCESS) {
+            RfidResult rc = rfidService.read(mode);
+            if (rc == RfidResult::Success) {
                 terminalView.println(std::string(" [TAG] UID   : ") + rfidService.uid());
                 terminalView.println(std::string("       ATQA  : ") + rfidService.atqa());
                 terminalView.println(std::string("       SAK   : ") + rfidService.sak());
@@ -126,11 +126,11 @@ void RfidController::handleWriteUid() {
         }
 
         // Write UID
-        int rc = rfidService.clone(false); // dont check sak
-        if (rc == RFIDInterface::SUCCESS) {
+        RfidResult rc = rfidService.clone(false); // dont check sak
+        if (rc == RfidResult::Success) {
             terminalView.println("RFID Write UID: Done.\n");
             return;
-        } else if (rc == RFIDInterface::TAG_NOT_PRESENT) {
+        } else if (rc == RfidResult::TagNotPresent) {
             utilityService.sleepMs(5);
             continue;
         } else {
@@ -187,11 +187,11 @@ void RfidController::handleWriteBlock() {
         }
 
         // Write
-        int rc = rfidService.write(mode);
-        if (rc == RFIDInterface::SUCCESS) {
+        RfidResult rc = rfidService.write(mode);
+        if (rc == RfidResult::Success) {
             terminalView.println("RFID Write: Done.\n");
             return;
-        } else if (rc == RFIDInterface::TAG_NOT_PRESENT) {
+        } else if (rc == RfidResult::TagNotPresent) {
             // keep trying until a tag is detected
             utilityService.sleepMs(5);
             continue;
@@ -224,11 +224,11 @@ void RfidController::handleErase(const TerminalCommand&) {
         }
 
         // Try erasing
-        int rc = rfidService.erase();
-        if (rc == RFIDInterface::SUCCESS) {
+        RfidResult rc = rfidService.erase();
+        if (rc == RfidResult::Success) {
             terminalView.println("RFID Erase: Done.\n");
             return;
-        } else if (rc != RFIDInterface::TAG_NOT_PRESENT) {
+        } else if (rc != RfidResult::TagNotPresent) {
             // Any other error -> report and stop
             terminalView.println(" -> " + rfidService.statusMessage(rc));
             terminalView.println("RFID Erase: Failed to erase tag.\n");
@@ -262,8 +262,8 @@ void RfidController::handleClone(const TerminalCommand&) {
             lastPrint = now;
 
             // Read
-            int rc = rfidService.read(mode);
-            if (rc == RFIDInterface::SUCCESS) {
+            RfidResult rc = rfidService.read(mode);
+            if (rc == RfidResult::Success) {
                 haveSource = true;
                 terminalView.println(std::string(" [SRC] UID   : ") + rfidService.uid());
                 terminalView.println(std::string("       ATQA  : ") + rfidService.atqa());
@@ -295,12 +295,12 @@ void RfidController::handleClone(const TerminalCommand&) {
             return;
         }
 
-        int rc = rfidService.clone();
-        if (rc == RFIDInterface::SUCCESS) {
+        RfidResult rc = rfidService.clone();
+        if (rc == RfidResult::Success) {
             terminalView.println(" -> Success");
             terminalView.println("RFID UID Clone: Done.\n");
             return;
-        } else if (rc == RFIDInterface::TAG_NOT_PRESENT) {
+        } else if (rc == RfidResult::TagNotPresent) {
             // target not detected
             utilityService.sleepMs(5);
             continue;
@@ -357,7 +357,6 @@ Ensure Configuration
 void RfidController::ensureConfigured() {
     if (!configured) {
         handleConfig();
-        configured = true;
         return;
     }
 

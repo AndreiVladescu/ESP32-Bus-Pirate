@@ -12,17 +12,15 @@
 #include "Interfaces/IUtilityService.h"
 #include "States/GlobalState.h"
 #include "Enums/ModeEnum.h"
-#include "Services/PinService.h"
-#include "Services/I2sService.h"
+#include "Interfaces/IPinService.h"
+#include "Interfaces/II2sService.h"
 #include "Managers/UserInputManager.h"
 #include "Analyzers/PinAnalyzer.h"
 #include "Managers/AliasManager.h"
 #include "Transformers/ArgTransformer.h"
 #include "Transformers/TerminalCommandTransformer.h"
-#include "Shells/SysInfoShell.h"
-#include "Shells/GuideShell.h"
+#include "Interfaces/IShell.h"
 #include "Shells/HelpShell.h"
-#include "Shells/ProfileShell.h"
 
 class UtilityController {
 public:
@@ -32,17 +30,17 @@ public:
         IDeviceView& deviceView, 
         IInput& terminalInput, 
         IUtilityService& utilityService,
-        PinService& pinService,
-        I2sService& i2sService,
+        IPinService& pinService,
+        II2sService& i2sService,
         UserInputManager& userInputManager,
         PinAnalyzer& pinAnalyzer,
         AliasManager& aliasManager,
         ArgTransformer& argTransformer,
         TerminalCommandTransformer& terminalCommandTransformer,
-        SysInfoShell& sysInfoShell,
-        GuideShell& guideShell,
+        IShell& sysInfoShell,
+        IShell& guideShell,
         HelpShell& helpShell,
-        ProfileShell& profileShell
+        IShell& profileShell
     );
 
     // Entry point for global utility commands
@@ -98,16 +96,16 @@ private:
     IDeviceView& deviceView;
     IInput& terminalInput;
     IUtilityService& utilityService;
-    PinService& pinService;
-    I2sService& i2sService;
+    IPinService& pinService;
+    II2sService& i2sService;
     UserInputManager& userInputManager;
     PinAnalyzer& pinAnalyzer;
     AliasManager& aliasManager;
     ArgTransformer& argTransformer;
     TerminalCommandTransformer& commandTransformer;
-    SysInfoShell& sysInfoShell;
-    GuideShell& guideShell;
+    IShell& sysInfoShell;
+    IShell& guideShell;
     HelpShell& helpShell;
-    ProfileShell& profileShell;
+    IShell& profileShell;
     GlobalState& state = GlobalState::getInstance();
 };

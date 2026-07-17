@@ -1,4 +1,5 @@
 #include "InfraredController.h"
+#include "Data/UniversalRemoteCommands.h"
 
 #ifdef DEVICE_STICKS3
     #include <M5Unified.h>
@@ -12,13 +13,13 @@ InfraredController::InfraredController(
     IInput&                  terminalInput,
     IDeviceView&             deviceView,
     IUtilityService&         utilityService,
-    InfraredService&         service,
-    LittleFsService&         littleFsService,
-    I2cService&              i2cService,
+    IInfraredService&        service,
+    ILittleFsService&        littleFsService,
+    II2cService&             i2cService,
     ArgTransformer&          argTransformer,
     InfraredRemoteTransformer& infraredRemoteTransformer,
     UserInputManager&        userInputManager,
-    UniversalRemoteShell&    universalRemoteShell,
+    IShell&                  universalRemoteShell,
     HelpShell&               helpShell
 )
     : terminalView(view),

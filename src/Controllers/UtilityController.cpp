@@ -8,17 +8,17 @@ UtilityController::UtilityController(
     IDeviceView& deviceView,
     IInput& terminalInput,
     IUtilityService& utilityService,
-    PinService& pinService,
-    I2sService& i2sService,
+    IPinService& pinService,
+    II2sService& i2sService,
     UserInputManager& userInputManager,
     PinAnalyzer& pinAnalyzer,
     AliasManager& aliasManager,
     ArgTransformer& argTransformer,
     TerminalCommandTransformer& commandTransformer,
-    SysInfoShell& sysInfoShell,
-    GuideShell& guideShell,
+    IShell& sysInfoShell,
+    IShell& guideShell,
     HelpShell& helpShell,
-    ProfileShell& profileShell
+    IShell& profileShell
 )
     : terminalView(terminalView),
       deviceView(deviceView),
@@ -107,7 +107,7 @@ ModeEnum UtilityController::handleModeSelect() {
     terminalView.print("Mode Number > ");
     auto modeNumber = userInputManager.readModeNumber();
 
-    if (modeNumber == -1) {
+    if (modeNumber == 0xFF) {
         terminalView.println("");
         terminalView.println("");
         terminalView.println("Invalid input.");
@@ -512,9 +512,9 @@ void UtilityController::handleListen(const TerminalCommand& cmd) {
     }
 
     // Apply existing pull config
-    PinService::pullType pull = pinService.getPullType(pin);
-    if (pull == PinService::PULL_UP)         pinService.setInputPullup(pin);
-    else if (pull == PinService::PULL_DOWN)  pinService.setInputPullDown(pin);
+    IPinService::pullType pull = pinService.getPullType(pin);
+    if (pull == IPinService::PULL_UP)         pinService.setInputPullup(pin);
+    else if (pull == IPinService::PULL_DOWN)  pinService.setInputPullDown(pin);
     else                                     pinService.setInput(pin);
 
     // I2S init with configured pins

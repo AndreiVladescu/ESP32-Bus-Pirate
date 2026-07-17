@@ -4,8 +4,8 @@
 #include "Interfaces/IInput.h"
 #include "Models/ByteCode.h"
 #include "Models/TerminalCommand.h"
-#include "Services/HdUartService.h"
-#include "Services/UartService.h"
+#include "Interfaces/IHdUartService.h"
+#include "Interfaces/IUartService.h"
 #include "Transformers/ArgTransformer.h"
 #include "States/GlobalState.h"
 #include "Managers/UserInputManager.h"
@@ -14,7 +14,7 @@
 class HdUartController {
 public:
     HdUartController(ITerminalView& terminalView, IInput& terminalInput, IInput& deviceInput,
-                     HdUartService& hdUartService, UartService& uartService, ArgTransformer& argTransformer, 
+                     IHdUartService& hdUartService, IUartService& uartService, ArgTransformer& argTransformer,
                      UserInputManager& userInputManager, HelpShell& helpShell);
     
     // Entry point for HDUART command
@@ -30,8 +30,8 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IInput& deviceInput;
-    HdUartService& hdUartService;
-    UartService& uartService;
+    IHdUartService& hdUartService;
+    IUartService& uartService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
     HelpShell& helpShell;

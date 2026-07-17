@@ -2,19 +2,17 @@
 
 #include <Interfaces/ITerminalView.h>
 #include <Interfaces/IInput.h>
-#include <Services/WifiService.h>
-#include <Services/NvsService.h>
-#include <Services/SshService.h>
-#include <Services/NetcatService.h>
-#include <Services/NmapService.h>
-#include <Services/ICMPService.h>
-#include <Services/WifiOpenScannerService.h>
+#include <Interfaces/IWifiService.h>
 #include <Transformers/ArgTransformer.h>
 #include <Managers/UserInputManager.h>
 #include <Models/TerminalCommand.h>
 #include <States/GlobalState.h>
 #include <Abstracts/ANetworkController.h>
+#if __has_include("Vendors/Preferences.h")
+#include "Vendors/Preferences.h"
+#else
 #include <Preferences.h>
+#endif
 
 class WifiController : public ANetworkController {
 public:

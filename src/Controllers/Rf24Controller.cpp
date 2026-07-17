@@ -67,7 +67,7 @@ void Rf24Controller::handleReceive() {
     }
 
     // Configure RX
-    Rf24Service::Rf24Config cfg{};
+    IRf24Service::Rf24Config cfg{};
     cfg.channel = static_cast<uint8_t>(channel);
     cfg.pipe = static_cast<uint8_t>(pipe);
     memcpy(cfg.addr, addr, addrLen); 
@@ -207,7 +207,7 @@ void Rf24Controller::handleSend() {
     }
 
     // Configure TX
-    Rf24Service::Rf24Config cfg{};
+    IRf24Service::Rf24Config cfg{};
     cfg.channel = static_cast<uint8_t>(channel);
     memcpy(cfg.addr, addr, addrLen); 
     cfg.addrStr = addrStr;

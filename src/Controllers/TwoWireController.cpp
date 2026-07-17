@@ -7,8 +7,8 @@ TwoWireController::TwoWireController(
     ITerminalView& terminalView,
     IInput& terminalInput,
     UserInputManager& userInputManager,
-    TwoWireService& twoWireService,
-    SmartCardShell& smartCardShell,
+    ITwoWireService& twoWireService,
+    IShell& smartCardShell,
     HelpShell& helpShell
 )
     : terminalView(terminalView)
@@ -176,4 +176,3 @@ void TwoWireController::ensureReleased() {
     twoWireService.end();
     configured = false;
 }
-

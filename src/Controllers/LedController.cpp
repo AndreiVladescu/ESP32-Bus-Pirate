@@ -6,7 +6,7 @@
 Constructor
 */
 LedController::LedController(ITerminalView& terminalView, IInput& terminalInput,
-                             IUtilityService& utilityService, LedService& ledService, ArgTransformer& argTransformer,
+                             IUtilityService& utilityService, ILedService& ledService, ArgTransformer& argTransformer,
                              UserInputManager& userInputManager, HelpShell& helpShell)
     : terminalView(terminalView), terminalInput(terminalInput),
       utilityService(utilityService), ledService(ledService), argTransformer(argTransformer),
@@ -65,8 +65,8 @@ void LedController::handleScan() {
 
     // Define scanned protocol
     std::vector<std::string> protocols = (typeChoice == 1)
-        ? LedService::getSingleWireProtocols()
-        : LedService::getSpiChipsets();
+        ? ledService.getSingleWireProtocols()
+        : ledService.getSpiChipsets();
 
     // Get saved GPIOs and leds count
     uint8_t dataPin = state.getLedDataPin();
@@ -263,8 +263,8 @@ Set Protocol
 void LedController::handleSetProtocol() {
     terminalView.println("\nSet LED Protocol:");
 
-    std::vector<std::string> oneWire = LedService::getSingleWireProtocols();
-    std::vector<std::string> spiChipsets = LedService::getSpiChipsets();
+    std::vector<std::string> oneWire = ledService.getSingleWireProtocols();
+    std::vector<std::string> spiChipsets = ledService.getSpiChipsets();
     std::vector<std::string> allProtocols;
     size_t index = 1;
 

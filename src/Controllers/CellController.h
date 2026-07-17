@@ -5,28 +5,27 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUtilityService.h"
-#include "Services/CellService.h"
+#include "Interfaces/ICellService.h"
 #include "Models/TerminalCommand.h"
 #include "Transformers/ArgTransformer.h"
 #include "Transformers/AtTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "States/GlobalState.h"
 #include "Shells/HelpShell.h"
-#include "Shells/CellCallShell.h"
-#include "Shells/CellSmsShell.h"
+#include "Interfaces/IShell.h"
 
 class CellController {
 public:
     CellController(ITerminalView& view,
                    IInput& terminalInput,
                    IUtilityService& utilityService,
-                   CellService& service,
+                   ICellService& service,
                    ArgTransformer& argTransformer,
                    AtTransformer& atTransformer,
                    UserInputManager& userInputManager,
                    HelpShell& helpShell,
-                   CellCallShell& cellCallShell,
-                   CellSmsShell& cellSmsShell);
+                   IShell& cellCallShell,
+                   IShell& cellSmsShell);
     
     // Entry point for cell command
     void handleCommand(const TerminalCommand& command);
@@ -38,13 +37,13 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;
-    CellService& cellService;
+    ICellService& cellService;
     ArgTransformer& argTransformer;
     AtTransformer& atTransformer;
     UserInputManager& userInputManager;
     HelpShell& helpShell;
-    CellCallShell& cellCallShell;
-    CellSmsShell& cellSmsShell;
+    IShell& cellCallShell;
+    IShell& cellSmsShell;
     GlobalState& state = GlobalState::getInstance();
 
     bool configured = false;

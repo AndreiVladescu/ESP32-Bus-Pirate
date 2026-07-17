@@ -4,7 +4,7 @@
 Constructor
 */
 HdUartController::HdUartController(ITerminalView& terminalView, IInput& terminalInput, IInput& deviceInput,
-                                   HdUartService& hdUartService, UartService& uartService, ArgTransformer& argTransformer, 
+                                   IHdUartService& hdUartService, IUartService& uartService, ArgTransformer& argTransformer,
                                    UserInputManager& userInputManager, HelpShell& helpShell)
     : terminalView(terminalView), terminalInput(terminalInput), deviceInput(deviceInput),
       hdUartService(hdUartService), uartService(uartService), argTransformer(argTransformer), 

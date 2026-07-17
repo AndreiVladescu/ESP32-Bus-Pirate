@@ -3,21 +3,21 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Models/TerminalCommand.h"
-#include "Services/JtagService.h" 
+#include "Interfaces/IJtagService.h"
 #include "States/GlobalState.h"
 #include "Managers/UserInputManager.h"
 #include "Shells/HelpShell.h"
-#include "Shells/UsbAdapterShell.h"
+#include "Interfaces/IUsbAdapterShell.h"
 
 class JtagController {
 public:
     // Constructor
     JtagController(ITerminalView& terminalView,
                    IInput& terminalInput,
-                   JtagService& jtagService,
+                   IJtagService& jtagService,
                    UserInputManager& userInputManager,
                    HelpShell& helpShell,
-                   UsbAdapterShell& usbAdapterShell);
+                   IUsbAdapterShell& usbAdapterShell);
 
     // Entry point for dispatch incoming JTAG command
     void handleCommand(const TerminalCommand& cmd);
@@ -28,10 +28,10 @@ public:
 private:
     ITerminalView& terminalView;
     IInput& terminalInput;
-    JtagService& jtagService;
+    IJtagService& jtagService;
     UserInputManager& userInputManager;
     HelpShell& helpShell;
-    UsbAdapterShell& usbAdapterShell;
+    IUsbAdapterShell& usbAdapterShell;
     bool configured = false;
     GlobalState& state = GlobalState::getInstance();
 

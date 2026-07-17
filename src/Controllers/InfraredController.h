@@ -9,25 +9,25 @@
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
 #include "Interfaces/IUtilityService.h"
-#include "Services/InfraredService.h"
-#include "Services/LittleFsService.h"
-#include "Services/I2cService.h"
+#include "Interfaces/IInfraredService.h"
+#include "Interfaces/ILittleFsService.h"
+#include "Interfaces/II2cService.h"
 #include "Models/TerminalCommand.h"
 #include "Models/PinoutConfig.h"
 #include "Transformers/ArgTransformer.h"
 #include "Transformers/InfraredRemoteTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "States/GlobalState.h"
-#include "Shells/UniversalRemoteShell.h"
+#include "Interfaces/IShell.h"
 #include "Shells/HelpShell.h"
 
 class InfraredController {
 public:
     // Constructor
     InfraredController(ITerminalView& view, IInput& terminalInput, IDeviceView& deviceView,
-                       IUtilityService& utilityService, InfraredService& service, LittleFsService& littleFsService, I2cService& i2cService,
+                       IUtilityService& utilityService, IInfraredService& service, ILittleFsService& littleFsService, II2cService& i2cService,
                        ArgTransformer& argTransformer, InfraredRemoteTransformer& infraredRemoteTransformer,
-                       UserInputManager& userInputManager, UniversalRemoteShell& universalRemoteShell, HelpShell& helpShell);
+                       UserInputManager& userInputManager, IShell& universalRemoteShell, HelpShell& helpShell);
 
     // Entry point for Infraredcommand dispatch
     void handleCommand(const TerminalCommand& command);
@@ -40,14 +40,14 @@ private:
     IInput& terminalInput;
     IDeviceView& deviceView;
     IUtilityService& utilityService;
-    InfraredService& infraredService;
-    I2cService& i2cService;
+    IInfraredService& infraredService;
+    II2cService& i2cService;
     GlobalState& state = GlobalState::getInstance();
     ArgTransformer& argTransformer;
     InfraredRemoteTransformer& infraredRemoteTransformer;
     UserInputManager& userInputManager;
-    UniversalRemoteShell& universalRemoteShell;
-    LittleFsService& littleFsService;
+    IShell& universalRemoteShell;
+    ILittleFsService& littleFsService;
     HelpShell& helpShell;
     
     bool configured = false;

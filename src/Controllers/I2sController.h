@@ -4,7 +4,7 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUtilityService.h"
-#include "Services/I2sService.h"
+#include "Interfaces/II2sService.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "Models/TerminalCommand.h"
@@ -15,7 +15,7 @@
 class I2sController {
 public:
     I2sController(ITerminalView& terminalView, IInput& terminalInput,
-                  IUtilityService& utilityService, I2sService& i2sService, ArgTransformer& argTransformer,
+                  IUtilityService& utilityService, II2sService& i2sService, ArgTransformer& argTransformer,
                   UserInputManager& userInputManager, HelpShell& helpShell);
 
     // Entry point for I2S cmd
@@ -55,7 +55,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;
-    I2sService& i2sService;
+    II2sService& i2sService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
     HelpShell& helpShell;

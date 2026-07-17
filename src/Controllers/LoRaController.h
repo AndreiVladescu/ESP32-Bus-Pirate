@@ -6,11 +6,11 @@
 #include "Interfaces/IUtilityService.h"
 #include "Managers/UserInputManager.h"
 #include "Models/TerminalCommand.h"
-#include "Services/LoRaService.h"
-#include "Services/LittleFsService.h"
-#include "Services/I2sService.h"
+#include "Interfaces/ILoRaService.h"
+#include "Interfaces/ILittleFsService.h"
+#include "Interfaces/II2sService.h"
+#include "Interfaces/IShell.h"
 #include "Shells/HelpShell.h"
-#include "Shells/MeshtasticShell.h"
 #include "States/GlobalState.h"
 #include "Transformers/ArgTransformer.h"
 #include "Transformers/LoRaTransformer.h"
@@ -19,13 +19,13 @@
 class LoRaController {
 public:
     LoRaController(ITerminalView& tv, IInput& input, IDeviceView& device,
-                   IUtilityService& utilityService, LoRaService& service, LittleFsService& littleFs,
-                   I2sService& i2s,
+                   IUtilityService& utilityService, ILoRaService& service, ILittleFsService& littleFs,
+                   II2sService& i2s,
                    ArgTransformer& transformer, LoRaTransformer& loRaTransformer,
                    TerminalCommandTransformer& commandTransformer,
                    UserInputManager& uim,
                    HelpShell& help,
-                   MeshtasticShell& meshtasticShell);
+                   IShell& meshtasticShell);
 
     void handleCommand(const TerminalCommand& cmd);
     void ensureConfigured();
@@ -63,15 +63,15 @@ private:
     IInput& terminalInput;
     IDeviceView& deviceView;
     IUtilityService& utilityService;
-    LoRaService& loRaService;
-    LittleFsService& littleFsService;
-    I2sService& i2sService;
+    ILoRaService& loRaService;
+    ILittleFsService& littleFsService;
+    II2sService& i2sService;
     ArgTransformer& argTransformer;
     LoRaTransformer& loRaTransformer;
     TerminalCommandTransformer& terminalCommandTransformer;
     UserInputManager& userInputManager;
     HelpShell& helpShell;
-    MeshtasticShell& meshtasticShell;
+    IShell& meshtasticShell;
     GlobalState& state = GlobalState::getInstance();
     bool configured = false;
 };

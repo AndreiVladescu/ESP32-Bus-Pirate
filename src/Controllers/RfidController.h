@@ -6,8 +6,8 @@
 #include "Interfaces/IInput.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IUtilityService.h"
+#include "Interfaces/IRfidService.h"
 #include "Models/TerminalCommand.h"
-#include "Services/RfidService.h"
 #include "Managers/UserInputManager.h"
 #include "Transformers/ArgTransformer.h"
 #include "States/GlobalState.h"
@@ -19,7 +19,7 @@ public:
         ITerminalView& view,
         IInput& input,
         IUtilityService& utilityService,
-        RfidService& rfidService,
+        IRfidService& rfidService,
         UserInputManager& uim,
         ArgTransformer& transformer,
         HelpShell& helpShell
@@ -48,7 +48,7 @@ bool configured = false;
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;
-    RfidService& rfidService;
+    IRfidService& rfidService;
     UserInputManager& userInputManager;
     ArgTransformer& argTransformer;
     HelpShell& helpShell;

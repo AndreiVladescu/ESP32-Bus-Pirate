@@ -6,7 +6,7 @@ Constructor
 ExpanderController::ExpanderController(ITerminalView& terminalView,
                            IInput& terminalInput,
                            IUtilityService& utilityService,
-                           UartService& uartService,
+                           IUartService& uartService,
                            ArgTransformer& argTransformer,
                            UserInputManager& userInputManager,
                            HelpShell& helpShell)

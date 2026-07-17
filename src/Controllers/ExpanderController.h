@@ -2,7 +2,7 @@
 
 #include <string>
 #include "Models/TerminalCommand.h"
-#include "Services/UartService.h"
+#include "Interfaces/IUartService.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUtilityService.h"
@@ -17,7 +17,7 @@ public:
     ExpanderController(ITerminalView& terminalView,
                  IInput& terminalInput,
                  IUtilityService& utilityService,
-                 UartService& uartService,
+                 IUartService& uartService,
                  ArgTransformer& argTransformer,
                  UserInputManager& userInputManager,
                  HelpShell& helpShell);
@@ -38,7 +38,7 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;
-    UartService& uartService;
+    IUartService& uartService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
     HelpShell& helpShell;

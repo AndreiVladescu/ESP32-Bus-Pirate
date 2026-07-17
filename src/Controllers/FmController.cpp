@@ -10,11 +10,11 @@ FmController::FmController(
     IInput& terminalInput,
     IDeviceView& deviceView,
     IUtilityService& utilityService,
-    FmService& fmService,
+    IFmService& fmService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
     HelpShell& helpShell,
-    FmBroadcastShell& fmBroadcastShell
+    IShell& fmBroadcastShell
 )
     : terminalView(terminalView),
       terminalInput(terminalInput),

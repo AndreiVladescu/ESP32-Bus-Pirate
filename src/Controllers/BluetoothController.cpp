@@ -8,7 +8,7 @@ BluetoothController::BluetoothController(
     IInput& terminalInput,
     IInput& deviceInput,
     IUtilityService& utilityService,
-    BluetoothService& bluetoothService,
+    IBluetoothService& bluetoothService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
     HelpShell& helpShell,
@@ -115,7 +115,7 @@ void BluetoothController::handleSniff(const TerminalCommand& cmd) {
     terminalView.println("Bluetooth Sniff: Started... Press [ENTER] to stop.\n");
 
     bluetoothService.switchToMode(BluetoothMode::CLIENT);
-    BluetoothService::startPassiveBluetoothSniffing();
+    bluetoothService.startPassiveSniffing();
 
     uint32_t lastPull = 0;
 
@@ -126,7 +126,7 @@ void BluetoothController::handleSniff(const TerminalCommand& cmd) {
 
         // Show paquets if any
         if (utilityService.nowMs() - lastPull > 200) {
-            auto logs = BluetoothService::getBluetoothSniffLog();
+            auto logs = bluetoothService.getPassiveSniffLog();
             for (const auto& line : logs) {
                 terminalView.println(line);
             }
@@ -136,7 +136,7 @@ void BluetoothController::handleSniff(const TerminalCommand& cmd) {
         utilityService.sleepMs(10);
     }
 
-    BluetoothService::stopPassiveBluetoothSniffing();
+    bluetoothService.stopPassiveSniffing();
     terminalView.println("Bluetooth Sniff: Stopped by user.\n");
 }
 

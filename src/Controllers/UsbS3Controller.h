@@ -9,24 +9,24 @@
 #include "States/GlobalState.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
-#include "Services/UsbS3Service.h"
+#include "Interfaces/IUsbS3Service.h"
+#include "Interfaces/IUsbAdapterShell.h"
 #include "Shells/HelpShell.h"
-#include "Shells/UsbAdapterShell.h"
 #include "Shells/MouseShell.h"
 
 class UsbS3Controller {
 public:
     // Constructor
     UsbS3Controller(
-        ITerminalView& terminalView, 
-        IInput& terminalInput, 
+        ITerminalView& terminalView,
+        IInput& terminalInput,
         IInput& deviceInput,
         IUtilityService& utilityService,
-        UsbS3Service& usbService, 
-        ArgTransformer& argTransformer, 
+        IUsbS3Service& usbService,
+        ArgTransformer& argTransformer,
         UserInputManager& userInputManager,
         HelpShell& helpShell,
-        UsbAdapterShell& usbAdapterShell,
+        IUsbAdapterShell& usbAdapterShell,
         MouseShell& mouseShell
     );
 
@@ -87,11 +87,11 @@ private:
     IInput& terminalInput;
     IInput& deviceInput;
     IUtilityService& utilityService;
-    UsbS3Service& usbService;
+    IUsbS3Service& usbService;
     ArgTransformer& argTransformer;
     GlobalState& state = GlobalState::getInstance();
     UserInputManager& userInputManager;
     HelpShell& helpShell;
-    UsbAdapterShell& usbAdapterShell;
+    IUsbAdapterShell& usbAdapterShell;
     MouseShell& mouseShell;
 };

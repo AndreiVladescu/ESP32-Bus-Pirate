@@ -4,7 +4,7 @@ CanController::CanController(ITerminalView& terminalView,
                              IInput& terminalInput,
                              UserInputManager& userInputManager,
                              IUtilityService& utilityService,
-                             CanService& canService,
+                             ICanService& canService,
                              ArgTransformer& argTransformer,
                              HelpShell& helpShell)
     : terminalView(terminalView),
@@ -23,7 +23,7 @@ void CanController::handleCommand(const TerminalCommand& cmd) {
     else if (cmd.getRoot() == "send")      handleSend(cmd);
     else if (cmd.getRoot() == "receive")   handleReceive(cmd);
     else if (cmd.getRoot() == "status")    handleStatus();
-    else if (cmd.getRoot() == "config")    handleConfig();
+    else if (cmd.getRoot() == "config")    configured = handleConfig();
     else handleHelp();
 }
 
@@ -75,9 +75,9 @@ Send a CAN frame with specific ID
 */
 void CanController::handleSend(const TerminalCommand& cmd) {
 
-    int id;
+    uint32_t id;
     if (!cmd.getSubcommand().empty() && argTransformer.isValidNumber(cmd.getSubcommand())) {
-        id = argTransformer.parseHexOrDec16(cmd.getSubcommand());
+        id = argTransformer.parseHexOrDec32(cmd.getSubcommand());
     } else {
         // Ask user for ID
         id = userInputManager.readValidatedCanId("Filter CAN ID", 0x123);
@@ -96,6 +96,11 @@ void CanController::handleSend(const TerminalCommand& cmd) {
     // Convert hex string to byte vector
     std::vector<uint8_t> data = argTransformer.parseHexList(hexString);
 
+    if (data.size() > 8) {
+        terminalView.println("\n❌ Classic CAN frames support at most 8 data bytes.");
+        return;
+    }
+
     if (canService.sendFrame(id, data)) {
         terminalView.println("\nCAN Send: ✅ Frame sent to 0x" + argTransformer.toHex(id, 3));
     } else {
@@ -109,9 +114,9 @@ Receive CAN frames with filtering by frame ID
 void CanController::handleReceive(const TerminalCommand& cmd) {
     terminalView.println("CAN Receive: Filtered by ID");
 
-    int id;
+    uint32_t id;
     if (!cmd.getSubcommand().empty() && argTransformer.isValidNumber(cmd.getSubcommand())) {
-        id = argTransformer.parseHexOrDec16(cmd.getSubcommand());
+        id = argTransformer.parseHexOrDec32(cmd.getSubcommand());
     } else {
         // Ask user for ID
         id = userInputManager.readValidatedCanId("Filter CAN ID", 0x123);
@@ -144,6 +149,7 @@ void CanController::handleReceive(const TerminalCommand& cmd) {
         // Reset CAN if no frame for 3 seconds
         if (utilityService.nowMs() - lastFrameTime > 3000) {
             canService.reset();
+            canService.setFilter(id);
             lastFrameTime = utilityService.nowMs();
         }
 
@@ -170,7 +176,7 @@ void CanController::handleHelp() {
 /*
 Configure the CAN controller
 */
-void CanController::handleConfig() {
+bool CanController::handleConfig() {
 
     terminalView.println("CAN Configuration:");
     terminalView.println("\nMake sure you are using an MCP2515 CAN module.\n");
@@ -182,6 +188,7 @@ void CanController::handleConfig() {
     terminalView.print("MCP2515 CS GPIO is fixed to: " + std::to_string(cs));
     terminalInput.waitPress();
     terminalView.println("");
+    forbidden.push_back(cs);
 
     // Configure SCK
     uint8_t sck = userInputManager.readValidatedPinNumber("MCP2515 SCK GPIO", state.getCanSckPin(), forbidden);
@@ -207,15 +214,16 @@ void CanController::handleConfig() {
     }
 
     // Apply configuration
-    canService.configure(cs, sck, so, si, kbps);
+    canService.configure(cs, sck, so, si, adjusted);
 
     // Test MCP2515 responsiveness
     auto probeOk = canService.probe();
     if (!probeOk) {
         terminalView.println("\n ❌ MCP2515 CAN configuration failed. Please check your wiring.\n");
-        return;
+        return false;
     }
     terminalView.println("\n ✅ MCP2515 CAN configured.\n");
+    return true;
 }
 
 /*
@@ -223,8 +231,7 @@ Ensure CAN is configured before any operation
 */
 void CanController::ensureConfigured() {
     if (!configured) {
-        handleConfig();
-        configured = true;
+        configured = handleConfig();
         return;
     }
 

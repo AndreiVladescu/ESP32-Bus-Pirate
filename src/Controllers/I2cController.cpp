@@ -1,4 +1,6 @@
 #include "I2cController.h"
+#include <cerrno>
+#include <cstdlib>
 #include <iomanip>
 
 /*
@@ -8,10 +10,10 @@ I2cController::I2cController(
     ITerminalView& terminalView,
     IInput& terminalInput,
     IUtilityService& utilityService,
-    I2cService& i2cService,
+    II2cService& i2cService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
-    I2cEepromShell& eepromShell,
+    II2cEepromShell& eepromShell,
     HelpShell& helpShell
 )
     : terminalView(terminalView),
@@ -140,23 +142,10 @@ void I2cController::handlePing(const TerminalCommand& cmd) {
 
     const std::string& arg = cmd.getSubcommand();
     uint8_t address = 0;
-
-    std::stringstream ss(arg);
-    int temp = 0;
-
-    // Detect hex prefix
-    if (arg.rfind("0x", 0) == 0 || arg.rfind("0X", 0) == 0) {
-        ss >> std::hex >> temp;
-    } else {
-        ss >> std::dec >> temp;
-    }
-
-    if (ss.fail() || temp < 0 || temp > 127) {
+    if (!tryParseAddress(arg, address)) {
         terminalView.println("I2C Ping: Invalid address. Use decimal or 0x-prefixed hex.");
         return;
     }
-
-    address = static_cast<uint8_t>(temp);
 
     std::stringstream result;
     result << "Ping 0x" << std::hex << std::uppercase << (int)address << ": ";
@@ -187,12 +176,11 @@ void I2cController::handleWrite(const TerminalCommand& cmd) {
 
     const std::string& addrStr = cmd.getSubcommand();
 
-    if (!argTransformer.isValidNumber(addrStr)) {
+    uint8_t addr = 0;
+    if (!tryParseAddress(addrStr, addr)) {
         terminalView.println("Error: Invalid address. Use decimal or 0x-prefixed hex.");
         return;
     }
-
-    uint8_t addr = argTransformer.parseHexOrDec(addrStr);
 
     // reg
     uint8_t reg = 0;
@@ -259,12 +247,11 @@ void I2cController::handleRead(const TerminalCommand& cmd) {
     }
 
     const std::string& addrStr = cmd.getSubcommand();
-    if (!argTransformer.isValidNumber(addrStr)) {
+    uint8_t addr = 0;
+    if (!tryParseAddress(addrStr, addr)) {
         terminalView.println("Error: Invalid address. Use decimal or 0x-prefixed hex.");
         return;
     }
-
-    uint8_t addr = argTransformer.parseHexOrDec(addrStr);
 
     // reg
     uint8_t reg = 0;
@@ -332,13 +319,12 @@ void I2cController::handleConfig() {
 Slave
 */
 void I2cController::handleSlave(const TerminalCommand& cmd) {
-    if (!argTransformer.isValidNumber(cmd.getSubcommand())) {
+    uint8_t addr = 0;
+    if (!tryParseAddress(cmd.getSubcommand(), addr)) {
         terminalView.println("Usage: slave <addr>");
         return;
     }
 
-    // Parse arg
-    uint8_t addr = argTransformer.parseHexOrDec(cmd.getSubcommand());
     uint8_t sda = state.getI2cSdaPin();
     uint8_t scl = state.getI2cSclPin();
 
@@ -355,7 +341,7 @@ void I2cController::handleSlave(const TerminalCommand& cmd) {
     i2cService.clearSlaveLog();
     i2cService.beginSlave(addr, sda, scl);
     std::vector<std::string> currentLog;
-    currentLog.reserve(I2cService::SLAVE_LOG_MAX);
+    currentLog.reserve(II2cService::SLAVE_LOG_MAX);
     uint32_t lastLogCount = 0;
 
     std::vector<std::string> lastLog;
@@ -387,19 +373,18 @@ void I2cController::handleSlave(const TerminalCommand& cmd) {
     i2cService.endSlave();
     i2cService.clearSlaveLog();
     ensureConfigured();
-    terminalView.println("\nI2S Slave: Stopped by user.");
+    terminalView.println("\nI2C Slave: Stopped by user.");
 }
 
 /*
 Dump
 */
 void I2cController::handleDump(const TerminalCommand& cmd) {
-    if (!argTransformer.isValidNumber(cmd.getSubcommand())) {
+    uint8_t addr = 0;
+    if (!tryParseAddress(cmd.getSubcommand(), addr)) {
         terminalView.println("Usage: dump <addr> [length]");
         return;
     }
-
-    uint8_t addr = argTransformer.parseHexOrDec(cmd.getSubcommand());
     uint16_t start = 0x00;
     uint16_t len = 256;
 
@@ -605,12 +590,11 @@ void I2cController::printHexDump(uint16_t start, uint16_t len,
 Identify
 */
 void I2cController::handleIdentify(const TerminalCommand& cmd) {
-    if (!argTransformer.isValidNumber(cmd.getSubcommand())) {
+    uint8_t address = 0;
+    if (!tryParseAddress(cmd.getSubcommand(), address)) {
         terminalView.println("Usage: identify <addr>");
         return;
     }
-
-    uint8_t address = argTransformer.parseHexOrDec(cmd.getSubcommand());
     terminalView.println(identifyToString(address, true));
 }
 
@@ -643,13 +627,13 @@ Glitch
 */
 void I2cController::handleGlitch(const TerminalCommand& cmd) {
     // Validate arg
-    if (!argTransformer.isValidNumber(cmd.getSubcommand())) {
+    uint8_t addr = 0;
+    if (!tryParseAddress(cmd.getSubcommand(), addr)) {
         terminalView.println("Usage: glitch <addr>");
         return;
     }
 
-    // Parse and get I2C default config
-    uint8_t addr = argTransformer.parseHexOrDec(cmd.getSubcommand());
+    // Get I2C default config
     uint8_t scl = state.getI2cSclPin();
     uint8_t sda = state.getI2cSdaPin();
     uint32_t freqHz = state.getI2cFrequency();
@@ -705,13 +689,11 @@ Flood
 */
 void I2cController::handleFlood(const TerminalCommand& cmd) {
     // Validate arg
-    if (!argTransformer.isValidNumber(cmd.getSubcommand())) {
+    uint8_t addr = 0;
+    if (!tryParseAddress(cmd.getSubcommand(), addr)) {
         terminalView.println("Usage: flood <addr>");
         return;
     }
-
-    // Parse arg
-    uint8_t addr = argTransformer.parseHexOrDec(cmd.getSubcommand());
     
     // Check device presence
     i2cService.beginTransmission(addr);
@@ -771,12 +753,11 @@ void I2cController::handleJam() {
 Monitor
 */
 void I2cController::handleMonitor(const TerminalCommand& cmd) {
-    if (!argTransformer.isValidNumber(cmd.getSubcommand())) {
+    uint8_t addr = 0;
+    if (!tryParseAddress(cmd.getSubcommand(), addr)) {
         terminalView.println("Usage: monitor <addr> [delay_ms]");
         return;
     }
-
-    uint8_t addr = argTransformer.parseHexOrDec(cmd.getSubcommand());
     uint16_t len = 256;
     uint32_t delayMs = 500;
 
@@ -846,7 +827,8 @@ void I2cController::handleMonitor(const TerminalCommand& cmd) {
 Trace
 */
 void I2cController::handleTrace(const TerminalCommand& cmd) {
-    if (!argTransformer.isValidNumber(cmd.getSubcommand())) {
+    uint8_t addr = 0;
+    if (!tryParseAddress(cmd.getSubcommand(), addr)) {
         terminalView.println("Usage: trace <addr> [reg] [delay_ms]");
         return;
     }
@@ -856,8 +838,6 @@ void I2cController::handleTrace(const TerminalCommand& cmd) {
         terminalView.println("Usage: trace <addr> [reg] [delay_ms]");
         return;
     }
-
-    uint8_t addr = argTransformer.parseHexOrDec(cmd.getSubcommand());
 
     uint8_t reg = 0;
     if (args.size() >= 1) {
@@ -929,18 +909,14 @@ void I2cController::handleEeprom(const TerminalCommand& cmd) {
 
     auto sub = cmd.getSubcommand();
     if (!sub.empty()) {
-        if (!argTransformer.isValidNumber(sub)) {
+        if (!tryParseAddress(sub, addr)) {
             terminalView.println("Usage: eeprom [addr]");
             return;
         }
-
-        auto parsed = argTransformer.parseHexOrDec(sub);
-        if (parsed < 0x03 || parsed > 0x77) { // plage valide I2C 7-bit
+        if (addr < 0x03 || addr > 0x77) { // plage valide I2C 7-bit
             terminalView.println("❌ Invalid I2C address. Must be between 0x03 and 0x77.");
             return;
         }
-
-        addr = parsed;
     }
 
     eepromShell.run(addr);
@@ -981,12 +957,11 @@ Health
 */
 void I2cController::handleHealth(const TerminalCommand& cmd) {
     // Validate subcommand (addr)
-    if (!argTransformer.isValidNumber(cmd.getSubcommand())) {
+    uint8_t addr = 0;
+    if (!tryParseAddress(cmd.getSubcommand(), addr)) {
         terminalView.println("Usage: health <addr>");
         return;
     }
-
-    uint8_t addr = argTransformer.parseHexOrDec(cmd.getSubcommand());
     terminalView.println("I2C Health: Analyzing @ 0x" + argTransformer.toHex(addr) + "... Press [ENTER] to stop.\n");
 
     auto stoppedByUser = [&]() -> bool {
@@ -1112,12 +1087,11 @@ Regs
 */
 void I2cController::handleRegs(const TerminalCommand& cmd) {
     // regs <addr> [len]
-    if (!argTransformer.isValidNumber(cmd.getSubcommand())) {
+    uint8_t addr = 0;
+    if (!tryParseAddress(cmd.getSubcommand(), addr)) {
         terminalView.println("Usage: regs <addr> [length]");
         return;
     }
-
-    uint8_t addr = argTransformer.parseHexOrDec(cmd.getSubcommand());
 
     uint16_t start = 0x00;
     uint16_t len   = 256;
@@ -1342,6 +1316,21 @@ std::string I2cController::identifyToString(uint8_t address, bool includeHeader)
     }
 
     return ss.str();
+}
+
+bool I2cController::tryParseAddress(const std::string& value, uint8_t& address) {
+    if (!argTransformer.isValidNumber(value)) return false;
+
+    const int base = value.rfind("0x", 0) == 0 || value.rfind("0X", 0) == 0 ? 16 : 10;
+    errno = 0;
+    char* end = nullptr;
+    const unsigned long long parsed = std::strtoull(value.c_str(), &end, base);
+    if (errno == ERANGE || end == value.c_str() || *end != '\0' || parsed > 0x7F) {
+        return false;
+    }
+
+    address = static_cast<uint8_t>(parsed);
+    return true;
 }
 
 /*

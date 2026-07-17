@@ -16,10 +16,10 @@
 #include "Managers/UserInputManager.h"
 #include "Analyzers/SubGhzAnalyzer.h"
 #include "States/GlobalState.h"
-#include "Services/SubGhzService.h"
-#include "Services/PinService.h"
-#include "Services/LittleFsService.h"
-#include "Services/I2sService.h"
+#include "Interfaces/ISubGhzService.h"
+#include "Interfaces/IPinService.h"
+#include "Interfaces/ILittleFsService.h"
+#include "Interfaces/II2sService.h"
 #include "Data/SubGhzProtocols.h"
 #include "Shells/HelpShell.h"
 
@@ -29,10 +29,10 @@ public:
                      IInput& terminalInput,
                      IDeviceView& deviceView,
                      IUtilityService& utilityService,
-                     SubGhzService& subGhzService,
-                     PinService& pinService,
-                     I2sService& i2sService,
-                     LittleFsService& littleFsService,
+                     ISubGhzService& subGhzService,
+                     IPinService& pinService,
+                     II2sService& i2sService,
+                     ILittleFsService& littleFsService,
                      ArgTransformer& argTransformer,
                      SubGhzTransformer& subGhzTransformer,
                      UserInputManager& userInputManager,
@@ -121,10 +121,10 @@ private:
     IInput& terminalInput;
     IDeviceView& deviceView;
     IUtilityService& utilityService;
-    SubGhzService& subGhzService;
-    PinService& pinService;
-    I2sService& i2sService;
-    LittleFsService& littleFsService;
+    ISubGhzService& subGhzService;
+    IPinService& pinService;
+    II2sService& i2sService;
+    ILittleFsService& littleFsService;
     ArgTransformer& argTransformer;
     SubGhzTransformer& subGhzTransformer;
     UserInputManager& userInputManager;

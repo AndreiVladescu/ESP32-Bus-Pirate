@@ -5,11 +5,11 @@
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
 #include "Interfaces/IUtilityService.h"
-#include "Services/FmService.h"
+#include "Interfaces/IFmService.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "Shells/HelpShell.h"
-#include "Shells/FmBroadcastShell.h"
+#include "Interfaces/IShell.h"
 #include "States/GlobalState.h"
 
 class FmController {
@@ -19,11 +19,11 @@ public:
         IInput& terminalInput,
         IDeviceView& deviceView,
         IUtilityService& utilityService,
-        FmService& fmService,
+        IFmService& fmService,
         ArgTransformer& argTransformer,
         UserInputManager& userInputManager,
         HelpShell& helpShell,
-        FmBroadcastShell& fmBroadcastShell
+        IShell& fmBroadcastShell
     );
 
     // Entry point for fm command
@@ -49,11 +49,11 @@ private:
     IInput& terminalInput;
     IDeviceView& deviceView;
     IUtilityService& utilityService;
-    FmService& fmService;
+    IFmService& fmService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
     HelpShell& helpShell;
-    FmBroadcastShell& fmBroadcastShell;
+    IShell& fmBroadcastShell;
     GlobalState& state = GlobalState::getInstance();
 
     bool configured = false;

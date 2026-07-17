@@ -2,14 +2,13 @@
 
 #include <vector>
 #include "Interfaces/ITerminalView.h"
-#include "Services/SpiService.h" 
 #include "Interfaces/IInput.h"
 #include "Models/TerminalCommand.h"
 #include "Models/ByteCode.h"
-#include "Services/TwoWireService.h"
+#include "Interfaces/ITwoWireService.h"
+#include "Interfaces/IShell.h"
 #include "Managers/UserInputManager.h"
 #include "States/GlobalState.h"
-#include "Shells/SmartCardShell.h"
 #include "Shells/HelpShell.h"
 
 class TwoWireController {
@@ -19,8 +18,8 @@ public:
         ITerminalView& terminalView, 
         IInput& terminalInput, 
         UserInputManager& userInputManager, 
-        TwoWireService& twoWireService,
-        SmartCardShell& smartCardShell,
+        ITwoWireService& twoWireService,
+        IShell& smartCardShell,
         HelpShell& helpShell
     );
 
@@ -52,8 +51,8 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     UserInputManager& userInputManager;
-    TwoWireService& twoWireService;
-    SmartCardShell& smartCardShell;
+    ITwoWireService& twoWireService;
+    IShell& smartCardShell;
     HelpShell& helpShell;
     GlobalState& state = GlobalState::getInstance();
     bool configured = false;

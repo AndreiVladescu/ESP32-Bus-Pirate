@@ -1,4 +1,5 @@
 #include "CellController.h"
+#include <algorithm>
 
 /*
 Constructor
@@ -6,13 +7,13 @@ Constructor
 CellController::CellController(ITerminalView& view,
                                IInput& terminalInput,
                                IUtilityService& utilityService,
-                               CellService& service,
+                               ICellService& service,
                                ArgTransformer& argTransformer,
                                AtTransformer& atTransformer,
                                UserInputManager& userInputManager,
                                HelpShell& helpShell,
-                               CellCallShell& cellCallShell,
-                               CellSmsShell& cellSmsShell)
+                               IShell& cellCallShell,
+                               IShell& cellSmsShell)
     : terminalView(view),
       terminalInput(terminalInput),
       utilityService(utilityService),

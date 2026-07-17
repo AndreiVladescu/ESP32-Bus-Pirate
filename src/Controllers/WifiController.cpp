@@ -44,11 +44,11 @@ std::vector<std::string> WifiController::buildWiFiLines() {
 
     // MODE
     lines.push_back(
-        std::string("MODE ") + WifiService::wifiModeToStr(mode)
+        std::string("MODE ") + IWifiService::wifiModeToStr(mode)
     );
 
     // Disconnection
-    if (status != WL_CONNECTED) {
+    if (status != IWifiService::kWifiStatusConnected) {
         lines.push_back("WIFI DISCONNECTED");
         return lines;
     }
@@ -181,7 +181,7 @@ void WifiController::handleStatus(const TerminalCommand &cmd)
     auto hostname = wifiService.getHostname(); if (hostname.empty()) hostname = "N/A";
 
     terminalView.println("\n=== Wi-Fi Status ===");
-    terminalView.println("Mode         : " + std::string(wifiService.getWifiModeRaw() == WIFI_MODE_AP ? "Access Point" : "Station"));
+    terminalView.println("Mode         : " + std::string(wifiService.getWifiModeRaw() == IWifiService::kWifiModeAp ? "Access Point" : "Station"));
     terminalView.println("AP MAC       : " + wifiService.getMacAddressAp());
     terminalView.println("STA MAC      : " + wifiService.getMacAddressSta());
     terminalView.println("IP           : " + wifiService.getLocalIp());
@@ -196,7 +196,7 @@ void WifiController::handleStatus(const TerminalCommand &cmd)
     terminalView.println("Prov enabled : " + std::string(wifiService.isProvisioningEnabled() ? "Yes" : "No"));
 
     const int status = wifiService.getWifiStatusRaw();
-    if (status == 3 /* WL_CONNECTED */) {
+    if (status == IWifiService::kWifiStatusConnected) {
         terminalView.println("RSSI         : " + std::to_string(wifiService.getRssi()) + " dBm");
         terminalView.println("Channel      : " + std::to_string(wifiService.getChannel()));
     } else {
@@ -204,8 +204,8 @@ void WifiController::handleStatus(const TerminalCommand &cmd)
         terminalView.println("Channel      : N/A");
     }
 
-    terminalView.println("Mode         : " + std::string(wifiService.wifiModeToStr(wifiService.getWifiModeRaw())));
-    terminalView.println("Status       : " + std::string(wifiService.wlStatusToStr(status)));
+    terminalView.println("Mode         : " + std::string(IWifiService::wifiModeToStr(wifiService.getWifiModeRaw())));
+    terminalView.println("Status       : " + std::string(IWifiService::wlStatusToStr(status)));
     terminalView.println("====================\n");
 }
 
@@ -487,10 +487,10 @@ void WifiController::handleSpoof(const TerminalCommand &cmd)
         return;
     }
 
-    WifiService::MacInterface iface =
+    WifiMacInterface iface =
         (mode == "sta")
-            ? WifiService::MacInterface::Station
-            : WifiService::MacInterface::AccessPoint;
+            ? WifiMacInterface::Station
+            : WifiMacInterface::AccessPoint;
 
     terminalView.println("WiFi: Spoofing " + mode + " MAC to " + mac + "...");
 

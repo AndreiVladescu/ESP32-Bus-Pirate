@@ -11,7 +11,7 @@ DioController::DioController(
     IInput& terminalInput,
     IDeviceView& deviceView,
     IUtilityService& utilityService,
-    PinService& pinService,
+    IPinService& pinService,
     ArgTransformer& argTransformer,
     HelpShell& helpShell,
     UserInputManager& userInputManager
@@ -153,8 +153,8 @@ void DioController::handleScan(const TerminalCommand& cmd) {
     // Configure pins as INPUT with existing pull
     for (uint8_t pin : validPins) {
         auto pull = pinService.getPullType(pin);
-        if (pull == PinService::PULL_UP)        pinService.setInputPullup(pin);
-        else if (pull == PinService::PULL_DOWN) pinService.setInputPullDown(pin);
+        if (pull == IPinService::PULL_UP)        pinService.setInputPullup(pin);
+        else if (pull == IPinService::PULL_DOWN) pinService.setInputPullDown(pin);
         else                                    pinService.setInput(pin);
     }
 
@@ -323,8 +323,8 @@ void DioController::handlePins(const TerminalCommand& cmd) {
 
         // PULL 
         std::string pullStr;
-        if (pull == PinService::PULL_UP)        pullStr = "PULLUP";
-        else if (pull == PinService::PULL_DOWN) pullStr = "PDOWN ";
+        if (pull == IPinService::PULL_UP)        pullStr = "PULLUP";
+        else if (pull == IPinService::PULL_DOWN) pullStr = "PDOWN ";
         else                                    pullStr = "NOPULL";
 
         // STATE 
@@ -334,7 +334,7 @@ void DioController::handlePins(const TerminalCommand& cmd) {
             // https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/gpio.html#_CPPv414gpio_get_level10gpio_num_t
             v = pinService.read(pin);
         }
-        std::string stateStr = bInput ? "INPUT (" + std::string(v == HIGH ? "HIGH" : "LOW") + ")" : "OUTPUT";
+        std::string stateStr = bInput ? "INPUT (" + std::string(v ? "HIGH" : "LOW") + ")" : "OUTPUT";
 
         // GPIO padded
         std::string gpioStr = std::to_string(pin);
@@ -392,9 +392,9 @@ void DioController::handleSniff(const TerminalCommand& cmd) {
     if (!isPinAllowed(pin, "Sniff")) return;
 
     // Apply existing pull config
-    PinService::pullType pull = pinService.getPullType(pin);
-    if (pull == PinService::PULL_UP)       pinService.setInputPullup(pin);
-    else if (pull == PinService::PULL_DOWN) pinService.setInputPullDown(pin);
+    IPinService::pullType pull = pinService.getPullType(pin);
+    if (pull == IPinService::PULL_UP)       pinService.setInputPullup(pin);
+    else if (pull == IPinService::PULL_DOWN) pinService.setInputPullDown(pin);
     else                                   pinService.setInput(pin);
 
     terminalView.println("DIO Sniff: GPIO " + std::to_string(pin) + "... Press [ENTER] to stop");
@@ -516,17 +516,17 @@ void DioController::handleMeasure(const TerminalCommand& cmd) {
     terminalView.println("DIO Measure: Sampling GPIO " + std::to_string(pin) +
                          " for " + std::to_string(durationMs) + " ms...");
 
-    PinService::pullType pull =  pinService.getPullType(pin);
+    IPinService::pullType pull =  pinService.getPullType(pin);
     
     switch (pull)
     {
-    case PinService::NOPULL:
+    case IPinService::NOPULL:
         pinService.setInput(pin);
         break;
-    case PinService::PULL_UP:
+    case IPinService::PULL_UP:
         pinService.setInputPullup(pin);
         break;
-    case PinService::PULL_DOWN:
+    case IPinService::PULL_DOWN:
         pinService.setInputPullDown(pin);
         break;
     
@@ -810,10 +810,10 @@ std::vector<std::string> DioController::buildPullConfigLines() {
     for (uint8_t pin : pins) {
         auto pull = pinService.getPullType(pin);
 
-        if (pull == PinService::PULL_UP) {
+        if (pull == IPinService::PULL_UP) {
             lines.push_back("GPIO " + std::to_string(pin) + " PULLUP");
         } 
-        else if (pull == PinService::PULL_DOWN) {
+        else if (pull == IPinService::PULL_DOWN) {
             lines.push_back("GPIO " + std::to_string(pin) + " PULLDOWN");
         } else {
             continue;

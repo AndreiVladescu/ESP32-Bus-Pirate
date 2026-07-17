@@ -6,21 +6,21 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUtilityService.h"
-#include "Services/I2cService.h"
+#include "Interfaces/II2cService.h"
 #include "Models/TerminalCommand.h"
 #include "Models/ByteCode.h"
 #include "States/GlobalState.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
 #include "Vendors/i2c_sniffer.h"
-#include "Shells/I2cEepromShell.h"
+#include "Interfaces/II2cEepromShell.h"
 #include "Shells/HelpShell.h"
 #include "Data/I2cKnownAdresses.h"
 
 class I2cController {
 public:
     // Constructor
-    I2cController(ITerminalView& terminalView, IInput& terminalInput, IUtilityService& utilityService, I2cService& i2cService, ArgTransformer& argTransformer, UserInputManager& userInputManager, I2cEepromShell& eepromShell, HelpShell& helpShell);
+    I2cController(ITerminalView& terminalView, IInput& terminalInput, IUtilityService& utilityService, II2cService& i2cService, ArgTransformer& argTransformer, UserInputManager& userInputManager, II2cEepromShell& eepromShell, HelpShell& helpShell);
 
     // Entry point for I2C command
     void handleCommand(const TerminalCommand& cmd);
@@ -62,10 +62,10 @@ private:
     ITerminalView& terminalView;
     IInput& terminalInput;
     IUtilityService& utilityService;
-    I2cService& i2cService;
+    II2cService& i2cService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
-    I2cEepromShell& eepromShell;
+    II2cEepromShell& eepromShell;
     HelpShell& helpShell;
     GlobalState& state = GlobalState::getInstance();
     bool configured = false;
@@ -139,4 +139,5 @@ private:
     void printHexDump(uint16_t, uint16_t len,
                     const std::vector<uint8_t>& values, const std::vector<bool>& valid);
     std::string identifyToString(uint8_t address, bool includeHeader = false);
+    bool tryParseAddress(const std::string& value, uint8_t& address);
 };

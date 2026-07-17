@@ -1,25 +1,31 @@
 #include "OneWireController.h"
+#include <cstring>
+
+namespace {
+constexpr int kSignalLow = 0;
+constexpr int kSignalHigh = 1;
+}
 
 /*
 Constructor
 */
 OneWireController::OneWireController(
-    ITerminalView& terminalView, 
-    IInput& terminalInput, 
+    ITerminalView& terminalView,
+    IInput& terminalInput,
     IUtilityService& utilityService,
-    OneWireService& service, 
+    IOneWireService& service,
     ArgTransformer& argTransformer,
-    UserInputManager& userInputManager, 
-    IbuttonShell& ibuttonShell,
-    OneWireEepromShell& eepromShell,
+    UserInputManager& userInputManager,
+    IShell& ibuttonShell,
+    IShell& eepromShell,
     HelpShell& helpShell
 )
-    : terminalView(terminalView), 
-      terminalInput(terminalInput), 
+    : terminalView(terminalView),
+      terminalInput(terminalInput),
       utilityService(utilityService),
-      oneWireService(service), 
-      argTransformer(argTransformer), 
-      userInputManager(userInputManager), 
+      oneWireService(service),
+      argTransformer(argTransformer),
+      userInputManager(userInputManager),
       ibuttonShell(ibuttonShell),
       eepromShell(eepromShell),
       helpShell(helpShell) {
@@ -44,7 +50,7 @@ void OneWireController::handleCommand(const TerminalCommand& command) {
 /*
 Entry point for instructions
 */
-void OneWireController::handleInstruction(std::vector<ByteCode>& bytecodes) {
+void OneWireController::handleInstruction(const std::vector<ByteCode>& bytecodes) {
     auto result = oneWireService.executeByteCode(bytecodes);
     if (!result.empty()) {
         terminalView.println("OneWire Read:\n");
@@ -169,13 +175,13 @@ bool OneWireController::handleScratchpadRead() {
     oss << "Scratchpad: ";
     for (int i = 0; i < 8; ++i) {
         oss << std::hex << std::uppercase << std::setw(2) << std::setfill('0') << (int)scratchpad[i];
-        if (i < 8) oss << " ";
+        if (i < 7) oss << " ";
     }
     terminalView.println(oss.str());
 
     // CRC (last byte)
-    uint8_t crc = oneWireService.crc8(scratchpad, 8);
-    if (crc != scratchpad[8]) {
+    uint8_t crc = oneWireService.crc8(scratchpad, 7);
+    if (crc != scratchpad[7]) {
         terminalView.println("CRC error on scratchpad.");
     }
 
@@ -239,10 +245,10 @@ void OneWireController::handleIdWrite(std::vector<uint8_t> idBytes) {
         if (key == '\r' || key == '\n') {
             terminalView.println("");
             terminalView.println("OneWire Write: Stopped by user.");
-            break;
+            return;
         }
     }
-    
+
     // Try to write and verify X times
     while (attempt < maxRetries && !success) {
         attempt++;
@@ -262,7 +268,7 @@ void OneWireController::handleIdWrite(std::vector<uint8_t> idBytes) {
         if (memcmp(buffer, idBytes.data(), 7) != 0) {
             terminalView.println("Mismatch in ROM ID bytes.");
             continue;
-        } 
+        }
 
         success = true;
         break;
@@ -323,7 +329,7 @@ void OneWireController::handleScratchpadWrite(std::vector<uint8_t> scratchpadByt
             terminalView.println("Mismatch in scratchpad data.");
             continue;
         }
-        
+
         // CRC error
         uint8_t crc = oneWireService.crc8(readback, 8);
         if (crc != readback[7]) {
@@ -388,21 +394,21 @@ void OneWireController::handleSniff() {
         // Enter press
         auto c = terminalInput.readChar();
         if (c == '\r' || c == '\n' ) break;
-        
+
         // Read current state of pin
         int current = oneWireService.readPinLevel();
         uint32_t now = utilityService.nowUs();
 
         // Detect a falling edge
-        if (prev == HIGH && current == LOW) {
+        if (prev == kSignalHigh && current == kSignalLow) {
             lastFall = now;
         }
 
         // Detect a rising edge (end of a LOW pulse)
-        if (prev == LOW && current == HIGH) {
+        if (prev == kSignalLow && current == kSignalHigh) {
             // Calculate duration of the LOW pulse
             uint32_t duration = now - lastFall;
-            
+
             // Too long, not mean anything
             if (duration >= 3000) {
                 terminalView.println("[Non-Standard Pulse] " + std::to_string(duration) + " µs");
@@ -414,7 +420,7 @@ void OneWireController::handleSniff() {
             // Most likely a presence pulse
             } else if (duration >= 60 && duration <= 240) {
                 terminalView.println("[Presence] LOW for " + std::to_string(duration) + " µs");
-            
+
             // Most likely a bit transmission
             } else if (duration >= 10 && duration <= 70) {
                 // Want to sample ~15 µs after the falling edge
@@ -423,7 +429,7 @@ void OneWireController::handleSniff() {
                 if (elapsed < 15) {
                     utilityService.sleepUs(15 - elapsed);
                 }
-                
+
                 // Read the bit
                 int sample = oneWireService.readPinLevel();
                 terminalView.println("[Bit] LOW " + std::to_string(duration) +

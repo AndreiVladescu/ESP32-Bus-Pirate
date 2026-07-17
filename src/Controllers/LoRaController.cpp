@@ -8,13 +8,13 @@
 Initialize the LoRa controller dependencies
 */
 LoRaController::LoRaController(ITerminalView& tv, IInput& input, IDeviceView& device,
-                               IUtilityService& utilityService, LoRaService& service, LittleFsService& littleFs,
-                               I2sService& i2s,
+                               IUtilityService& utilityService, ILoRaService& service, ILittleFsService& littleFs,
+                               II2sService& i2s,
                                ArgTransformer& transformer, LoRaTransformer& transformerLoRa,
                                TerminalCommandTransformer& commandTransformer,
                                UserInputManager& uim,
                                HelpShell& help,
-                               MeshtasticShell& meshShell)
+                               IShell& meshShell)
     : terminalView(tv), terminalInput(input), deviceView(device), utilityService(utilityService), loRaService(service),
       littleFsService(littleFs), i2sService(i2s), argTransformer(transformer),
       loRaTransformer(transformerLoRa),
@@ -409,12 +409,12 @@ void LoRaController::handleReceive() {
 
         std::vector<uint8_t> payload;
         const int16_t result = loRaService.pollReceive(payload);
-        if (result == LoRaService::RECEIVE_ERROR) {
+        if (result == ILoRaService::RECEIVE_ERROR) {
             errors++;
             utilityService.sleepMs(1);
             continue;
         }
-        if (result != LoRaService::RECEIVE_OK) {
+        if (result != ILoRaService::RECEIVE_OK) {
             utilityService.sleepMs(1);
             continue;
         }
@@ -497,10 +497,10 @@ void LoRaController::handleRecord() {
         if (c == '\r' || c == '\n') break;
 
         const int16_t result = loRaService.pollReceive(payload);
-        if (result == LoRaService::RECEIVE_ERROR) {
+        if (result == ILoRaService::RECEIVE_ERROR) {
             errors++;
         }
-        if (result != LoRaService::RECEIVE_OK) {
+        if (result != ILoRaService::RECEIVE_OK) {
             payload.clear();
             utilityService.sleepMs(1);
         }
@@ -665,7 +665,7 @@ void LoRaController::handleRssi(const TerminalCommand& cmd) {
         const char c = terminalInput.readChar();
         if (c == '\r' || c == '\n') break;
 
-        LoRaService::RssiStats stats;
+        ILoRaService::RssiStats stats;
         const uint32_t sampleDuration = static_cast<uint32_t>(std::min(intervalMs, 200));
         if (loRaService.measureRssi(state.getLoRaFrequency(), sampleDuration, stats)) {
             globalMinimum = std::min(globalMinimum, stats.minimum);
@@ -730,7 +730,7 @@ void LoRaController::handleEar() {
         const char c = terminalInput.readChar();
         if (c == '\r' || c == '\n') break;
 
-        LoRaService::RssiStats stats;
+        ILoRaService::RssiStats stats;
         if (!loRaService.measureRssi(state.getLoRaFrequency(), 20, stats)) {
             utilityService.sleepMs(1);
             continue;
@@ -834,7 +834,7 @@ void LoRaController::handleScan() {
                 break;
             }
 
-            LoRaService::RssiStats stats;
+            ILoRaService::RssiStats stats;
             if (!loRaService.measureRssi(
                     frequencies[i],
                     static_cast<uint32_t>(dwellMs),
@@ -1038,7 +1038,7 @@ void LoRaController::handleWaterfall() {
             bestFrequency = 0.0f;
         }
 
-        LoRaService::RssiStats stats;
+        ILoRaService::RssiStats stats;
         int peak = dbmMin;
         if (loRaService.measureRssi(
                 frequencies[index],

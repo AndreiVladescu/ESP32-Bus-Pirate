@@ -4,7 +4,7 @@
 Constructor
 */
 I2sController::I2sController(ITerminalView& terminalView, IInput& terminalInput,
-                             IUtilityService& utilityService, I2sService& i2sService, ArgTransformer& argTransformer,
+                             IUtilityService& utilityService, II2sService& i2sService, ArgTransformer& argTransformer,
                              UserInputManager& userInputManager, HelpShell& helpShell)
     : terminalView(terminalView), terminalInput(terminalInput),
       utilityService(utilityService), i2sService(i2sService), argTransformer(argTransformer),

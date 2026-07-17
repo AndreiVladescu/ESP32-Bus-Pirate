@@ -4,7 +4,7 @@
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IUtilityService.h"
-#include "Services/BluetoothService.h"
+#include "Interfaces/IBluetoothService.h"
 #include "Transformers/ArgTransformer.h"
 #include "Models/TerminalCommand.h"
 #include "Managers/UserInputManager.h"
@@ -19,7 +19,7 @@ public:
         IInput& terminalInput,
         IInput& deviceInput,
         IUtilityService& utilityService,
-        BluetoothService& bluetoothService,
+        IBluetoothService& bluetoothService,
         ArgTransformer& argTransformer,
         UserInputManager& userInputManager,
         HelpShell& helpShell,
@@ -40,7 +40,7 @@ private:
     IInput& terminalInput;
     IInput& deviceInput;
     IUtilityService& utilityService;
-    BluetoothService& bluetoothService;
+    IBluetoothService& bluetoothService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
     HelpShell& helpShell;

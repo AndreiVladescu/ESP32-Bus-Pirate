@@ -5,59 +5,60 @@
 #include <string>
 #include "Models/TerminalCommand.h"
 #include "Models/ByteCode.h"
-#include "Services/UartService.h"
-#include "Services/HdUartService.h"
-#include "Services/SdService.h"
+#include "Interfaces/IUartService.h"
+#include "Interfaces/IHdUartService.h"
+#include "Interfaces/ISdService.h"
 #include "Interfaces/ITerminalView.h"
 #include "Interfaces/IInput.h"
 #include "Interfaces/IDeviceView.h"
 #include "Interfaces/IUtilityService.h"
+#include "Interfaces/IShell.h"
+#include "Interfaces/IUartSnifferService.h"
 #include "States/GlobalState.h"
 #include "Transformers/ArgTransformer.h"
 #include "Managers/UserInputManager.h"
-#include "Shells/UartAtShell.h"
 #include "Shells/HelpShell.h"
-#include "Shells/UartEmulationShell.h"
 
 class UartController {
 public:
     // Constructor
-    UartController(ITerminalView& terminalView, 
+    UartController(ITerminalView& terminalView,
                    IInput& terminalInput,
                    IDeviceView& deviceView,
                    IInput& deviceInput,
                    IUtilityService& utilityService,
-                   UartService& uartService, 
-                   SdService& sdService,
-                   HdUartService& hdUartService, 
+                   IUartService& uartService,
+                   ISdService& sdService,
+                   IHdUartService& hdUartService,
+                   IUartSnifferService& uartSnifferService,
                    ArgTransformer& argTransformer,
                    UserInputManager& userInputManager,
-                   UartAtShell& uartAtShell,
+                   IShell& uartAtShell,
                    HelpShell& helpShell,
-                   UartEmulationShell& uartEmulationShell);
-    
+                   IShell& uartEmulationShell);
+
     // Entry point for UART command
     void handleCommand(const TerminalCommand& cmd);
 
     //  Entry point for handle parsed bytecode instructions
     void handleInstruction(const std::vector<ByteCode>& bytecodes);
-    
+
     // Ensure UART is configured before use
     void ensureConfigured();
-    
+
 private:
     // Start bidirectional UART bridge
     void handleBridge();
-    
+
     // Perform ascii read
     void handleRead(const TerminalCommand& cmd);
 
     // Perform hex read
     void handleRaw();
-    
+
     // Send probes to get a response
     void handlePing();
-    
+
     // Write data to UART
     void handleWrite(const TerminalCommand& cmd);
 
@@ -102,26 +103,27 @@ private:
 
     // sniff on a serial communication
     void handleSniff(const TerminalCommand& cmd);
-    
+
     // sniff on a serial communication, text mode display
     void handleSniffTxt();
-    
+
     // sniff on a serial communication, hex and ASCCI mode display
     void handleSniffRaw();
-    
+
     ITerminalView& terminalView;
     IDeviceView& deviceView;
     IInput& terminalInput;
     IInput& deviceInput;
     IUtilityService& utilityService;
-    UartService& uartService;
-    SdService& sdService;
-    HdUartService& hdUartService;
+    IUartService& uartService;
+    ISdService& sdService;
+    IHdUartService& hdUartService;
+    IUartSnifferService& uartSnifferService;
     ArgTransformer& argTransformer;
     UserInputManager& userInputManager;
-    UartAtShell& uartAtShell;
+    IShell& uartAtShell;
     HelpShell& helpShell;
-    UartEmulationShell& uartEmulationShell;
+    IShell& uartEmulationShell;
     GlobalState& state = GlobalState::getInstance();
     bool configured = false;
     bool scanCancelled = false;

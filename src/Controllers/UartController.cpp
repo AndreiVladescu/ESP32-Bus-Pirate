@@ -1,5 +1,8 @@
 #include "UartController.h"
+
+#include <cctype>
 #include <map>
+#include <sstream>
 
 /*
 Constructor
@@ -10,14 +13,15 @@ UartController::UartController(
     IDeviceView& deviceView,
     IInput& deviceInput,
     IUtilityService& utilityService,
-    UartService& uartService,
-    SdService& sdService,
-    HdUartService& hdUartService,
+    IUartService& uartService,
+    ISdService& sdService,
+    IHdUartService& hdUartService,
+    IUartSnifferService& uartSnifferService,
     ArgTransformer& argTransformer,
     UserInputManager& userInputManager,
-    UartAtShell& uartAtShell,
+    IShell& uartAtShell,
     HelpShell& helpShell,
-    UartEmulationShell& uartEmulationShell
+    IShell& uartEmulationShell
 )
     : terminalView(terminalView),
       terminalInput(terminalInput),
@@ -27,6 +31,7 @@ UartController::UartController(
       uartService(uartService),
       sdService(sdService),
       hdUartService(hdUartService),
+      uartSnifferService(uartSnifferService),
       argTransformer(argTransformer),
       userInputManager(userInputManager),
       uartAtShell(uartAtShell),
@@ -261,7 +266,7 @@ void UartController::handleWrite(const TerminalCommand& cmd) {
         // Reject wildcards (mask=0)
         for (size_t i = 0; i < hexMask.size(); ++i) {
             if (hexMask[i] == 0) {
-                terminalView.println("UART Write: wildcards (??) are not allowed in write payload.\n");
+                terminalView.println("UART Write: wildcards are not allowed in write payload.\n");
                 return;
             }
         }
@@ -360,7 +365,7 @@ void UartController::handleScan() {
     state.setJtagScanPins(selectedPins); //save for later use
     
     // Accumulateur for activity
-    std::map<uint8_t, UartService::PinActivity> accum;
+    std::map<uint8_t, UartPinActivity> accum;
     std::vector<std::string> activeLines; //for deviceView pinout
     PinoutConfig cfg;
     PinoutConfig lastCfg;
@@ -591,7 +596,7 @@ void UartController::handleSpam(const TerminalCommand& cmd) {
         // Reject wildcards
         for (size_t i = 0; i < hexMask.size(); ++i) {
             if (hexMask[i] == 0) {
-                terminalView.println("UART Spam: wildcards (??) are not allowed in spam payload.\n");
+                terminalView.println("UART Spam: wildcards are not allowed in spam payload.\n");
                 return;
             }
         }
@@ -1030,32 +1035,12 @@ void UartController::handleSniff(const TerminalCommand& cmd) {
 Sniff exchanges on a serial communication mixed mode display
 */
 void UartController::handleSniffRaw() {
-    enum source {NONE, UART1, UART2};
-    const char toHex[]={'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-    source lastUart = NONE;
-    boolean uartChanged = true;
-    uint8_t carDisplayed = 0;
-    const uint8_t maxCarPerLine = 16;
-    std::array<char, 81> lineBuffer;
-    lineBuffer.fill(0x20); lineBuffer[80]=0; lineBuffer[48]='|';
-    uint32_t lastUpdateMixed = utilityService.nowMs();
-    constexpr uint32_t TIMEOUT_MIXED = 2000;  // 2 seconds
-
-    struct rcvSer{
-        source uart;
-        char key;
-    };
-
-    std::queue<rcvSer> fifo;
-    rcvSer rcv, snd;
-
     const unsigned long baud = state.getUartBaudRate();
     const uint32_t config = state.getUartConfig();
     const bool inverted = state.isUartInverted();
 
     const uint8_t rxPin1 = state.getUartRxPin();
     const uint8_t rxPin2 = state.getUartTxPin();
-    const int8_t noTxPin = -1;
 
     if (rxPin1 == rxPin2) {
         terminalView.println("UART Sniff: RX and TX pins are identical.");
@@ -1073,89 +1058,7 @@ void UartController::handleSniffRaw() {
     terminalView.println(" Sniffing in WebUI may be unstable");
     terminalView.println(" It may lag and be difficult to stop\n");
 
-    UartService uart1;
-    UartService uart2;
-
-    uart1.configure(baud, config, rxPin1, noTxPin, inverted, &Serial1, true);
-    uart2.configure(baud, config, rxPin2, noTxPin, inverted, &Serial2, true);
- 
-    uart1.flush();
-    uart2.flush();
-    while (uart1.available()) {uart1.read();}
-    while (uart2.available()) {uart2.read();}
-    uart1.setRxFIFOFull(1);
-    uart2.setRxFIFOFull(1);
-
-    while (true) {
-        // Manage user's input mode change or exit
-        char key = terminalInput.readChar();
-        if (key == '\r' || key == '\n') {
-            terminalView.println("\n\r\n\rUART Sniff: Stopped by user.");
-            break;
-        }
-
-       // Manage Serial1 & 2
-        // read characters and push it into the FIFO
-       if (uart1.available() > 0) {
-            rcv.uart = UART1;
-            rcv.key =  uart1.read();
-            fifo.push(rcv);
-        }
-
-        if (uart2.available() > 0) {
-            rcv.uart = UART2;
-            rcv.key =  uart2.read();
-            fifo.push(rcv);
-        }
-
-        // If FIFO not empty display according to the chosen mode
-        if (!fifo.empty()){
-            snd = fifo.front();
-            fifo.pop();
-            
-            if (snd.uart != lastUart){      // UART just changed
-                lastUart = snd.uart;
-                uartChanged = true;
-            }
-
-            if (uartChanged && carDisplayed > 0){       // if uart changed print buffer content
-                terminalView.print(lastUart == UART2 ? "\n\r[RX] " : "\n\r\t[TX] ");
-                terminalView.print(lineBuffer.data());
-                lineBuffer.fill(0x20); lineBuffer[80]=0; lineBuffer[48]='|';
-                carDisplayed = 0;
-                uartChanged = false;
-                lastUpdateMixed = utilityService.nowMs();
-            }
-
-            lineBuffer[3 * carDisplayed] = toHex[snd.key >> 4];
-            lineBuffer[3 * carDisplayed + 1] = toHex[snd.key & 0xF];
-            lineBuffer[50 + carDisplayed] = (snd.key >= ' ') ? snd.key : '.';
-            carDisplayed++;
-            uartChanged = false;
-            if (carDisplayed >= maxCarPerLine){
-                terminalView.print(lastUart == UART1 ? "\n\r[RX] " : "\n\r\t[TX] ");
-                terminalView.print(lineBuffer.data());
-                lineBuffer.fill(0x20); lineBuffer[80]=0; lineBuffer[48]='|';
-                carDisplayed = 0;
-                lastUpdateMixed = utilityService.nowMs();
-            }
-
-        }
-
-        if ((carDisplayed > 0) && ((utilityService.nowMs() - lastUpdateMixed) > TIMEOUT_MIXED)){ // if mixed mode not updated since a long time
-            terminalView.print(lastUart == UART1 ? "\n\r[RX] " : "\n\r\t[TX] ");
-            terminalView.print(lineBuffer.data());
-            lineBuffer.fill(0x20); lineBuffer[80]=0; lineBuffer[48]='|';
-            carDisplayed = 0;
-            lastUpdateMixed = utilityService.nowMs();
-        }
-
-        yield();
-    }
-
-    uart1.end();
-    uart2.end();
-
+    uartSnifferService.sniffRaw(terminalView, terminalInput, utilityService, baud, config, inverted, rxPin1, rxPin2);
     ensureConfigured();
 }
 
@@ -1163,27 +1066,12 @@ void UartController::handleSniffRaw() {
 Sniff exchanges on a serial communication text mode display
 */
 void UartController::handleSniffTxt() {
-    enum source {NONE, UART1, UART2};
-    source lastUart = NONE;
-    boolean uartChanged = true;
-    uint8_t carDisplayed = 0;
-    const uint8_t maxCarPerLine = 80;
-
-    struct rcvSer{
-        source uart;
-        char key;
-    };
-
-    std::queue<rcvSer> fifo;
-    rcvSer rcv, snd;
-
     const unsigned long baud = state.getUartBaudRate();
     const uint32_t config = state.getUartConfig();
     const bool inverted = state.isUartInverted();
 
     const uint8_t rxPin1 = state.getUartRxPin();
     const uint8_t rxPin2 = state.getUartTxPin();
-    const int8_t noTxPin = -1;
 
     if (rxPin1 == rxPin2) {
         terminalView.println("UART Sniff: RX and TX pins are identical.");
@@ -1201,70 +1089,7 @@ void UartController::handleSniffTxt() {
     terminalView.println(" Sniffing in WebUI may be unstable");
     terminalView.println(" It may lag and be difficult to stop\n");
 
-    UartService uart1;
-    UartService uart2;
-
-    uart1.configure(baud, config, rxPin1, noTxPin, inverted, &Serial1, true);
-    uart2.configure(baud, config, rxPin2, noTxPin, inverted, &Serial2, true);
- 
-    uart1.flush();
-    uart2.flush();
-    while (uart1.available()) {uart1.read();}
-    while (uart2.available()) {uart2.read();}
-    uart1.setRxFIFOFull(1);
-    uart2.setRxFIFOFull(1);
-
-    while (true) {
-        char key = terminalInput.readChar();
-        if (key == '\r' || key == '\n') {
-                terminalView.println("\n\r\n\rUART Sniff: Stopped by user.");
-                break;
-        }
-
-        // Manage Serial1 & 2
-        // read characters and push it into the FIFO
-       if (uart1.available() > 0) {
-            rcv.uart = UART1;
-            rcv.key =  uart1.read();
-            fifo.push(rcv);
-      }
-
-        if (uart2.available() > 0) {
-           rcv.uart = UART2;
-            rcv.key =  uart2.read();
-            fifo.push(rcv);
-         }
-
-        // If FIFO not empty display according to the chosen mode
-        if (!fifo.empty()){
-            snd = fifo.front();
-            fifo.pop();
-            
-            if (snd.uart != lastUart){      // UART just changed
-                lastUart = snd.uart;
-                uartChanged = true;
-            }
-
-            if (uartChanged || carDisplayed >= maxCarPerLine){
-                terminalView.print(snd.uart == UART1 ? "\n\r[RX] " : "\n\r\t[TX] ");
-                carDisplayed = 0;
-                uartChanged = false;
-            }
-            if (snd.key >= ' '){
-                terminalView.print(std::string(1, snd.key));
-            } else {
-                terminalView.print(" ");
-            }
-            carDisplayed++;
-
-        }
-
-        yield();
-    }
-
-    uart1.end();
-    uart2.end();
-
+    uartSnifferService.sniffText(terminalView, terminalInput, utilityService, baud, config, inverted, rxPin1, rxPin2);
     ensureConfigured();
 }
 
