@@ -1,3 +1,5 @@
+#pragma once
+
 static const char* const autoCompleteWords[] = {
 
     // --- General ---
