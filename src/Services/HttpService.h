@@ -11,24 +11,25 @@
 #include <string>
 #include <atomic>
 #include <mutex>
+#include "Interfaces/IHttpService.h"
 
-class HttpService {
+class HttpService : public IHttpService {
 public:
     // Http(s) get task on url
     void startGetTask(const std::string& url, int timeout_ms, int bodyMaxBytes, bool insecure,
-                      int stack_bytes = 20000, int core = 1, bool onlyContent = false);
+                      int stack_bytes = 20000, int core = 1, bool onlyContent = false) override;
 
     // Fetch JSON data from a URL
-    std::string fetchJson(const std::string& url, int bodyMaxBytes);
+    std::string fetchJson(const std::string& url, int bodyMaxBytes) override;
 
     // Verify if the response is ready
-    bool isResponseReady() const noexcept;
+    bool isResponseReady() const noexcept override;
 
     // Get last HTTP response
-    std::string lastResponse();
+    std::string lastResponse() override;
 
     // Resets the internal state
-    void reset() { response.clear(); ready = false; }
+    void reset() override { response.clear(); ready = false; }
 
 private:
     static void getTask(void* pv);

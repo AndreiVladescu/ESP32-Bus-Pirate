@@ -8,9 +8,10 @@
 #include <EEPROM_SPI_WE.h>
 #include <SPI.h>
 #include <Data/FlashDatabase.h>
+#include <Interfaces/ISpiService.h>
 #include <Models/ByteCode.h>
 
-class SpiService {
+class SpiService : public ISpiService {
 public:
     // Base
     void configure(uint8_t mosi, uint8_t miso, uint8_t sclk, uint8_t cs, uint32_t frequency = 1000000);
@@ -64,5 +65,4 @@ private:
     uint32_t eepromFrequency = 8000000;
 
 };
-
 

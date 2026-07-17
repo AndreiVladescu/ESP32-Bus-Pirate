@@ -9,59 +9,55 @@
 #include "hal/uart_types.h"
 #include "soc/uart_periph.h"
 #include "Models/ByteCode.h"
+#include "Interfaces/IUartService.h"
 #include <SD.h>
 #include <map>
 
 #define UART_PORT UART_NUM_1
 
-class UartService {
+class UartService : public IUartService {
 public:
-    struct PinActivity {
-        uint8_t pin;
-        uint32_t edges;
-        float edgesPerSec;
-        uint32_t approxBaud;
-    };
+    using PinActivity = UartPinActivity;
 
-    void configure(unsigned long baud, uint32_t config, uint8_t rx, uint8_t tx, bool inverted, HardwareSerial* serial = &Serial1, bool noAllocation = false);
-    void release();
-    void print(const std::string& msg);
-    void println(const std::string& msg);
-    char read();
-    std::string readLine();
-    bool available() const;
-    void write(char c);
-    void write(const char* str);
-    void write(const std::string& str);
-    void setRxFIFOFull(uint8_t fifoBytes);
-    void setDefaultRxFIFOFull();
-std::string executeByteCode(const std::vector<ByteCode>& bytecodes);
-    void switchBaudrate(unsigned long newBaud);
-    void flush();
-    void clearUartBuffer();
-    void end();
-    bool isInstalled() const;
-    uint32_t buildUartConfig(uint8_t dataBits, char parity, uint8_t stopBits);
-    void initXmodem();
-    bool xmodemReceiveToFile(File& file);
-    bool xmodemSendFile(File& file);
-    static void blockLookupHandler(void* blk_id, size_t idSize, byte* data, size_t dataSize);
-    static bool receiveBlockHandler(void* blk_id, size_t idSize, byte* data, size_t dataSize);
-    void setXmodemReceiveHandler(bool (*handler)(void*, size_t, byte*, size_t));
-    void setXmodemSendHandler(void (*handler)(void*, size_t, byte*, size_t));
-    void setXmodemBlockSize(int32_t size);
-    void setXmodemIdSize(int8_t size);
-    void setXmodemCrc(bool enabled);
-    int32_t getXmodemBlockSize() const;
-    int8_t getXmodemIdSize() const;
-    PinActivity measureUartActivity(uint8_t pin, uint32_t windowMs = 100, bool pullup = true);
+    void configure(unsigned long baud, uint32_t config, uint8_t rx, uint8_t tx, bool inverted, HardwareSerial* serial = nullptr, bool noAllocation = false) override;
+    void release() override;
+    void print(const std::string& msg) override;
+    void println(const std::string& msg) override;
+    char read() override;
+    std::string readLine() override;
+    bool available() const override;
+    void write(char c) override;
+    void write(const char* str) override;
+    void write(const std::string& str) override;
+    void setRxFIFOFull(uint8_t fifoBytes) override;
+    void setDefaultRxFIFOFull() override;
+    std::string executeByteCode(const std::vector<ByteCode>& bytecodes) override;
+    void switchBaudrate(unsigned long newBaud) override;
+    void flush() override;
+    void clearUartBuffer() override;
+    void end() override;
+    bool isInstalled() const override;
+    uint32_t buildUartConfig(uint8_t dataBits, char parity, uint8_t stopBits) override;
+    void initXmodem() override;
+    bool xmodemReceiveToFile(File& file) override;
+    bool xmodemSendFile(File& file) override;
+    static void blockLookupHandler(void* blk_id, size_t idSize, uint8_t* data, size_t dataSize);
+    static bool receiveBlockHandler(void* blk_id, size_t idSize, uint8_t* data, size_t dataSize);
+    void setXmodemReceiveHandler(bool (*handler)(void*, size_t, uint8_t*, size_t)) override;
+    void setXmodemSendHandler(void (*handler)(void*, size_t, uint8_t*, size_t)) override;
+    void setXmodemBlockSize(int32_t size) override;
+    void setXmodemIdSize(int8_t size) override;
+    void setXmodemCrc(bool enabled) override;
+    int32_t getXmodemBlockSize() const override;
+    int8_t getXmodemIdSize() const override;
+    PinActivity measureUartActivity(uint8_t pin, uint32_t windowMs = 100, bool pullup = true) override;
     std::vector<PinActivity> scanUartActivity(const std::vector<uint8_t>& pins,
                                               uint32_t windowMs = 100,
                                               uint32_t minEdges = 10,
-                                              bool pullup = true);
-    uint32_t detectBaudByEdge(uint8_t pin, uint32_t totalMs = 5000, uint32_t windowMs = 300, uint32_t minEdges = 30, bool pullup = true);
-    std::vector<uint32_t> getBaudList() const { 
-        return std::vector<uint32_t>(kBaudRates, kBaudRates + kBaudRatesCount); 
+                                              bool pullup = true) override;
+    uint32_t detectBaudByEdge(uint8_t pin, uint32_t totalMs = 5000, uint32_t windowMs = 300, uint32_t minEdges = 30, bool pullup = true) override;
+    std::vector<uint32_t> getBaudList() const override {
+        return std::vector<uint32_t>(kBaudRates, kBaudRates + kBaudRatesCount);
     }
 private:
     XModem xmodem;

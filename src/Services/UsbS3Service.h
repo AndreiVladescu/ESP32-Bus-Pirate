@@ -14,10 +14,11 @@
 #include "usb/usb_types_ch9.h"
 #include "usb/usb_types_stack.h"
 #include "usb/usb_helpers.h"
+#include "Interfaces/IUsbS3Service.h"
 #include "esp_log.h"
 #include <sstream>
 
-class UsbS3Service {
+class UsbS3Service : public IUsbS3Service {
 public:
     UsbS3Service();
 

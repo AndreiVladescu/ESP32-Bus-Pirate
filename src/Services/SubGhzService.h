@@ -9,6 +9,7 @@
 #include "freertos/task.h"
 #include "ELECHOUSE_CC1101_SRC_DRV.h"
 #include "Data/SugGhzFreqs.h"
+#include "Interfaces/ISubGhzService.h"
 #include "Models/SubghzFileCommand.h"
 #include "driver/rmt_rx.h"
 #include "driver/rmt_tx.h"
@@ -24,7 +25,7 @@
 #define TEMBED_CC1101_SW0 48
 #define TEMBED_CC1101_SW1 47
 
-class SubGhzService {
+class SubGhzService : public ISubGhzService {
 public:
     // Configure CC1101
     bool configure(SPIClass& spi, uint8_t sck, uint8_t miso, uint8_t mosi, uint8_t ss, uint8_t gdo0,

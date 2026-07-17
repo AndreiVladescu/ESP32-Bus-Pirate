@@ -4,19 +4,20 @@
 #include <atomic>
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include "Interfaces/IWifiOpenScannerService.h"
 
-class WifiOpenScannerService {
+class WifiOpenScannerService : public IWifiOpenScannerService {
 public:
     WifiOpenScannerService() = default;
 
     // Start the open probe task
-    bool startOpenProbe(uint32_t scanIntervalMs = 200);
-    void stopOpenProbe();
-    bool isOpenProbeRunning() const { return openProbeRunning.load(); }
+    bool startOpenProbe(uint32_t scanIntervalMs = 200) override;
+    void stopOpenProbe() override;
+    bool isOpenProbeRunning() const override { return openProbeRunning.load(); }
 
     // Fetch logs from the probe task
-    std::vector<std::string> fetchProbeLog();
-    void clearProbeLog();
+    std::vector<std::string> fetchProbeLog() override;
+    void clearProbeLog() override;
 
 private:
     // Task management

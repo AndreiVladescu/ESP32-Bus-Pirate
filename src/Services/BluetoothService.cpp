@@ -172,8 +172,7 @@ void BluetoothService::sendEmptyReports() {
 }
 
 void BluetoothService::pairWithAddress(const std::string& addrStr) {
-    BLEAddress addr(String(addrStr.c_str()));
-    BLEDevice::whiteListAdd(addr);  // Optionnel ?
+    connectTo(addrStr);
 }
 
 void BluetoothService::sendMouseReport(int16_t x, int16_t y, uint8_t buttons) {

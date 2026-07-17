@@ -1,10 +1,15 @@
 #ifndef NVS_SERVICE_H
 #define NVS_SERVICE_H
 
+#if __has_include("Vendors/Preferences.h")
+#include "Vendors/Preferences.h"
+#else
 #include <Preferences.h>
+#endif
 #include <cstdint>
 #include <string>
 #include "States/GlobalState.h"
+#include "Interfaces/INvsService.h"
 
 enum class OneShotBootMode : uint8_t {
     None = 0,
@@ -18,18 +23,18 @@ enum class OneShotBootMode : uint8_t {
     Bpio2 = 9,
 };
 
-class NvsService {
+class NvsService : public INvsService {
 public:
-    ~NvsService();
+    ~NvsService() override;
 
     // Open/Close namespace
-    void open();
-    void close();
+    void open() override;
+    void close() override;
     bool hasKey(const std::string& key);
 
     // Read/write string
-    void saveString(const std::string& key, const std::string& value);
-    std::string getString(const std::string& key, const std::string& defaultValue = "");
+    void saveString(const std::string& key, const std::string& value) override;
+    std::string getString(const std::string& key, const std::string& defaultValue = "") override;
 
     // Read/write int
     void saveInt(const std::string& key, int value);

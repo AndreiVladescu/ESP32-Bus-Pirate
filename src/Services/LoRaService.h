@@ -5,63 +5,49 @@
 #include <cstddef>
 #include <cstdint>
 #include <vector>
-#include "Models/LoRaFrame.h"
+#include "Interfaces/ILoRaService.h"
 
-class LoRaService {
+class LoRaService : public ILoRaService {
 public:
-    enum ReceiveResult : int16_t {
-        RECEIVE_OK = 0,
-        RECEIVE_NOT_INITIALIZED = -1,
-        RECEIVE_TIMEOUT = 1,
-        RECEIVE_ERROR = 2
-    };
-
-    struct RssiStats {
-        int16_t minimum = 0;
-        int16_t maximum = 0;
-        float average = 0.0f;
-        uint32_t samples = 0;
-    };
-
     bool configure(SPIClass& spi, uint8_t sck, uint8_t miso, uint8_t mosi,
                    uint8_t cs, uint8_t rst, uint8_t busy, uint8_t dio1,
-                   const LoRaRadioProfile& profile);
+                   const LoRaRadioProfile& profile) override;
 
-    void deinitRfModule();
+    void deinitRfModule() override;
 
-    bool send(const uint8_t* data, size_t length);
-    bool startContinuousWave();
-    void stopContinuousWave();
+    bool send(const uint8_t* data, size_t length) override;
+    bool startContinuousWave() override;
+    void stopContinuousWave() override;
 
-    bool startReceive(bool boosted = true);
-    int16_t pollReceive(std::vector<uint8_t>& payload);
-    void stopReceive();
-    bool isReceiving() const { return receiving_; }
+    bool startReceive(bool boosted = true) override;
+    int16_t pollReceive(std::vector<uint8_t>& payload) override;
+    void stopReceive() override;
+    bool isReceiving() const override { return receiving_; }
     int16_t receive(std::vector<uint8_t>& payload, uint32_t timeoutMs,
-                    bool boosted = true, bool countTimeout = true);
+                    bool boosted = true, bool countTimeout = true) override;
 
-    bool setFrequency(float frequency);
-    bool setModemProfile(const LoRaRadioProfile& profile);
-    bool transmitFrame(const LoRaFrame& frame, bool& profileRestored);
-    LoRaRadioProfile getProfile() const;
-    bool measureRssi(float frequency, uint32_t durationMs, RssiStats& stats);
-    bool runCad(bool& detected, uint32_t timeoutMs = 250);
-    uint32_t getTimeOnAir(size_t payloadLength) const;
+    bool setFrequency(float frequency) override;
+    bool setModemProfile(const LoRaRadioProfile& profile) override;
+    bool transmitFrame(const LoRaFrame& frame, bool& profileRestored) override;
+    LoRaRadioProfile getProfile() const override;
+    bool measureRssi(float frequency, uint32_t durationMs, RssiStats& stats) override;
+    bool runCad(bool& detected, uint32_t timeoutMs = 250) override;
+    uint32_t getTimeOnAir(size_t payloadLength) const override;
 
-    bool isInitialized() const { return initialized_; }
-    float getCurrentFrequency() const { return currentFrequency_; }
-    float getRssi() const { return lastRssi_; }
-    float getSnr() const { return lastSnr_; }
-    size_t getLastPacketLength() const { return lastPacketLength_; }
-    int16_t getLastError() const { return lastError_; }
+    bool isInitialized() const override { return initialized_; }
+    float getCurrentFrequency() const override { return currentFrequency_; }
+    float getRssi() const override { return lastRssi_; }
+    float getSnr() const override { return lastSnr_; }
+    size_t getLastPacketLength() const override { return lastPacketLength_; }
+    int16_t getLastError() const override { return lastError_; }
 
-    uint32_t getTxPackets() const { return txPackets_; }
-    uint32_t getTxErrors() const { return txErrors_; }
-    uint32_t getRxPackets() const { return rxPackets_; }
-    uint32_t getRxTimeouts() const { return rxTimeouts_; }
-    uint32_t getRxErrors() const { return rxErrors_; }
-    uint32_t getRxDropped() const { return rxDropped_; }
-    void resetStats();
+    uint32_t getTxPackets() const override { return txPackets_; }
+    uint32_t getTxErrors() const override { return txErrors_; }
+    uint32_t getRxPackets() const override { return rxPackets_; }
+    uint32_t getRxTimeouts() const override { return rxTimeouts_; }
+    uint32_t getRxErrors() const override { return rxErrors_; }
+    uint32_t getRxDropped() const override { return rxDropped_; }
+    void resetStats() override;
 
 private:
     static constexpr uint8_t RX_QUEUE_SIZE = 8;

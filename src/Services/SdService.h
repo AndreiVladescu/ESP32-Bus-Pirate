@@ -6,8 +6,9 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include "Interfaces/ISdService.h"
 
-class SdService {
+class SdService : public ISdService {
 private:
     bool sdCardMounted = false;
     std::unordered_map<std::string, std::vector<std::string>> cachedDirectoryElements;

@@ -8,12 +8,7 @@
 #include "BLEHIDDevice.h"
 #include "HIDTypes.h"
 #include "Data/AsciiHid.h"
-
-enum class BluetoothMode {
-    NONE,
-    SERVER,
-    CLIENT
-};
+#include "Interfaces/IBluetoothService.h"
 
 struct ScannedDevice {
     std::string name;
@@ -23,7 +18,7 @@ struct ScannedDevice {
     std::string adSummary;
 };
 
-class BluetoothService {
+class BluetoothService : public IBluetoothService {
 private:
     BLEServer* server = nullptr;
     BLESecurity* security = nullptr;
@@ -45,44 +40,47 @@ public:
     };
 
     // begin / end server BT
-    void startServer(const std::string& deviceName = "Bit-Pirate-Bluetooth");
-    void stopServer();
-    void releaseBtClassic();
+    void startServer(const std::string& deviceName = "Bit-Pirate-Bluetooth") override;
+    void stopServer() override;
+    void releaseBtClassic() override;
 
     // Init client
-    void init(const std::string& deviceName = "Bit-Pirate-Bluetooth");
-    void deinit();
+    void init(const std::string& deviceName = "Bit-Pirate-Bluetooth") override;
+    void deinit() override;
 
     // Pair as client
-    void pairWithAddress(const std::string& addrStr);      // pair <addr>
+    void pairWithAddress(const std::string& addrStr) override;      // pair <addr>
 
     // Connexion
     void onConnect();
     void onDisconnect();
-    bool isConnected() const;
+    bool isConnected() const override;
 
     // HID – Kb
-    void sendKeyboardText(const std::string& text);
-    void sendKeyboardReport(uint8_t modifier, const std::array<uint8_t, 6>& keys);
+    void sendKeyboardText(const std::string& text) override;
+    void sendKeyboardReport(uint8_t modifier, const std::array<uint8_t, 6>& keys) override;
 
     // HID – Mouse
-    void mouseMove(int16_t x, int16_t y);
-    void clickMouse();  // Simule un clic 
-    void sendMouseReport(int16_t x, int16_t y, uint8_t buttons);
+    void mouseMove(int16_t x, int16_t y) override;
+    void clickMouse() override;  // Simule un clic
+    void sendMouseReport(int16_t x, int16_t y, uint8_t buttons) override;
 
     // Utils
-    void sendEmptyReports();
-    bool spoofMacAddress(const std::string& macStr);
-    std::string getMacAddress();
-    BluetoothMode getMode();
-    void switchToMode(BluetoothMode newMode);
+    void sendEmptyReports() override;
+    bool spoofMacAddress(const std::string& macStr) override;
+    std::string getMacAddress() override;
+    BluetoothMode getMode() override;
+    void switchToMode(BluetoothMode newMode) override;
     
     // Scan
-    std::vector<std::string> scanDevices(int seconds = 10);
-    std::vector<std::string> connectTo(const std::string& addr);
+    std::vector<std::string> scanDevices(int seconds = 10) override;
+    std::vector<std::string> connectTo(const std::string& addr) override;
     
     // Bluetooth sniffing
     class PassiveBLEAdvertisedDeviceCallbacks;
+    void startPassiveSniffing() override { startPassiveBluetoothSniffing(); }
+    void stopPassiveSniffing() override { stopPassiveBluetoothSniffing(); }
+    std::vector<std::string> getPassiveSniffLog() override { return getBluetoothSniffLog(); }
     static void startPassiveBluetoothSniffing();
     static void stopPassiveBluetoothSniffing();
     static std::vector<std::string> getBluetoothSniffLog();

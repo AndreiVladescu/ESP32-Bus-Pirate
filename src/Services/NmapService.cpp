@@ -447,7 +447,7 @@ void NmapService::scanTarget(const std::string &host, const std::vector<uint16_t
         this->report.append("Not shown: ").append(std::to_string(closed_ports)).append(" ports\r\n\n");
 }
 
-void NmapService::setICMPService(ICMPService* icmpService){
+void NmapService::setICMPService(IICMPService* icmpService){
     this->icmpService = icmpService;
 }
 

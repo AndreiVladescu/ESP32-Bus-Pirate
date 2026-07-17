@@ -38,10 +38,11 @@
 #include <Arduino.h>
 #include <cstdint>
 #include <vector>
+#include "Interfaces/IJtagService.h"
 
-class JtagService {
+class JtagService : public IJtagService {
 public:
-    void configureJtag(uint8_t tck, uint8_t tms, uint8_t tdi, uint8_t tdo, int trst = -1);
+    void configureJtag(uint8_t tck, uint8_t tms, uint8_t tdi, uint8_t tdo, int trst = -1) override;
     
     bool scanJtagDevice(
         const std::vector<uint8_t>& pins,
@@ -51,9 +52,9 @@ public:
         std::vector<uint32_t>& outDeviceIDs,
         bool pulsePins,
         void (*onProgress)(size_t, size_t)
-    );
+    ) override;
 
-    bool scanSwdDevice(const std::vector<uint8_t>& pins, uint8_t& foundIO, uint8_t& foundCLK, uint32_t& idcodeOut);
+    bool scanSwdDevice(const std::vector<uint8_t>& pins, uint8_t& foundIO, uint8_t& foundCLK, uint32_t& idcodeOut) override;
 
 private:
     // JTAG pins

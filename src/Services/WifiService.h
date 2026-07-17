@@ -4,23 +4,12 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include "Interfaces/IWifiService.h"
 
 extern "C" {
   #include "esp_wifi.h"
   #include "esp_wifi_types.h"
 }
-
-struct WiFiNetwork {
-    std::string ssid;
-    int32_t rssi = 0;
-    wifi_auth_mode_t encryption = WIFI_AUTH_OPEN;
-    bool open = false;
-    bool vulnerable = false;
-
-    std::string bssid;
-    int32_t channel = 0;
-    bool hidden = false;
-};
 
 struct SniffedPacket {
     int8_t rssi;
@@ -29,80 +18,77 @@ struct SniffedPacket {
     uint8_t type;
 };
 
-class WifiService {
+class WifiService : public IWifiService {
 public:
 
-    enum class MacInterface {
-        Station,
-        AccessPoint
-    };
+    using MacInterface = WifiMacInterface;
     
     WifiService();
 
     // Connection
-    bool connect(const std::string& ssid, const std::string& password, unsigned long timeoutMs = 15000);
-    void disconnect();
-    bool isConnected() const;
+    bool connect(const std::string& ssid, const std::string& password, unsigned long timeoutMs = 15000) override;
+    void disconnect() override;
+    bool isConnected() const override;
     bool connected = false;
     bool repeater = false;
 
     // Utils
-    std::string getLocalIP() const;
-    std::string getCurrentIP() const;
-    std::string getSubnetMask() const;
-    std::string getGatewayIp() const;
-    std::string getDns1() const;
-    std::string getDns2() const;
-    std::string getHostname() const;
-    void setModeApSta();
-    void setModeApOnly();
-    std::string getMacAddressSta() const;
-    std::string getMacAddressAp() const;
-    std::string getApIp() const;
-    std::string getLocalIp() const;
-    int getRssi() const;
-    int getChannel() const;
-    std::string getSsid() const;
-    std::string getBssid() const;
-    int getWifiModeRaw() const;   // wifi_mode_t
-    int getWifiStatusRaw() const; // wl_status_t
-    bool isProvisioningEnabled() const;
-    void reset();
-    void recoverStaForRetry(bool keepApMode);
-    bool prepareRawTx(uint8_t channel = 1);
+    std::string getLocalIP() const override;
+    std::string getCurrentIP() const override;
+    std::string getSubnetMask() const override;
+    std::string getGatewayIp() const override;
+    std::string getDns1() const override;
+    std::string getDns2() const override;
+    std::string getHostname() const override;
+    void setModeApSta() override;
+    void setModeApOnly() override;
+    std::string getMacAddressSta() const override;
+    std::string getMacAddressAp() const override;
+    std::string getApIp() const override;
+    std::string getLocalIp() const override;
+    int getRssi() const override;
+    int getChannel() const override;
+    std::string getSsid() const override;
+    std::string getBssid() const override;
+    int getWifiModeRaw() const override;   // wifi_mode_t
+    int getWifiStatusRaw() const override; // wl_status_t
+    bool isProvisioningEnabled() const override;
+    void reset() override;
+    void recoverStaForRetry(bool keepApMode) override;
+    bool prepareRawTx(uint8_t channel = 1) override;
     
     // Access point
-    bool startAccessPoint(const std::string& ssid, const std::string& password = "", int channel = 1, int maxConn = 4);
-    bool stopAccessPoint();
+    bool startAccessPoint(const std::string& ssid, const std::string& password = "", int channel = 1, int maxConn = 4) override;
+    bool stopAccessPoint() override;
 
     // Spoof MAC
-    bool spoofMacAddress(const std::string& macStr, MacInterface which);
+    bool spoofMacAddress(const std::string& macStr, MacInterface which) override;
     static std::string formatMac(const uint8_t* mac);
 
     // Scan
-    std::vector<std::string> scanNetworks();
-    std::vector<WiFiNetwork> scanDetailedNetworks();
+    std::vector<std::string> scanNetworks() override;
+    std::vector<WiFiNetwork> scanDetailedNetworks() override;
     std::vector<WiFiNetwork> getOpenNetworks(const std::vector<WiFiNetwork>& networks);
     std::vector<WiFiNetwork> getVulnerableNetworks(const std::vector<WiFiNetwork>& networks);
-    bool isVulnerable(wifi_auth_mode_t encryption) const;
-    std::string encryptionTypeToString(wifi_auth_mode_t encryption);
-    int8_t scanRssiOnChannel(uint8_t channel);
-    uint32_t countPacketsOnChannel(uint8_t channel, uint16_t dwellMs);
+    bool isVulnerable(int encryption) const;
+    std::string encryptionTypeToString(int encryption) override;
+    int8_t scanRssiOnChannel(uint8_t channel) override;
+    uint32_t countPacketsOnChannel(uint8_t channel, uint16_t dwellMs) override;
     static void pktCountCb(void* buf, wifi_promiscuous_pkt_type_t);
     inline static volatile uint32_t g_pktCount = 0; // rx callback
 
     // Sniffing passif
-    void startPassiveSniffing();
-    void stopPassiveSniffing();
-    std::vector<std::string> getSniffLog();
-    bool switchChannel(uint8_t channel);
+    void startPassiveSniffing() override;
+    void stopPassiveSniffing() override;
+    std::vector<std::string> getSniffLog() override;
+    bool switchChannel(uint8_t channel) override;
     static std::string getFrameTypeSubtype(const uint8_t* payload, uint8_t& type, uint8_t& subtype);
     static std::string parseSsidFromPacket(const uint8_t* payload, int len, uint8_t type, uint8_t subtype);
     static std::string getFrameTypeName(uint8_t type, uint8_t subtype);
     static void extractTypeSubtype(const uint8_t* payload, uint8_t& type, uint8_t& subtype);
 
     // Deathentication attacks
-    bool deauthApBySsid (const std::string& ssid);
+    bool deauthApBySsid (const std::string& ssid) override;
     void deauthAttack(const uint8_t bssid[6], uint8_t channel, uint8_t bursts, uint32_t sniffMs);
 
     // Client sniffer
@@ -121,11 +107,11 @@ public:
                     const std::string& apPass,
                     int apChannel = 1,
                     int maxConn = 10,
-                    unsigned long timeoutMs = 15000);
+                    unsigned long timeoutMs = 15000) override;
 
-    void stopRepeater();
-    bool isRepeaterRunning() const;
-    std::string getRepeaterIp() const;
+    void stopRepeater() override;
+    bool isRepeaterRunning() const override;
+    std::string getRepeaterIp() const override;
 
     // Wifi mode to string
     static inline const char* wifiModeToStr(int m) {

@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <string>
+#include "Interfaces/ITelnetService.h"
 
 extern "C" {
   #include <lwip/sockets.h>
@@ -8,31 +9,31 @@ extern "C" {
   #include <lwip/netdb.h>
 }
 
-class TelnetService {
+class TelnetService : public ITelnetService {
 public:
   // Connect to a Telnet server (synchronous)
-  bool connectTo(const std::string& host, uint16_t port, uint32_t recvTimeoutMs = 3000);
+  bool connectTo(const std::string& host, uint16_t port, uint32_t recvTimeoutMs = 3000) override;
 
-  void close();
-  bool isConnected() const { return _sock >= 0; }
+  void close() override;
+  bool isConnected() const override { return _sock >= 0; }
 
   // Send a character
-  bool writeChar(char c);
+  bool writeChar(char c) override;
 
   // Send raw data
-  int  writeRaw(const char* data, size_t len);
+  int  writeRaw(const char* data, size_t len) override;
 
   // Send a line
-  bool writeLine(const std::string& line);
+  bool writeLine(const std::string& line) override;
 
   // Read the socket
-  void poll();
+  void poll() override;
 
   // Retrieve and clear the text buffer accumulated by poll()
-  std::string readOutputNonBlocking();
+  std::string readOutputNonBlocking() override;
 
   // Get the last error message if connection failed
-  const std::string& lastError() const { return _lastError; }
+  const std::string& lastError() const override { return _lastError; }
 
 private:
   // Telnet constants

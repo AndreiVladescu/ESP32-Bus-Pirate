@@ -6,6 +6,7 @@
 
 #include "Models/InfraredCommand.h"
 #include "Enums/InfraredProtocolEnum.h"
+#include "Interfaces/IInfraredService.h"
 #include "Models/InfraredFileRemoteCommand.h"
 
 /*
@@ -20,7 +21,7 @@ There are two backends for infrared:
 #include <IRsend.h>
 #include <IRrecv.h>
 
-class InfraredService {
+class InfraredService : public IInfraredService {
 public:
     InfraredService() = default;
 
@@ -60,7 +61,7 @@ private:
 
 #else
 
-class InfraredService {
+class InfraredService : public IInfraredService {
 public:
     enum class JamMode : uint8_t { CARRIER, SWEEP, RANDOM };
     void configure(uint8_t tx, uint8_t rx);
@@ -76,7 +77,7 @@ public:
         uint32_t& sweepIndex,
         uint8_t density);
     std::vector<std::string> getCarrierStrings();
-    static std::vector<std::string> getJamModeStrings();
+    std::vector<std::string> getJamModeStrings();
 private:        
     inline static constexpr uint16_t carrierKhz[] = {
         30, 33, 36, 38, 40, 42, 56

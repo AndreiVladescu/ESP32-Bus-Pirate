@@ -37,11 +37,22 @@ bool RfidService::begin() {
 
 // Operations
 
-int RfidService::read(int cardBaudRate)      { return _rfid->read(cardBaudRate); }
-int RfidService::write(int cardBaudRate)     { return _rfid->write(cardBaudRate); }
+RfidResult RfidService::read(int cardBaudRate) {
+    return static_cast<RfidResult>(_rfid->read(cardBaudRate));
+}
+
+RfidResult RfidService::write(int cardBaudRate) {
+    return static_cast<RfidResult>(_rfid->write(cardBaudRate));
+}
+
 int RfidService::write_ndef()                { return _rfid->write_ndef(); }
-int RfidService::erase()                     { return _rfid->erase(); }
-int RfidService::clone(bool checkSak)        { return _rfid->clone(checkSak); }
+RfidResult RfidService::erase() {
+    return static_cast<RfidResult>(_rfid->erase());
+}
+
+RfidResult RfidService::clone(bool checkSak) {
+    return static_cast<RfidResult>(_rfid->clone(checkSak));
+}
 
 // Getters
 
@@ -76,8 +87,8 @@ bool RfidService::pageReadOk() const {
 
 // Helpers
 
-std::string RfidService::statusMessage(int rc) const {
-    return std::string(_rfid->statusMessage(rc).c_str());
+std::string RfidService::statusMessage(RfidResult result) const {
+    return std::string(_rfid->statusMessage(static_cast<int>(result)).c_str());
 }
 
 void RfidService::loadDump(const std::string& dump) {
@@ -99,5 +110,4 @@ std::vector<std::string> RfidService::getTagTypes() const {
 std::vector<std::string> RfidService::getMifareFamily() const {
     return  { " MIFARE Classic (16 bytes)", " NTAG/Ultralight (4 bytes)" };
 }
-
 

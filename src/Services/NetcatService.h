@@ -1,14 +1,15 @@
 #pragma once
 
 #include <string>
+#include "Interfaces/INetcatService.h"
 
-class NetcatService {
+class NetcatService : public INetcatService {
 public:
-    void startTask(const std::string& host, int verbosity, uint16_t port, bool lineBuffer = false);    
-    bool isConnected() const;
-    void writeChar(char c);
-    std::string readOutputNonBlocking();
-    void close();
+    void startTask(const std::string& host, int verbosity, uint16_t port, bool lineBuffer = false) override;
+    bool isConnected() const override;
+    void writeChar(char c) override;
+    std::string readOutputNonBlocking() override;
+    void close() override;
 
 private:
     // Netcat Task, cause overflow if it runs in the main loop, so it must run in a dedicated FreeRTOS task with a larger stack

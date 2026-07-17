@@ -1,6 +1,10 @@
 #include "HdUartService.h"
 
 void HdUartService::configure(unsigned long baud, uint8_t dataBits, char parity, uint8_t stopBits, uint8_t ioPin, bool inverted) {
+    this->ioPin = ioPin;
+    baudRate = baud;
+    isInverted = inverted;
+
     // Build config from raw values
     uart_config_t uart_config = buildUartConfig(baud, dataBits, parity, stopBits);
 
@@ -55,6 +59,33 @@ char HdUartService::read() {
     uint8_t c;
     int len = uart_read_bytes(HD_UART_PORT, &c, 1, pdMS_TO_TICKS(10));
     return (len == 1) ? static_cast<char>(c) : '\0';
+}
+
+std::string HdUartService::readLine() {
+    std::string input;
+
+    while (true) {
+        const char c = read();
+        if (c == '\0') {
+            delay(1);
+            continue;
+        }
+
+        if (c == '\r' || c == '\n') break;
+
+        if (c == '\b' || c == 127) {
+            if (!input.empty()) input.pop_back();
+            continue;
+        }
+
+        input += c;
+    }
+
+    return input;
+}
+
+void HdUartService::flush() {
+    uart_wait_tx_done(HD_UART_PORT, pdMS_TO_TICKS(100));
 }
 
 std::string HdUartService::executeByteCode(const std::vector<ByteCode>& bytecodes) {

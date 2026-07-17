@@ -2,50 +2,37 @@
 #include <string>
 #include <vector>
 #include <freertos/FreeRTOS.h>
+#include "Interfaces/IICMPService.h"
 
-enum phy_interface_t {
-    phy_none,
-    phy_wifi,
-    phy_eth
-};
-
-enum ping_rc_t {
-    ping_ok,
-    ping_timeout,
-    ping_resolve_fail,
-    ping_session_fail,
-    ping_error
-};
-
-class ICMPService {
+class ICMPService : public IICMPService {
 public:
     ICMPService();
-    ~ICMPService();
+    ~ICMPService() override;
 
     // Normal ping
-    void startPingTask(const std::string& host, int count = 5, int timeout_ms = 1000, int interval_ms = 200);
+    void startPingTask(const std::string& host, int count = 5, int timeout_ms = 1000, int interval_ms = 200) override;
     // Discovery of devices
-    void startDiscoveryTask(const std::string deviceIP, int timeout_ms = 200);
+    void startDiscoveryTask(const std::string deviceIP, int timeout_ms = 200) override;
     static void discoveryTask(void* params);
 
     // Results
-    bool isPingReady() const { return pingReady; }
-    ping_rc_t lastRc() const { return pingRC; }
-    int lastMedianMs() const { return pingMedianMs; }
-    int lastSent() const { return pingTX; }
-    int lastRecv() const { return pingRX; }
-    const std::string& getReport() const { return report; }
-    std::string getPingHelp() const;
-    bool isDiscoveryReady() const { return discoveryReady; }
+    bool isPingReady() const override { return pingReady; }
+    ping_rc_t lastRc() const override { return pingRC; }
+    int lastMedianMs() const override { return pingMedianMs; }
+    int lastSent() const override { return pingTX; }
+    int lastRecv() const override { return pingRX; }
+    const std::string& getReport() const override { return report; }
+    std::string getPingHelp() const override;
+    bool isDiscoveryReady() const override { return discoveryReady; }
 
     // Task entry
     static void pingAPI(void *pvParams);
 
     // Responsive ICMP logging
-    std::vector<std::string> fetchICMPLog();
-    static void clearICMPLogging();
-    static void stopICMPService();
-    void clearDiscoveryFlag() { discoveryReady = false; }
+    std::vector<std::string> fetchICMPLog() override;
+    void clearICMPLogging() override;
+    void stopICMPService() override;
+    void clearDiscoveryFlag() override { discoveryReady = false; }
 
 private:
     bool pingReady = false;

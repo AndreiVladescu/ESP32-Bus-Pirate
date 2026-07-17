@@ -3,8 +3,9 @@
 #include <string>
 #include <SPI.h>
 #include <ETH.h>
+#include "Interfaces/IEthernetService.h"
 
-class EthernetService {
+class EthernetService : public IEthernetService {
 public:
   EthernetService();
 
@@ -17,20 +18,20 @@ public:
                  uint32_t spiHz,
                  const std::array<uint8_t,6>& chosenMac,
                  SPIClass* spi = &SPI,
-                 uint8_t phyAddr = 1);
+                 uint8_t phyAddr = 1) override;
 
-  bool beginDHCP(unsigned long timeoutMs);
+  bool beginDHCP(unsigned long timeoutMs) override;
 
-  bool isConnected() const;
-  bool linkUp() const;
+  bool isConnected() const override;
+  bool linkUp() const override;
 
-  std::string getMac() const;
-  std::string getLocalIP() const;
-  std::string getSubnetMask() const;
-  std::string getGatewayIp() const;
-  std::string getDns() const;
+  std::string getMac() const override;
+  std::string getLocalIP() const override;
+  std::string getSubnetMask() const override;
+  std::string getGatewayIp() const override;
+  std::string getDns() const override;
 
-  void hardReset();
+  void hardReset() override;
   
 private:
   static void onNetEvent(arduino_event_id_t event, arduino_event_info_t info);

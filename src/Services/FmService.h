@@ -2,8 +2,9 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <Adafruit_Si4713.h>
+#include "Interfaces/IFmService.h"
 
-class FmService {
+class FmService : public IFmService {
 public:
     FmService() = default;
     ~FmService();

@@ -11,7 +11,7 @@ void UartService::configure(unsigned long baud,
                             HardwareSerial* serial,
                             bool noAllocation) {
 
-    _serial = serial;
+    _serial = serial != nullptr ? serial : &Serial1;
 
     _serial->end();
 
@@ -249,11 +249,11 @@ void UartService::setXmodemCrc(bool enabled) {
     xmodemProtocol = enabled ? XModem::ProtocolType::CRC_XMODEM : XModem::ProtocolType::XMODEM;
 }
 
-void UartService::setXmodemReceiveHandler(bool (*handler)(void*, size_t, byte*, size_t)) {
+void UartService::setXmodemReceiveHandler(bool (*handler)(void*, size_t, uint8_t*, size_t)) {
     xmodem.setRecieveBlockHandler(handler);
 }
 
-void UartService::setXmodemSendHandler(void (*handler)(void*, size_t, byte*, size_t)) {
+void UartService::setXmodemSendHandler(void (*handler)(void*, size_t, uint8_t*, size_t)) {
     xmodem.setBlockLookupHandler(handler);
 }
 
@@ -263,7 +263,7 @@ void UartService::initXmodem() {
     xmodem.setIdSize(xmodemIdSize);
 }
 
-void UartService::blockLookupHandler(void* blk_id, size_t idSize, byte* data, size_t dataSize) {
+void UartService::blockLookupHandler(void* blk_id, size_t idSize, uint8_t* data, size_t dataSize) {
     if (!currentFile) {
         return;
     }
@@ -288,7 +288,7 @@ void UartService::blockLookupHandler(void* blk_id, size_t idSize, byte* data, si
     Serial.printf("Sending bloc: %u\n\r", (unsigned int)blockId);
 }
 
-bool UartService::receiveBlockHandler(void* blk_id, size_t idSize, byte* data, size_t dataSize) {
+bool UartService::receiveBlockHandler(void* blk_id, size_t idSize, uint8_t* data, size_t dataSize) {
     if (!currentFile) {
         return false;
     }

@@ -29,7 +29,9 @@ void CanService::end() {
 }
 
 bool CanService::sendFrame(uint32_t id, const std::vector<uint8_t>& data) {
-    struct can_frame frame;
+    if (id > 0x7FF || data.size() > 8) return false;
+
+    struct can_frame frame{};
     frame.can_id = id;
     frame.can_dlc = data.size();
     memcpy(frame.data, data.data(), data.size());

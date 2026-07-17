@@ -6,10 +6,11 @@
 #include <functional>
 #include <cstddef>
 #include <LittleFS.h>
+#include "Interfaces/ILittleFsService.h"
 
 struct httpd_req;
 
-class LittleFsService {
+class LittleFsService : public ILittleFsService {
 public:
     struct Entry {
         std::string name; 

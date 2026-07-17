@@ -203,7 +203,7 @@ std::vector<WiFiNetwork> WifiService::getOpenNetworks(const std::vector<WiFiNetw
     return open;
 }
 
-bool WifiService::isVulnerable(wifi_auth_mode_t encryption) const {
+bool WifiService::isVulnerable(int encryption) const {
     return encryption == WIFI_AUTH_WEP || encryption == WIFI_AUTH_WPA_PSK;
 }
 
@@ -220,8 +220,8 @@ std::vector<WiFiNetwork> WifiService::getVulnerableNetworks(const std::vector<Wi
 }
 
 
-std::string WifiService::encryptionTypeToString(wifi_auth_mode_t enc) {
-    switch (enc) {
+std::string WifiService::encryptionTypeToString(int enc) {
+    switch (static_cast<wifi_auth_mode_t>(enc)) {
         case WIFI_AUTH_OPEN: return "OPEN";
         case WIFI_AUTH_WEP: return "WEP";
         case WIFI_AUTH_WPA_PSK: return "WPA";

@@ -3,20 +3,21 @@
 #include <stddef.h>
 #include <functional>
 #include <ESP_I2S.h>
+#include "Interfaces/II2sService.h"
 
-class I2sService {
+class I2sService : public II2sService {
 public:
-    void configureOutput(uint8_t bclk, uint8_t lrck, uint8_t dout, uint32_t sampleRate, uint8_t bits, uint8_t percentlevel);
-    void configureInput(uint8_t bclk, uint8_t lrck, uint8_t din,  uint32_t sampleRate, uint8_t bits);
+    void configureOutput(uint8_t bclk, uint8_t lrck, uint8_t dout, uint32_t sampleRate, uint8_t bits, uint8_t percentlevel) override;
+    void configureInput(uint8_t bclk, uint8_t lrck, uint8_t din,  uint32_t sampleRate, uint8_t bits) override;
 
-    void playTone(uint32_t sampleRate, uint16_t freq, uint32_t durationMs);
-    void playToneInterruptible(uint32_t sampleRate, uint16_t freq, uint32_t durationMs, std::function<bool()> shouldStop);
+    void playTone(uint32_t sampleRate, uint16_t freq, uint32_t durationMs) override;
+    void playToneInterruptible(uint32_t sampleRate, uint16_t freq, uint32_t durationMs, std::function<bool()> shouldStop) override;
 
-    void playPcm(const int16_t* data, size_t numBytes);
-    size_t recordSamples(int16_t* outBuffer, size_t sampleCount);
+    void playPcm(const int16_t* data, size_t numBytes) override;
+    size_t recordSamples(int16_t* outBuffer, size_t sampleCount) override;
 
-    void end();
-    bool isInitialized() const;
+    void end() override;
+    bool isInitialized() const override;
 
 private:
     I2SClass i2s;

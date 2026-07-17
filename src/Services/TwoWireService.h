@@ -3,8 +3,9 @@
 #include <Arduino.h>
 #include <vector>
 #include <string>
+#include "Interfaces/ITwoWireService.h"
 
-class TwoWireService {
+class TwoWireService : public ITwoWireService {
 public:
     typedef struct {
         uint8_t protocol_type            : 4;
@@ -14,61 +15,61 @@ public:
         uint8_t data_units               : 4;
     } sle44xx_atr_t;
 
-    void configure(uint8_t clkPin, uint8_t ioPin, uint8_t rstPin);
-    void end();
+    void configure(uint8_t clkPin, uint8_t ioPin, uint8_t rstPin) override;
+    void end() override;
     
-    void setRST(bool level);
-    void setCLK(bool level);
-    void setIO(bool level);
-    bool readIO();
+    void setRST(bool level) override;
+    void setCLK(bool level) override;
+    void setIO(bool level) override;
+    bool readIO() override;
     
-    void pulseClock();
-    void sendClocks(uint16_t ticks);
-    bool waitIOHigh(uint32_t maxTicks);
+    void pulseClock() override;
+    void sendClocks(uint16_t ticks) override;
+    bool waitIOHigh(uint32_t maxTicks) override;
     
-    void writeBit(bool bit);
-    bool readBit();
-    void writeByte(uint8_t byte);
-    uint8_t readByte();
+    void writeBit(bool bit) override;
+    bool readBit() override;
+    void writeByte(uint8_t byte) override;
+    uint8_t readByte() override;
     
-    void sendStart();
-    void sendStop();
-    void sendCommand(uint8_t a, uint8_t b, uint8_t c);
-    std::vector<uint8_t> readResponse(uint16_t len);
+    void sendStart() override;
+    void sendStop() override;
+    void sendCommand(uint8_t a, uint8_t b, uint8_t c) override;
+    std::vector<uint8_t> readResponse(uint16_t len) override;
     
     // Smartcard
-    std::vector<uint8_t> performSmartCardAtr();
-    std::string parseSmartCardAtr(const std::vector<uint8_t>& atr);
-    uint8_t parseSmartCardRemainingAttempts(uint8_t statusByte);
-    std::string parseSmartCardStructureIdentifier(uint8_t id);
-    std::vector<uint8_t> dumpSmartCardFullMemory();
-    void resetSmartCard();
-    void updateSmartCardSecurityAttempts(uint8_t pattern);
-    void compareSmartCardVerificationData(uint8_t address, uint8_t value);
-    void writeSmartCardSecurityMemory(uint8_t address, uint8_t value);
-    void writeSmartCardProtectionMemory(uint8_t address, uint8_t value);
-    bool writeSmartCardMainMemory(uint8_t address, uint8_t value);
-    std::vector<uint8_t> readSmartCardSecurityMemory();
-    std::vector<uint8_t> readSmartCardMainMemory(uint8_t startAddress, uint16_t length);
-    std::vector<uint8_t> readSmartCardProtectionMemory();
-    bool protectSmartCard();
-    bool unlockSmartCard(const uint8_t psc[3]);
-    bool updateSmartCardPSC(const uint8_t psc[3]);
-    bool getSmartCardPSC(uint8_t out_psc[3]);
+    std::vector<uint8_t> performSmartCardAtr() override;
+    std::string parseSmartCardAtr(const std::vector<uint8_t>& atr) override;
+    uint8_t parseSmartCardRemainingAttempts(uint8_t statusByte) override;
+    std::string parseSmartCardStructureIdentifier(uint8_t id) override;
+    std::vector<uint8_t> dumpSmartCardFullMemory() override;
+    void resetSmartCard() override;
+    void updateSmartCardSecurityAttempts(uint8_t pattern) override;
+    void compareSmartCardVerificationData(uint8_t address, uint8_t value) override;
+    void writeSmartCardSecurityMemory(uint8_t address, uint8_t value) override;
+    void writeSmartCardProtectionMemory(uint8_t address, uint8_t value) override;
+    bool writeSmartCardMainMemory(uint8_t address, uint8_t value) override;
+    std::vector<uint8_t> readSmartCardSecurityMemory() override;
+    std::vector<uint8_t> readSmartCardMainMemory(uint8_t startAddress, uint16_t length) override;
+    std::vector<uint8_t> readSmartCardProtectionMemory() override;
+    bool protectSmartCard() override;
+    bool unlockSmartCard(const uint8_t psc[3]) override;
+    bool updateSmartCardPSC(const uint8_t psc[3]) override;
+    bool getSmartCardPSC(uint8_t out_psc[3]) override;
 
     // Start sniffing
-    bool startSniffer();
+    bool startSniffer() override;
 
     // Stop sniffing and restore pins to idle state.
-    void stopSniffer();
+    void stopSniffer() override;
 
     // Release sniffer buffers allocated on demand.
-    void releaseSniffer();
+    void releaseSniffer() override;
 
-    bool getNextSniffEvent(uint8_t& type, uint8_t& data);
+    bool getNextSniffEvent(uint8_t& type, uint8_t& data) override;
 
     // Print all available events
-    void printSniffOnce(Stream& out);
+    void printSniffOnce(Stream& out) override;
 
 
 private:
