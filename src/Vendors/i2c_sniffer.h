@@ -25,7 +25,7 @@
  * restart the CPU.
  *                   https://github.com/WhitehawkTailor/I2C-sniffer/
  */
-#include <Arduino.h>
+#include <cstdint>
 
 #pragma once
 
