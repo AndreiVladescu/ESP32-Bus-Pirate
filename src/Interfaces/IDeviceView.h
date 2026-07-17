@@ -6,7 +6,8 @@
 #include "Enums/ModeEnum.h"
 #include "Enums/TerminalTypeEnum.h"
 #include "Models/PinoutConfig.h"
-#include <SPI.h>
+
+class SPIClass;
 
 class IDeviceView {
 public:

@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <Enums/TerminalTypeEnum.h>
+#include <cstdint>
 
 class ITerminalView {
 public:

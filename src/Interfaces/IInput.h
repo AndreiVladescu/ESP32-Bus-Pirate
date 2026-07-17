@@ -2,6 +2,7 @@
 
 #include <string>
 #include "Data/InputKeys.h"
+#include <cstdint>
 
 // Interface for terminal input
 // This is the interface expected by the ActionDispatcher to handle user input.
