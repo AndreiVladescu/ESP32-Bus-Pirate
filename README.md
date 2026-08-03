@@ -61,15 +61,15 @@ From there you can [install the firmware](https://geo-tp.github.io/ESP32-Bit-Pir
 | Device               |                                     | Description                       |
 |-----------------------|------------------------------------------|---------------------------------------------------|
 | **ESP32 S3 Dev Kit**  | ![Photo of the ESP32 S3 Dev Kit](/images/s3-devkit_s.jpg)     | More than 20 available GPIO, 1 button |
+| [**M5 AtomS3 Lite**](https://shop.m5stack.com/products/atoms3-lite-esp32s3-dev-kit?ref=pvosfmid)    | [![Photo of the M5 Atom S3 Lite](/images/atom_s.jpg)](https://shop.m5stack.com/products/atoms3-lite-esp32s3-dev-kit?ref=pvosfmid)            | 8 GPIO (Grove, Header), IR TX, 1 buttton                  |
+| **M5 Cardputer**      | ![Photo of the M5 Cardputer](/images/cardputer_s.png)            | 2 GPIO (Grove), screen, keyboard, mic, speaker, IR TX, SD card, battery, [standalone mode](#standalone-mode-for-the-cardputer)            |
+| [**M5 Cardputer ADV**](https://shop.m5stack.com/products/m5stack-cardputer-adv-version-esp32-s3?ref=pvosfmid)  | [![Photo of the M5 Cardputer ADV](/images/cardputer-adv_s.jpg)](https://shop.m5stack.com/products/m5stack-cardputer-adv-version-esp32-s3?ref=pvosfmid)    | 12 GPIO (Grove, Header), screen, keyboard, mic, speaker, IR TX, SD card, IMU, battery, [standalone mode](#standalone-mode-for-the-cardputer)                  |
+| [**M5 StampS3**](https://shop.m5stack.com/products/m5stamps3a-with-2-54-header-pin?ref=pvosfmid)        | [![Photo of the M5 StampS3](/images/stamps3_s.jpg)](https://shop.m5stack.com/products/m5stamps3a-with-2-54-header-pin?ref=pvosfmid)             | 9 GPIO (exposed pins), 1 button                       |
+| [**M5 Stick S3**](https://shop.m5stack.com/products/m5sticks3-esp32s3-mini-iot-dev-kit?ref=pvosfmid) | [![Photo of the M5 Stick S3](/images/m5sticks3_s.jpg)](https://shop.m5stack.com/products/m5sticks3-esp32s3-mini-iot-dev-kit?ref=pvosfmid)      | 13 GPIO (Grove, Header), screen, mic, speaker, IR TX, IR RX, IMU, 3 buttons, battery                 |
 | **LILYGO T-Display** | ![Photo of the T-Display-S3](/images/t_displays3_s.jpg) | 13 GPIO (1 Qwicc), screen, 2 buttons |
 | **LILYGO T-Embed**    | ![Photo of the LILYGO T-Embed](/images/tembed_s.jpg)          | 9 GPIO (Grove, Header), screen, encoder, speaker, mic, SD card                                         |
 | **LILYGO T-Embed CC1101** | ![Photo of the LILYGO T-Embed CC1101](/images/tembedcc1101_s.jpg) | 4 GPIO (2x Qwiic), screen, encoder, speaker, mic, SD Card, CC1101, PN532, IR TX, IR RX , battery                                 |
 | **LILYGO T-Embed CC1101 Plus** | ![Photo of the LILYGO T-Embed CC1101 Plus](/images/tembedcc1101_s.jpg) | 4 GPIO (2x Qwiic), screen, encoder, speaker, mic, SD Card, CC1101, NRF24, PN532, IR TX, IR RX , battery                                 |
-| **M5 AtomS3 Lite**    | ![Photo of the M5 Atom S3 Lite](/images/atom_s.jpg)            | 8 GPIO (Grove, Header), IR TX, 1 buttton                  |
-| **M5 Cardputer**      | ![Photo of the M5 Cardputer](/images/cardputer_s.png)            | 2 GPIO (Grove), screen, keyboard, mic, speaker, IR TX, SD card, battery, [standalone mode](#standalone-mode-for-the-cardputer)            |
-| **M5 Cardputer ADV**  | ![Photo of the M5 Cardputer ADV](/images/cardputer-adv_s.jpg)    | 12 GPIO (Grove, Header), screen, keyboard, mic, speaker, IR TX, SD card, IMU, battery, [standalone mode](#standalone-mode-for-the-cardputer)                  |
-| **M5 StampS3**        | ![Photo of the M5 StampS3](/images/stamps3_s.jpg)             | 9 GPIO (exposed pins), 1 button                       |
-| **M5 Stick S3** | ![Photo of the M5 Stick S3](/images/m5sticks3_s.jpg)      | 13 GPIO (Grove, Header), screen, mic, speaker, IR TX, IR RX, IMU, 3 buttons, battery                 |
 | **Seeed Studio Xiao S3** | ![Photo of the Seeed Studio Xiao ESP32-S3](/images/xiaos3_s.jpg)        | 9 GPIO (exposed pins), 1 button |
 
 - **Other ESP32-S3-based Boards**
