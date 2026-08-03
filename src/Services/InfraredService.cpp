@@ -34,8 +34,6 @@ void InfraredService::configure(uint8_t tx, uint8_t rx) {
     _sender = new IRsend(_txPin);
     _sender->begin();
 
-    static constexpr uint16_t kRawBufferSize = 512; //Increase raw buffer size from its default value of 100
-
     _receiver = new IRrecv(_rxPin, kRawBufferSize);
 
     _configured = true;

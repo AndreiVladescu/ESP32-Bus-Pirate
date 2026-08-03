@@ -47,6 +47,7 @@ public:
 private:
     enum class JamMode : uint8_t { CARRIER = 0, SWEEP = 1, RANDOM = 2 };
     inline static const uint16_t carrierKhz[] = {36, 38, 40, 56, 57, 58};
+    inline static constexpr uint16_t kRawBufferSize = 512; //Increase raw buffer size from its default value of 100
 
     // Helpers
     uint16_t getKaseikyoVendorIdCode(const std::string& input);
