@@ -127,17 +127,37 @@ jobs:
             pio run -e "${ENVIRONMENT}"
 
             BUILD_DIR=".pio/build/${ENVIRONMENT}"
-            FACTORY_IMAGE="${BUILD_DIR}/firmware.factory.bin"
+
+            BOOTLOADER_IMAGE="${BUILD_DIR}/bootloader.bin"
+            PARTITIONS_IMAGE="${BUILD_DIR}/partitions.bin"
+            FIRMWARE_IMAGE="${BUILD_DIR}/firmware.bin"
+
             FIRMWARE_NAME="esp32-bit-pirate-${ENVIRONMENT}-upstream.bin"
             DESTINATION="${DOWNLOAD_DIR}/${FIRMWARE_NAME}"
 
-            if [[ ! -f "${FACTORY_IMAGE}" ]]; then
-              echo "Merged firmware was not generated for ${ENVIRONMENT}."
-              echo "Expected file: ${FACTORY_IMAGE}"
-              exit 1
-            fi
+            # Make sure all required firmware components were generated.
+            for FILE in \
+              "${BOOTLOADER_IMAGE}" \
+              "${PARTITIONS_IMAGE}" \
+              "${FIRMWARE_IMAGE}"
+            do
+              if [[ ! -f "${FILE}" ]]; then
+                echo "Required firmware component not found: ${FILE}"
+                exit 1
+              fi
+            done
 
-            cp "${FACTORY_IMAGE}" "${DESTINATION}"
+            # Build a complete flashable image:
+            #   0x0000  bootloader
+            #   0x8000  partition table
+            #   0x10000 application firmware
+            python -m esptool \
+              --chip esp32s3 \
+              merge_bin \
+              -o "${DESTINATION}" \
+              0x0 "${BOOTLOADER_IMAGE}" \
+              0x8000 "${PARTITIONS_IMAGE}" \
+              0x10000 "${FIRMWARE_IMAGE}"
 
             if [[ ! -s "${DESTINATION}" ]]; then
               echo "Generated firmware is empty for ${ENVIRONMENT}."
