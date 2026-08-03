@@ -140,11 +140,11 @@ The Expander adds support for the **WiFi 5 GhZ** or other radio protocols.
 🔧 **[A docking station for the ESP32 S3 DevKit](https://github.com/AndreiVladescu/ESP32-Bit-Pirate-Dock) designed to work with original Bus Pirate adapters.**
 It allows you to plug and use the original [Bus Pirate](https://buspirate.com/) ecosystem of adapters and accessories.
 
-![The ESP32 Bit Pirate dock board](images/bus_pirate_dock_board.png)
+[![The ESP32 Bit Pirate dock board](images/bus_pirate_dock_board.png)](https://www.pcbway.com/project/shareproject/ESP32_Bit_Pirate_Dock_ca02ded7.html)
 
-(Coming soon)
+[**Get the ESP32 Bit Pirate Dock on PCBWay.**](https://www.pcbway.com/project/shareproject/ESP32_Bit_Pirate_Dock_ca02ded7.html)
 
-[![PCBWay Logo](images/pcbway_logo.png)](https://www.pcbway.com)
+[![PCBWay Logo](images/pcbway_logo.png)](https://www.pcbway.com/project/shareproject/ESP32_Bit_Pirate_Dock_ca02ded7.html)
 
 
 
