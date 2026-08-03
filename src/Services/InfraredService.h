@@ -24,6 +24,7 @@ There are two backends for infrared:
 class InfraredService : public IInfraredService {
 public:
     InfraredService() = default;
+    ~InfraredService();
 
     void configure(uint8_t tx, uint8_t rx);
 
